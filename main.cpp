@@ -6,7 +6,16 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/01/27 16:26:02 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/01/28 17:14:49 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "Lexer.hpp"
+
+int main(int argc, char **argv)
+{
+    if (argc > 2)
+        return 1;
+    (void)argv;
+    return 0;
+}
