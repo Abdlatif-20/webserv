@@ -1,29 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Lexer.hpp                                          :+:      :+:    :+:   */
+/*   Token.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/29 11:15:12 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/01/29 14:50:12 by mel-yous         ###   ########.fr       */
+/*   Created: 2024/01/28 14:47:04 by mel-yous          #+#    #+#             */
+/*   Updated: 2024/01/29 20:23:14 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <list>
-#include <iostream>
-#include <fstream>
-#include <exception>
-#include "Token.hpp"
-#include "Utils.hpp"
+#include <string>
 
-class Lexer
+typedef enum e_type
+{
+    WORD,
+    SEMICOLON,
+    OPEN_BRACKET,
+    CLOSED_BRACKET
+} t_type;
+
+class Token
 {
     private:
-        Lexer();
-        static void getToken(const std::string& line, std::list<Token>& tokenList);
+        std::string content;
+        t_type type;
     public:
-        static std::list<Token> tokenize(const std::string& configFile);
+        Token();
+        Token(const std::string& content, t_type type);
+        Token(const Token& obj);
+        Token& operator=(const Token& obj);
+        ~Token();
+        
+        const std::string& getContent();
+        t_type getType();
 };
