@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/01/29 20:26:57 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/01/31 18:13:57 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,13 @@ int main(int argc, char **argv)
                 std::cout << "WORD =>\t\t\t" + iter->getContent() << std::endl;
                 break;
             case SEMICOLON:
-                std::cout << "SEMICOLON =>\t\t\t" + iter->getContent() << std::endl;
+                std::cout << "SEMICOLON =>\t\t" + iter->getContent() << std::endl;
                 break;           
             case OPEN_BRACKET:
-                std::cout << "OPEN_BRACKET =>\t" + iter->getContent() << std::endl;
+                std::cout << "OPEN_BRACKET =>\t\t" + iter->getContent() << std::endl;
                 break;           
             case CLOSED_BRACKET:
-                std::cout << "CLOSED_BRACKET =>\t" + iter->getContent() << std::endl;
+                std::cout << "CLOSE_BRACKET =>\t" + iter->getContent() << std::endl;
                 break;           
             default:
                 break;
