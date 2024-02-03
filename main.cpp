@@ -3,56 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/01/29 20:26:57 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/01 15:21:57 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Lexer.hpp"
+#include "utils/Utils.hpp"
 
-int main(int argc, char **argv)
+int main(int ac, char **av)
 {
-    std::string configPath = "webserv.conf";
-    try
+    if (ac != 2)
     {
-        if (argc == 2)
-            configPath = argv[1];
-        else if (argc > 2)
-            throw "Error: invalid number of args";
-        std::list<Token> tokens = Lexer::tokenize(configPath);
-
-        std::list<Token>::iterator iter = tokens.begin();
-        while (iter != tokens.end())
-        {
-            switch (iter->getType())
-            {
-            case WORD:
-                std::cout << "WORD =>\t\t\t" + iter->getContent() << std::endl;
-                break;
-            case SEMICOLON:
-                std::cout << "SEMICOLON =>\t\t\t" + iter->getContent() << std::endl;
-                break;           
-            case OPEN_BRACKET:
-                std::cout << "OPEN_BRACKET =>\t" + iter->getContent() << std::endl;
-                break;           
-            case CLOSED_BRACKET:
-                std::cout << "CLOSED_BRACKET =>\t" + iter->getContent() << std::endl;
-                break;           
-            default:
-                break;
-            }
-            iter++;
-        }
+        std::cerr << "Error: Invalid number of arguments" << std::endl;
+        return 1;
     }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-    }
-    catch(const char* msg)
-    {
-        std::cerr << msg << std::endl;
-    }
+    runServer(av[1]);
     return 0;
 }
