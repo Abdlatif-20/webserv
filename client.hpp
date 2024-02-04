@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 21:51:52 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/03 23:16:55 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/04 17:06:46 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,15 @@
 class Client
 {
 	private:
-		std::vector<std::string> _clientHeaders;
-		std::string _clientBody;
-		std::string _clientMethod;
-		std::string _clientPath;
-		std::string _clientVersion;
-		Request		_request;
+		Request request;
 		int _clientStatus;
 
 	public:
-		void parseRequest(std::string request);
-		void parseHeaders(std::string headers);
-		void fillHeaders(std::vector<std::string> headers);
+		Client();
+		~Client();
+		void parseRequest(std::string receivedRequest);
+		// void parseRequest(std::string request);
+		// void parseHeaders(std::string headers);
+		// void fillHeaders(std::vector<std::string> headers);
+		
 };

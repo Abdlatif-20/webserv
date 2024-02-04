@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/04 13:23:58 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/04 22:18:30 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,7 @@
 #include <poll.h>
 #include <algorithm>
 
-
-enum RequestError
+enum Errors
 {
 	NotImplemented = 501,
 	BadRequest = 400,
@@ -31,7 +30,7 @@ enum RequestError
 	NotFound = 404,
 	MovedPermanently = 301,
 	MethodNotAllowed = 405,
-	// 
+	//
 	InvalidPath = 1,
 	InvalidMethod = 2,
 	InvalidVersion = 3,
@@ -40,65 +39,37 @@ enum RequestError
 	InvalidRequest = 6,
 };
 
+#define CRLF "\r\n"
+#define MAX_BODY_SIZE 1000000
+#define ALLOWED_CHARACTERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%"
+
 class Request
 {
 	private:
-		std::map<std::string, std::string> _headers;
+		int _status;
+		std::map<std::string, std::string> _requestLine;
+		std::string _requestData;
 		std::string _body;
-		std::string _method;
-		std::string _path;
-		std::string _version;
-		int			_status;
-		Request();
+		std::map<std::string, std::string> _headers;
+		std::string _params;
 	public:
+		Request();
 		~Request();
 
-	/* *************************** exceptions *************************** */
-		class InvalidPathException : public std::exception
-		{
-			virtual const char* what() const throw();
-		};
-
-		class InvalidMethodException : public std::exception
-		{
-			virtual const char* what() const throw();
-		};
-
-		class InvalidVersionException : public std::exception
-		{
-			virtual const char* what() const throw();
-		};
-
-		class InvalidHeaderException : public std::exception
-		{
-			virtual const char* what() const throw();
-		};
-
-		class InvalidBodyException : public std::exception
-		{
-			virtual const char* what() const throw();
-		};
-
-		class InvalidRequestException : public std::exception
-		{
-			virtual const char* what() const throw();
-		};
-	
+	typedef std::invalid_argument InvalidRequest;
 	/* *************************** methods *************************** */
-		void	parseRequest(std::string buffer);
-		void fillHeaders(std::vector<std::string> headers);
-		// void	fillBuddy(std::string req);
-		void	checkRequirements(std::string buffer);
-		void	is_req_well_formed();
-		void	handelTransferEncoding();
-		// void	handelContentLength();
-		// void	handelContentType();
+		void	parseRequest(const std::string& receivedRequest);
+		void	fillHeaders(std::vector<std::string> headers);
+		void	requestIsWellFormed();
+		void	fillRequestLine(const std::string& requestLine);
+		void	parseContentLength();
+		void	parseContentType();
+		void	parseTransferEncoding();
+		void	matchUriRequest();
 
 	/* *************************** getters *************************** */
-		std::string getMethod();
-		std::string getPath();
-		std::string getVersion();
 		std::string getBody();
+		std::map<std::string, std::string> getRequestLine();
 		std::map<std::string, std::string> getHeaders();
 		int getStatus();
 

@@ -6,12 +6,13 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:58 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/04 13:34:46 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/04 18:41:58 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "utils/Utils.hpp"
-#include "Request/Request.hpp"
+#include "Utils.hpp"
+#include "Request.hpp"
+#include "Client.hpp"
 
 /*
 	steps:
@@ -62,9 +63,19 @@ int runServer(char *av)
 		std::cerr << "Error receiving data" << std::endl;
 		return 1;
 	}
-	std::cout << "<< Received message from client: >>\n" << buffer << std::endl;
+	// std::cout << "<< Received message from client: >>\n" << buffer << std::endl;
 	close(serverSocket);
 	close(clientSocket);
+	
+	Client client;
 
+	try
+	{
+		client.parseRequest(buffer);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
 	return 0;
 }

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/03 00:38:29 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/04 17:18:53 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ std::string Utils::strTrim(const std::string& str, char c)
 		j = str.size();
 	return str.substr(i, j - i + 1);
 }
-
+//POST / HTTP/1.1^M$
 std::vector<std::string> Utils::splitRequest(const std::string& str, const char *sep)
 {
 	std::vector<std::string> result;
@@ -32,11 +32,12 @@ std::vector<std::string> Utils::splitRequest(const std::string& str, const char 
 	size_t pos = str.find(sep);
 	while (pos != std::string::npos)
 	{
-		result.push_back(str.substr(start, (pos - start) + 1));
+		std::string _sep = sep;
+		result.push_back(str.substr(start, (pos - start)));
 		start = pos + 2;
-		pos = str.find(sep, start + 1);
+		pos = str.find(sep, start);
 	}
-	result.push_back(str.substr(start, (pos - start) + 1));
+	result.push_back(str.substr(start, (pos - start)));
 	return result;
 }
 
@@ -50,7 +51,7 @@ std::vector<std::string> Utils::split(const std::string& str, const char sep)
 	{
 		if(token.empty() || token == "\n" || token == "\r" || token == "\r\n" || token == "\n\r")
 			continue; 
-		result.push_back(token);	
+		result.push_back(token);
 	}
 	return result;
 }

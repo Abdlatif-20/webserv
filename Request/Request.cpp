@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/04 13:34:55 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/04 22:28:43 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,7 @@
 
 Request::Request()
 {
-	_headers.clear();
-	_body.clear();
-	_method.clear();
-	_path.clear();
-	_version.clear();
-	_status = 0;
+	_status = 200;
 }
 
 Request::~Request()
@@ -31,21 +26,6 @@ Request::~Request()
 }
 
 /* *************************** getters *************************** */
-
-std::string	Request::getMethod()
-{
-	return (_method);
-}
-
-std::string	Request::getPath()
-{
-	return (_path);
-}
-
-std::string	Request::getVersion()
-{
-	return (_version);
-}
 
 std::string	Request::getBody()
 {
@@ -57,6 +37,11 @@ std::map<std::string, std::string>	Request::getHeaders()
 	return (_headers);
 }
 
+std::map<std::string, std::string>	Request::getRequestLine()
+{
+	return (_requestLine);
+}
+
 int	Request::getStatus()
 {
 	return (_status);
@@ -64,43 +49,9 @@ int	Request::getStatus()
 
 #pragma endregion
 
-/* *************************** exceptions *************************** */
-
-#pragma region RequestExceptions
-const char* Request::InvalidPathException::what() const throw()
-{
-	return "Invalid Path";
-}
-
-const char* Request::InvalidMethodException::what() const throw()
-{
-	return "Invalid Method";
-}
-
-const char* Request::InvalidVersionException::what() const throw()
-{
-	return "Invalid Version";
-}
-
-const char* Request::InvalidHeaderException::what() const throw()
-{
-	return "Invalid Header";
-}
-
-const char* Request::InvalidBodyException::what() const throw()
-{
-	return "Invalid Body";
-}
-
-const char* Request::InvalidRequestException::what() const throw()
-{
-	return "Invalid Request";
-}
-
-#pragma endregion
-
 /* *************************** methods *************************** */
 
+//function to fill the headers to the map
 void	Request::fillHeaders(std::vector<std::string> headers)
 {
 	std::vector<std::string>::iterator it;
@@ -121,113 +72,127 @@ void	Request::fillHeaders(std::vector<std::string> headers)
 	}
 }
 
-// void	Request::fillBuddy(std::string req)
-// {
-// 	size_t pos = req.find("Content-Length");
-// 	// if (pos != std::string::npos)
-// 	// {
-// 	// 	_body = req.substr(pos + 16);
-// 	// }
-// 	// std::cout << "body: " << _body << std::endl;
-// }
-
-void	Request::handelTransferEncoding()
+//function to parse the content length
+void	Request::parseContentLength()
 {
-	// std::ofstream file;
-
-	// file.open("file");
-	// if (!file)
-	// {
-		
-	// }
+	if (_headers["content-length"].find_first_not_of("0123456789") != std::string::npos)
+	{
+		_status = BadRequest;
+		throw InvalidRequest("Invalid body");
+	}
+	if (std::stoi(_headers["content-length"]) > MAX_BODY_SIZE)
+	{
+		_status = RequestEntityTooLarge;
+		throw InvalidRequest("Request Entity Too Large");
+	}
 }
 
-void	Request::is_req_well_formed()
+//function to parse the content type
+void	Request::parseContentType()
 {
-	std::map<std::string, std::string>::iterator it;
-	bool isTransferEncoding = true;
-	bool isContentLength = true;
-	bool isContentType = true;
-
-	it = _headers.find("transfer-encoding");
-	if (it != _headers.end())
+	if (_headers["content-type"].find("boundary") == std::string::npos)
 	{
-		if (it->second != "chunked")
-		{
-			_status = NotImplemented;
-			return;
-		}
-		std::cout << "chunked exists" << std::endl;
+		_status = BadRequest;
+		throw InvalidRequest("Invalid body(Invalid Content-Type)");
 	}
-	if (_method == "POST")
+}
+
+//function to parse the transfer encoding
+void	Request::parseTransferEncoding()
+{
+	if (_headers["transfer-encoding"] != "chunked")
 	{
-		it = _headers.find("content-length");
-		if (it == _headers.end())
+		_status = NotImplemented;
+		throw InvalidRequest("Not Implemented(Transfer-Encoding not supported)");
+	}
+}
+
+//function to check if the request is well formed
+void	Request::requestIsWellFormed()
+{
+	if (_requestLine["path"].size() > 2048)
+	{
+		_status = RequestURITooLong;
+		throw InvalidRequest("Request-URI Too Long");
+	}
+	if (_requestLine["path"].find_first_not_of(ALLOWED_CHARACTERS) != std::string::npos)
+	{
+		_status = BadRequest;
+		throw InvalidRequest("Bad Request(Invalid path)");
+	}
+	if (_requestLine["method"] == "POST")
+	{
+		if (_headers.find("content-length") != _headers.end())
+			parseContentLength();
+		else if (_headers.find("content-type") != _headers.end())
+			parseContentType();
+		else if (_headers.find("transfer-encoding") != _headers.end())
+			parseTransferEncoding();
+		else
 		{
-			isContentLength = false;
-			it = _headers.find("transfer-encoding");
-			if (it == _headers.end())
+			_status = BadRequest;
+			throw InvalidRequest("Bad Request(Invalid body)");
+		}
+	}
+}
+
+void	Request::fillRequestLine(const std::string& requestLine)
+{
+	std::vector<std::string> requestLineVector;
+	std::map<std::string, std::string> requestLineMap;
+	requestLineVector = Utils::split(requestLine, ' ');
+	if (requestLineVector.size() != 3)
+		 throw InvalidRequest("Invalid request line");
+	if (requestLineVector[0] != "GET" && requestLineVector[0] != "POST"
+		&& requestLineVector[0] != "DELETE")
+	{
+		if (requestLineVector[0] != "HEAD" && requestLineVector[0] != "PUT"
+			&& requestLineVector[0] != "CONNECT" && requestLineVector[0] != "OPTIONS"
+				&& requestLineVector[0] != "TRACE")
 			{
-				isTransferEncoding = false;
-				it = _headers.find("content-type");
-				if (it == _headers.end())
-				{
-					isContentType = false;
-					_status = BadRequest;
-					return;
-				}
+				_status = BadRequest;
+				throw InvalidRequest("Invalid method");
 			}
-		}
-		// if (isContentLength == true)
-		// 	handelContentLength();
-		// else if (isTransferEncoding == true)
-		// 	handelTransferEncoding();
-		// else if (isContentType == true)
-		// 	handelContentType();
-		
+		throw InvalidRequest("Method not implemented");
 	}
+	if (requestLineVector[1].front() != '/')
+	{
+		_status = BadRequest;
+		throw InvalidRequest("Invalid path");
+	}
+	if (requestLineVector[2] != "HTTP/1.1")
+	{
+		_status = BadRequest;
+		throw InvalidRequest("Invalid version");
+	}
+	requestLineMap["method"] = requestLineVector[0];
+	requestLineMap["path"] = requestLineVector[1];
+	_requestLine = requestLineMap;
 }
 
-void	Request::parseRequest(std::string buffer)
+void	Request::matchUriRequest()
 {
-	checkRequirements(buffer);
-	Request::fillHeaders(Utils::splitRequest(buffer, "\r\n"));
-	Request::is_req_well_formed();
-	// std::cout<<"-------- map -------------";
-	// Utils::printMap(_headers);
-	// std::cout<<"----------------------------";
-	// Request::fillBuddy(buffer);
+	std::string uri = "index.html";
+	std::string path = _requestLine["path"];
+	if (path == "/")
+		_requestLine["path"] = uri;
+	else
+		_requestLine["path"] = path.substr(1);
+	if (uri != _requestLine["path"])
+	{
+		_status = NotFound;
+		throw InvalidRequest("404 Not Found");
+	}
+	std::cout << "Uri request matched: " << _requestLine["path"] << std::endl;
 }
 
-void	Request::checkRequirements(std::string buffer)
+void	Request::parseRequest(const std::string& receivedRequest)
 {
-	//methods = GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE
+	std::vector<std::string> requestLineVector;
 
-	std::vector<std::string> request = Utils::splitRequest(buffer, "\r\n");
-	std::string method = request[0];
-	std::vector<std::string> methodSplit = Utils::split(method, ' ');
-	if (methodSplit.size() != 3)
-	{
-		_status = InvalidRequest;
-		throw Request::InvalidRequestException();
-	}
-	_method = methodSplit[0];
-	_path = methodSplit[1];
-	_version = methodSplit[2];
-
-	if (_method != "GET" &&  _method != "POST" && _method != "DELETE" )
-	{
-		_status = MethodNotAllowed;
-		throw Request::InvalidMethodException();
-	}
-	if (_version != "HTTP/1.1")
-	{
-		_status = InvalidVersion;
-		throw Request::InvalidVersionException();
-	}
-	if (_path[0] != '/')
-	{
-		_status = InvalidPath;
-		throw Request::InvalidPathException();
-	}
+	requestLineVector = Utils::splitRequest(receivedRequest, "\r\n");
+	fillRequestLine(requestLineVector[0]);
+	fillHeaders(requestLineVector);
+	requestIsWellFormed();
+	matchUriRequest();
 }
