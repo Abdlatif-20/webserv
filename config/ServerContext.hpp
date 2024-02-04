@@ -6,30 +6,24 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 10:40:11 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/02 22:35:57 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/04 16:00:05 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "Context.hpp"
 #include "LocationContext.hpp"
-#include <utility>
 
-typedef std::pair<std::string, std::vector<std::string> > Directive;
-
-class LocationContext;
-
-class ServerContext
+class ServerContext : public Context
 {
     private:
         std::vector<LocationContext> locations;
-        std::map<std::string, std::vector<std::string> > directives;
     public:
         ServerContext();
         ServerContext(const ServerContext& obj);
         ServerContext& operator=(const ServerContext& obj);
         ~ServerContext();
 
-        void addDirective(Directive _directive);
         void addLocation(LocationContext location);
 };

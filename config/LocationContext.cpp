@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 11:31:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/02 20:27:19 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/04 15:12:48 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,11 @@
 LocationContext::LocationContext()
 {
 
+}
+
+LocationContext::LocationContext(const std::string& prefix)
+{
+    this->prefix = prefix;
 }
 
 LocationContext::LocationContext(const LocationContext& obj)
@@ -34,14 +39,4 @@ LocationContext& LocationContext::operator=(const LocationContext& obj)
 LocationContext::~LocationContext()
 {
 
-}
-
-void LocationContext::setPrefix(const std::string& prefix)
-{
-    this->prefix = prefix;
-}
-
-void LocationContext::addDirective(Directive _directive)
-{
-    directives.insert(_directive);
 }

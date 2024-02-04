@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 10:40:09 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/02 20:28:39 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/04 15:12:59 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,6 @@ ServerContext& ServerContext::operator=(const ServerContext& obj)
 ServerContext::~ServerContext()
 {
 
-}
-
-void ServerContext::addDirective(Directive _directive)
-{
-    directives.insert(_directive);
 }
 
 void ServerContext::addLocation(LocationContext location)
