@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/03 00:21:43 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/04 13:23:58 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <fstream>
 #include <sstream>
 #include <poll.h>
+#include <algorithm>
 
 
 enum RequestError
@@ -30,6 +31,7 @@ enum RequestError
 	NotFound = 404,
 	MovedPermanently = 301,
 	MethodNotAllowed = 405,
+	// 
 	InvalidPath = 1,
 	InvalidMethod = 2,
 	InvalidVersion = 3,
@@ -41,29 +43,63 @@ enum RequestError
 class Request
 {
 	private:
-		static std::map<std::string, std::string> _headers;
-		static std::string _body;
-		static std::string _method;
-		static std::string _path;
-		static std::string _version;
-		static int			_status;
+		std::map<std::string, std::string> _headers;
+		std::string _body;
+		std::string _method;
+		std::string _path;
+		std::string _version;
+		int			_status;
 		Request();
 	public:
 		~Request();
+
+	/* *************************** exceptions *************************** */
+		class InvalidPathException : public std::exception
+		{
+			virtual const char* what() const throw();
+		};
+
+		class InvalidMethodException : public std::exception
+		{
+			virtual const char* what() const throw();
+		};
+
+		class InvalidVersionException : public std::exception
+		{
+			virtual const char* what() const throw();
+		};
+
+		class InvalidHeaderException : public std::exception
+		{
+			virtual const char* what() const throw();
+		};
+
+		class InvalidBodyException : public std::exception
+		{
+			virtual const char* what() const throw();
+		};
+
+		class InvalidRequestException : public std::exception
+		{
+			virtual const char* what() const throw();
+		};
 	
 	/* *************************** methods *************************** */
-		static void	parseRequest(std::string buffer);
-		static void fillHeaders(std::vector<std::string> headers);
-		static void	checkRequirements(std::string buffer);
-		static void	is_req_well_formed();
+		void	parseRequest(std::string buffer);
+		void fillHeaders(std::vector<std::string> headers);
+		// void	fillBuddy(std::string req);
+		void	checkRequirements(std::string buffer);
+		void	is_req_well_formed();
+		void	handelTransferEncoding();
+		// void	handelContentLength();
+		// void	handelContentType();
 
 	/* *************************** getters *************************** */
-		static std::string getMethod();
-		static std::string getPath();
-		static std::string getVersion();
-		static std::string getBody();
-		static std::map<std::string, std::string> getHeaders();
-		static int getStatus();
-
+		std::string getMethod();
+		std::string getPath();
+		std::string getVersion();
+		std::string getBody();
+		std::map<std::string, std::string> getHeaders();
+		int getStatus();
 
 };

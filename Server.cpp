@@ -6,13 +6,12 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:58 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/03 00:27:55 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/04 13:34:46 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "utils/Utils.hpp"
-#include "Request.hpp"
-
+#include "Request/Request.hpp"
 
 /*
 	steps:
@@ -67,13 +66,5 @@ int runServer(char *av)
 	close(serverSocket);
 	close(clientSocket);
 
-	
-	try{
-		Request::parseRequest(buffer);
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << "Error: " << e.what() << std::endl;
-	}
 	return 0;
 }

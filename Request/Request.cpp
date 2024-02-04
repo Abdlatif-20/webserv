@@ -6,19 +6,12 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/03 00:43:35 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/04 13:34:55 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "utils/Utils.hpp"
+#include "../utils/Utils.hpp"
 #include "Request.hpp"
-
-std::map<std::string, std::string> Request::_headers;
-std::string Request::_body;
-std::string Request::_method;
-std::string Request::_path;
-std::string Request::_version;
-int Request::_status;
 
 //group this methods inside pragma region
 #pragma region Request
@@ -71,15 +64,45 @@ int	Request::getStatus()
 
 #pragma endregion
 
+/* *************************** exceptions *************************** */
+
+#pragma region RequestExceptions
+const char* Request::InvalidPathException::what() const throw()
+{
+	return "Invalid Path";
+}
+
+const char* Request::InvalidMethodException::what() const throw()
+{
+	return "Invalid Method";
+}
+
+const char* Request::InvalidVersionException::what() const throw()
+{
+	return "Invalid Version";
+}
+
+const char* Request::InvalidHeaderException::what() const throw()
+{
+	return "Invalid Header";
+}
+
+const char* Request::InvalidBodyException::what() const throw()
+{
+	return "Invalid Body";
+}
+
+const char* Request::InvalidRequestException::what() const throw()
+{
+	return "Invalid Request";
+}
+
+#pragma endregion
+
 /* *************************** methods *************************** */
 
 void	Request::fillHeaders(std::vector<std::string> headers)
 {
-	if (headers.back() != "\r\n")
-	{
-		_status = BadRequest;
-		throw std::exception();
-	}
 	std::vector<std::string>::iterator it;
 	it = headers.begin();
 	it++;
@@ -98,9 +121,33 @@ void	Request::fillHeaders(std::vector<std::string> headers)
 	}
 }
 
+// void	Request::fillBuddy(std::string req)
+// {
+// 	size_t pos = req.find("Content-Length");
+// 	// if (pos != std::string::npos)
+// 	// {
+// 	// 	_body = req.substr(pos + 16);
+// 	// }
+// 	// std::cout << "body: " << _body << std::endl;
+// }
+
+void	Request::handelTransferEncoding()
+{
+	// std::ofstream file;
+
+	// file.open("file");
+	// if (!file)
+	// {
+		
+	// }
+}
+
 void	Request::is_req_well_formed()
 {
 	std::map<std::string, std::string>::iterator it;
+	bool isTransferEncoding = true;
+	bool isContentLength = true;
+	bool isContentType = true;
 
 	it = _headers.find("transfer-encoding");
 	if (it != _headers.end())
@@ -117,17 +164,26 @@ void	Request::is_req_well_formed()
 		it = _headers.find("content-length");
 		if (it == _headers.end())
 		{
+			isContentLength = false;
 			it = _headers.find("transfer-encoding");
 			if (it == _headers.end())
 			{
-				_status = BadRequest;
-				return;
+				isTransferEncoding = false;
+				it = _headers.find("content-type");
+				if (it == _headers.end())
+				{
+					isContentType = false;
+					_status = BadRequest;
+					return;
+				}
 			}
 		}
-		else
-		{
-			//handle body here	
-		}
+		// if (isContentLength == true)
+		// 	handelContentLength();
+		// else if (isTransferEncoding == true)
+		// 	handelTransferEncoding();
+		// else if (isContentType == true)
+		// 	handelContentType();
 		
 	}
 }
@@ -137,6 +193,10 @@ void	Request::parseRequest(std::string buffer)
 	checkRequirements(buffer);
 	Request::fillHeaders(Utils::splitRequest(buffer, "\r\n"));
 	Request::is_req_well_formed();
+	// std::cout<<"-------- map -------------";
+	// Utils::printMap(_headers);
+	// std::cout<<"----------------------------";
+	// Request::fillBuddy(buffer);
 }
 
 void	Request::checkRequirements(std::string buffer)
@@ -149,25 +209,25 @@ void	Request::checkRequirements(std::string buffer)
 	if (methodSplit.size() != 3)
 	{
 		_status = InvalidRequest;
-		throw std::exception();
+		throw Request::InvalidRequestException();
 	}
 	_method = methodSplit[0];
 	_path = methodSplit[1];
 	_version = methodSplit[2];
-	
+
 	if (_method != "GET" &&  _method != "POST" && _method != "DELETE" )
 	{
 		_status = MethodNotAllowed;
-		throw std::exception();
+		throw Request::InvalidMethodException();
 	}
 	if (_version != "HTTP/1.1")
 	{
 		_status = InvalidVersion;
-		throw std::exception();
+		throw Request::InvalidVersionException();
 	}
 	if (_path[0] != '/')
 	{
 		_status = InvalidPath;
-		throw std::exception();
+		throw Request::InvalidPathException();
 	}
 }
