@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/04 22:18:30 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/08 22:39:50 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,6 @@
 #include <map>
 #include <fstream>
 #include <sstream>
-#include <poll.h>
 #include <algorithm>
 
 enum Errors
@@ -41,23 +40,34 @@ enum Errors
 
 #define CRLF "\r\n"
 #define MAX_BODY_SIZE 1000000
-#define ALLOWED_CHARACTERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%"
+#define ALLOWED_CHARACTERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJ\
+							KLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%"
 
 class Request
 {
 	private:
+		//status
+		bool _bodyDone;
+		bool _headersDone;
+		bool _requestLineDone;
+		bool _requestIsWellFormed;
+		int	_receivecount;
 		int _status;
 		std::map<std::string, std::string> _requestLine;
+		std::string	headers;
 		std::string _requestData;
 		std::string _body;
+		unsigned int	_contentLength;
 		std::map<std::string, std::string> _headers;
 		std::string _params;
 	public:
+	/* *************************** constructors *************************** */
 		Request();
 		~Request();
 
 	typedef std::invalid_argument InvalidRequest;
 	/* *************************** methods *************************** */
+		void	separateRequest(std::string receivedRequest);
 		void	parseRequest(const std::string& receivedRequest);
 		void	fillHeaders(std::vector<std::string> headers);
 		void	requestIsWellFormed();
@@ -66,6 +76,9 @@ class Request
 		void	parseContentType();
 		void	parseTransferEncoding();
 		void	matchUriRequest();
+		void	parseBody();
+		// function to parse boundary
+		void	parseBoundary();
 
 	/* *************************** getters *************************** */
 		std::string getBody();

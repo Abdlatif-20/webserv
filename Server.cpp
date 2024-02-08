@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:58 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/04 18:41:58 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/08 22:48:00 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,26 +24,25 @@
 	6. close sockets
 */
 
-
 int runServer(char *av)
 {
-    int serverSocket = socket(AF_INET, SOCK_STREAM, 0); // IPv4, TCP, default protocol
-    if (serverSocket < 0)
-    {
-        std::cerr << "Error creating socket\n";
-        return 1;
-    }
+	int serverSocket = socket(AF_INET, SOCK_STREAM, 0); // IPv4, TCP, default protocol
+	if (serverSocket < 0)
+	{
+		std::cerr << "Error creating socket\n";
+		return 1;
+	}
 	int port = std::stoi(av);
-	struct sockaddr_in serverAddr; // IPv4 address structure
-	serverAddr.sin_family = AF_INET; // IPv4
-	serverAddr.sin_port = htons(port); // Port, converted to network byte order
-	serverAddr.sin_addr.s_addr = INADDR_ANY;// INADDR_ANY is accept any address
-    if (bind(serverSocket, (struct sockaddr*)&serverAddr, sizeof(serverAddr)) != 0)
+	struct sockaddr_in serverAddr;			 // IPv4 address structure
+	serverAddr.sin_family = AF_INET;		 // IPv4
+	serverAddr.sin_port = htons(port);		 // Port, converted to network byte order
+	serverAddr.sin_addr.s_addr = INADDR_ANY; // INADDR_ANY is accept any address
+	if (bind(serverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) != 0)
 	{
 		std::cerr << "Error binding socket" << std::endl;
 		return 1;
 	}
-	if (listen(serverSocket, 1) < 0) //5 is the number of connections that can be waiting while the process is handling a particular connection
+	if (listen(serverSocket, 1) < 0) // 5 is the number of connections that can be waiting while the process is handling a particular connection
 	{
 		std::cerr << "Error listening on socket" << std::endl;
 		return 1;
@@ -51,31 +50,34 @@ int runServer(char *av)
 	std::cout << "Server listening on port " << port << std::endl;
 	// Accept incoming connections
 	int clientSocket = accept(serverSocket, NULL, NULL);
-	if (clientSocket < 0) {
+	if (clientSocket < 0)
+	{
 		std::cerr << "Error accepting connection\n";
 		return 1;
 	}
-	char buffer[1024];
-	memset(buffer, 0, sizeof(buffer));
-	int bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
-	if (bytesRead < 0)
+	int bytesRead = 1;
+	Client client;
+	while (bytesRead > 0)
 	{
-		std::cerr << "Error receiving data" << std::endl;
-		return 1;
+		char buffer[1024];
+		memset(buffer, 0, sizeof(buffer));
+		bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
+		if (bytesRead < 0)
+		{
+			std::cerr << "Error receiving data" << std::endl;
+			return 1;
+		}
+
+		try
+		{
+			client.parseRequest(buffer);
+		}
+		catch (const std::exception &e)
+		{
+			std::cerr << e.what() << '\n';
+		}
 	}
-	// std::cout << "<< Received message from client: >>\n" << buffer << std::endl;
 	close(serverSocket);
 	close(clientSocket);
-	
-	Client client;
-
-	try
-	{
-		client.parseRequest(buffer);
-	}
-	catch(const std::exception& e)
-	{
-		std::cerr << e.what() << '\n';
-	}
 	return 0;
 }
