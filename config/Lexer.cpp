@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 11:15:21 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/01/31 18:19:04 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/08 14:10:28 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,12 +19,12 @@ Lexer::Lexer()
 
 bool Lexer::isSpecialChar(char c)
 {
-    if (c == '{' || c == '}' || c == ';' || c == '#' || c == ' ')
+    if (c == '{' || c == '}' || c == ';' || c == '#' || std::isspace(c))
         return true;
     return false;
 }
 
-void Lexer::getToken(const std::string& line, std::list<Token>& tokenList)
+void Lexer::getToken(const std::string& line, std::vector<Token>& tokenList)
 {
     std::string s = Utils::strTrim(line, ' ');
     std::string _token;
@@ -48,11 +48,11 @@ void Lexer::getToken(const std::string& line, std::list<Token>& tokenList)
     }
 }
 
-std::list<Token> Lexer::tokenize(const std::string& configFile)
+std::vector<Token> Lexer::tokenize(const std::string& configFile)
 {
     std::ifstream ifs(configFile);
     std::string line;
-    std::list<Token> tokenList;
+    std::vector<Token> tokenList;
 
     if (!ifs.good())
         throw std::runtime_error("Error while opening config_file");
