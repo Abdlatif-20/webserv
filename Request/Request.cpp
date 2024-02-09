@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/08 22:48:48 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/09 13:32:21 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ void	Request::fillHeaders(std::vector<std::string> headers)
 		if (pos != std::string::npos)
 		{
 			key = it->substr(0, pos);
-			value = Utils::strTrim(it->substr(pos + 2), '\r');
+			value = Utils::strTrim(it->substr(pos + 2), CR);
 			_headers[key] = value;
 		}
 	}
@@ -198,7 +198,7 @@ void	Request::matchUriRequest()
 
 void	Request::separateRequest(std::string receivedRequest)
 {
-	size_t pos = receivedRequest.find("\r\n\r\n");
+	size_t pos = receivedRequest.find(CRLF CRLF);
 	if (pos != std::string::npos)
 	{
 		headers = receivedRequest.substr(0, pos + 4);
@@ -218,7 +218,7 @@ void	Request::parseRequest(const std::string& receivedRequest)
 	if (!_requestLineDone && !_headersDone && !_requestIsWellFormed)
 	{
 		separateRequest(receivedRequest); //separate the request line from the headers
-		requestLineVector = Utils::splitRequest(headers, "\r\n");
+		requestLineVector = Utils::splitRequest(headers, CRLF);
 		fillRequestLine(requestLineVector[0]); //fill the request line
 		fillHeaders(requestLineVector); //fill the headers
 		requestIsWellFormed(); //check if the request is well formed
@@ -226,6 +226,7 @@ void	Request::parseRequest(const std::string& receivedRequest)
 		_receivecount++;
 	}
 	// matchUriRequest();
+	std::cout << "body: " << _body << std::endl;
 	if (!_bodyDone)
 	{
 		if (_receivecount > 1)

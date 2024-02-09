@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/08 22:39:50 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/09 13:32:40 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,11 +38,11 @@ enum Errors
 	InvalidRequest = 6,
 };
 
+#define CR '\r'
 #define CRLF "\r\n"
 #define MAX_BODY_SIZE 1000000
 #define ALLOWED_CHARACTERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJ\
 							KLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%"
-
 class Request
 {
 	private:
