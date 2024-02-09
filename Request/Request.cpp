@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/09 22:01:42 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/09 23:02:59 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -238,39 +238,42 @@ void	Request::parseRequest(const std::string& receivedRequest)
 
 void	Request::boundary()
 {
+	std::ifstream file(_boundaryName);
+	std::string line;
+	std::map<std::string, std::string> boundaryMap;
+	bool isValue = false;
 
-}
-
-void	Request::parseBoundary()
-{
-	int random = std::rand();
-	std::string randomStr = Utils::intToString(random);
-	std::ofstream file("boundary" + randomStr + ".txt", std::ios::app);
-	bool isComplete = false;
-	std::string StartBoundary = "--" + _headers["content-type"].substr(30);
-	std::string EndBoundary = StartBoundary + "--";
 	if (!file.is_open())
 	{
 		_status = BadRequest;
 		throw InvalidRequest("can't open file");
 	}
-	if (_body.find(EndBoundary) == std::string::npos)
+	std::string key;
+	while (std::getline(file, line))
 	{
-		file << _body;
-		_receivecount++;
+		if (line.find("Content-Disposition") != std::string::npos)
+		{
+			key = line.substr(line.find("name=") + 6);
+			key = key.substr(0, key.find("\""));
+		}
+		if (line == "\r")
+			isValue = true;
+		else if (isValue)
+		{
+			std::string value = line;
+			boundaryMap[key] = value;
+			isValue = false;
+		}
 	}
-	else
+	for (std::map<std::string, std::string>::iterator it = boundaryMap.begin(); it != boundaryMap.end(); it++)
 	{
-		file << _body.substr(0, _body.find(EndBoundary) + EndBoundary.size() + 2);
-		_body = _body.substr(_body.find(EndBoundary) + EndBoundary.size() + 2);
-		isComplete = true;
-	}
-	if (isComplete)
-	{
-		file.close();
-		boundary();
-		_bodyDone = true;
-		std::cout << "Body parsed" << std::endl;
+		std::ofstream file(it->first + ".txt", std::ios::app);
+		if (!file.is_open())
+		{
+			_status = BadRequest;
+			throw InvalidRequest("can't open file");
+		}
+		file << it->second;
 	}
 }
 
@@ -305,6 +308,39 @@ Content-Disposition: form-data; name="test3"
 ----------------------------512122774062530383246207--
 
 */
+
+void	Request::parseBoundary()
+{
+	std::string randomStr = Utils::intToString(std::rand() % 1000);
+	_boundaryName = "boundary" + randomStr + ".txt";
+	std::ofstream file(_boundaryName, std::ios::app);
+	bool isComplete = false;
+	std::string StartBoundary = "--" + _headers["content-type"].substr(30);
+	std::string EndBoundary = StartBoundary + "--";
+	if (!file.is_open())
+	{
+		_status = BadRequest;
+		throw InvalidRequest("can't open file");
+	}
+	if (_body.find(EndBoundary) == std::string::npos)
+	{
+		file << _body;
+		_receivecount++;
+	}
+	else
+	{
+		file << _body.substr(0, _body.find(EndBoundary) + EndBoundary.size() + 2);
+		_body = _body.substr(_body.find(EndBoundary) + EndBoundary.size() + 2);
+		isComplete = true;
+	}
+	if (isComplete)
+	{
+		file.close();
+		boundary();
+		_bodyDone = true;
+		std::cout << "Body parsed" << std::endl;
+	}
+}
 
 void	Request::ContentLength()
 {
