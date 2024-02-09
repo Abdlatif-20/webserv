@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/09 13:32:40 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/09 20:49:49 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,8 @@ enum Errors
 #define MAX_BODY_SIZE 1000000
 #define ALLOWED_CHARACTERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJ\
 							KLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%"
+
+							//?t=hello\&k=cvfv&l=dcdc
 class Request
 {
 	private:
@@ -78,7 +80,9 @@ class Request
 		void	matchUriRequest();
 		void	parseBody();
 		// function to parse boundary
+		void	ContentLength();
 		void	parseBoundary();
+		void	boundary();
 
 	/* *************************** getters *************************** */
 		std::string getBody();

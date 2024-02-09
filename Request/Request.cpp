@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/09 13:32:21 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/09 22:01:42 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ void	Request::parseContentLength()
 	if (_headers["content-length"].find_first_not_of("0123456789") != std::string::npos)
 	{
 		_status = BadRequest;
-		throw InvalidRequest("Invalid body");
+		throw InvalidRequest("Invalid body(Invalid Content-Length)");
 	}
 	if (std::stoi(_headers["content-length"]) > MAX_BODY_SIZE)
 	{
@@ -215,6 +215,7 @@ void	Request::separateRequest(std::string receivedRequest)
 void	Request::parseRequest(const std::string& receivedRequest)
 {
 	std::vector<std::string> requestLineVector;
+	std::srand(time(0));
 	if (!_requestLineDone && !_headersDone && !_requestIsWellFormed)
 	{
 		separateRequest(receivedRequest); //separate the request line from the headers
@@ -226,50 +227,51 @@ void	Request::parseRequest(const std::string& receivedRequest)
 		_receivecount++;
 	}
 	// matchUriRequest();
-	std::cout << "body: " << _body << std::endl;
 	if (!_bodyDone)
 	{
 		if (_receivecount > 1)
 			_body = receivedRequest;
 		parseBody();
 	}
+	// Utils::printFile("boundary.txt");
+}
+
+void	Request::boundary()
+{
+
 }
 
 void	Request::parseBoundary()
 {
-	
-}
-
-void	Request::parseBody()
-{
-	std::ofstream file;
-	static std::string	body;
-	if (_requestLine["method"] == "POST"
-			&& _headers.find("content-length") != _headers.end())
+	int random = std::rand();
+	std::string randomStr = Utils::intToString(random);
+	std::ofstream file("boundary" + randomStr + ".txt", std::ios::app);
+	bool isComplete = false;
+	std::string StartBoundary = "--" + _headers["content-type"].substr(30);
+	std::string EndBoundary = StartBoundary + "--";
+	if (!file.is_open())
 	{
-		file.open("c_l_body.txt");
-		if (!file.is_open())
-		{
-			_status = BadRequest;
-			throw InvalidRequest("can't open file");
-		}
-		if (_bodyDone == false)
-		{
-			body += _body;
-			_receivecount++;
-			if (body.size() == _contentLength)
-			{
-				file << body;
-				file.close();
-				_bodyDone = true;
-				std::cout << "Body parsed" << std::endl;
-			}
-			return ;
-		}
+		_status = BadRequest;
+		throw InvalidRequest("can't open file");
 	}
-	// else if (_requestLine["method"] == "POST"
-	// 		&& _headers.find("content-type") != _headers.end())
-	// 	parseBoundary();
+	if (_body.find(EndBoundary) == std::string::npos)
+	{
+		file << _body;
+		_receivecount++;
+	}
+	else
+	{
+		file << _body.substr(0, _body.find(EndBoundary) + EndBoundary.size() + 2);
+		_body = _body.substr(_body.find(EndBoundary) + EndBoundary.size() + 2);
+		isComplete = true;
+	}
+	if (isComplete)
+	{
+		file.close();
+		boundary();
+		_bodyDone = true;
+		std::cout << "Body parsed" << std::endl;
+	}
 }
 
 /*
@@ -282,24 +284,66 @@ Postman-Token: 6cc92122-4a1d-48f6-ad15-3ba1638c8ae9
 Host: localhost:5008
 Accept-Encoding: gzip, deflate, br
 Connection: keep-alive
-Content-Type: multipart/form-data; boundary=--------------------------136639999040286537770224
+Content-Type: multipart/form-data; boundary=--------------------------512122774062530383246207
 
-----------------------------136639999040286537770224
-Content-Disposition: form-data; name="dsdf"
+----------------------------512122774062530383246207
+Content-Disposition: form-data; name="test"
 
-dfg
-----------------------------136639999040286537770224
-Content-Disposition: form-data; name="fg"
+gfd
+----------------------------512122774062530383246207
+Content-Disposition: form-data; name="test1"
 
-fggh
-----------------------------136639999040286537770224
-Content-Disposition: form-data; name="jk"
+455564sddsf
+----------------------------512122774062530383246207
+Content-Disposition: form-data; name="test2"
 
-hhh
-----------------------------136639999040286537770224
-Content-Disposition: form-data; name="kyhj"
+sds5fds5f
+----------------------------512122774062530383246207
+Content-Disposition: form-data; name="test3"
 
-hjhk
-----------------------------136639999040286537770224--
+5dcdsfds5
+----------------------------512122774062530383246207--
 
 */
+
+void	Request::ContentLength()
+{
+	std::string randomStr = Utils::intToString(std::rand() % 1000);
+	std::ofstream file("body" + randomStr + ".txt", std::ios::app);
+	if (!file.is_open())
+	{
+		_status = BadRequest;
+		throw InvalidRequest("can't open file");
+	}
+	if (_bodyDone == false)
+	{
+		if (_contentLength > _body.size())
+		{
+			file << _body;
+			_contentLength -= _body.size();
+			_receivecount++;
+		}
+		else if (_contentLength < _body.size())
+		{
+			file << _body.substr(0, _contentLength);
+			_body = _body.substr(_contentLength);
+			_contentLength = 0;
+		}
+	}
+	if (_contentLength == 0)
+	{
+		file.close();
+		_bodyDone = true;
+		std::cout << "Body parsed" << std::endl;
+	}
+}
+
+void	Request::parseBody()
+{
+	if (_requestLine["method"] == "POST"
+			&& _headers.find("content-length") != _headers.end())
+			ContentLength();
+	else if (_requestLine["method"] == "POST"
+			&& _headers.find("content-type") != _headers.end())
+			parseBoundary();
+}

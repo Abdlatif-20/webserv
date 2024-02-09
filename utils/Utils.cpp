@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/08 17:40:38 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/09 20:28:58 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,4 +73,30 @@ void    Utils::toLower(std::string& str)
 	std::string::iterator it;
 	for (it = str.begin(); it != str.end(); it++)
 		*it = tolower(*it);
+}
+
+void		Utils::printFile(std::string filename)
+{
+	std::ifstream file(filename);
+	std::string str;
+	if (file.is_open())
+	{
+		while (std::getline(file, str))
+			std::cout << str << std::endl;
+		file.close();
+	}
+	else
+		std::cout << "Unable to open file" << std::endl;
+}
+
+std::string Utils::intToString(int number)
+{
+    // Create a string stream
+    std::ostringstream oss;
+    
+    // Write the integer to the string stream
+    oss << number;
+    
+    // Convert the string stream to a string and return it
+    return oss.str();
 }

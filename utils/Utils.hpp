@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/03 00:40:55 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/09 20:29:03 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include <vector>
 #include <sstream>
 #include <map>
+#include <fstream>
 
 class Utils
 {
@@ -34,5 +35,7 @@ class Utils
 		static void		printVector(std::vector<std::string> vec);
 		static void		printMap(const std::map<std::string, std::string>& map);
 		static void		toLower(std::string& str);
+		static void		printFile(std::string filename);
+		static std::string intToString(int number);
 };
 int     runServer(char *av);

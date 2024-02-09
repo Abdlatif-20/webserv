@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:58 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/08 22:48:00 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/09 19:17:44 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,9 @@ int runServer(char *av)
 		return 1;
 	}
 	int port = std::stoi(av);
-	struct sockaddr_in serverAddr;			 // IPv4 address structure
+	
+	struct sockaddr_in serverAddr;// IPv4 address structure
+	memset(&serverAddr, 0, sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;		 // IPv4
 	serverAddr.sin_port = htons(port);		 // Port, converted to network byte order
 	serverAddr.sin_addr.s_addr = INADDR_ANY; // INADDR_ANY is accept any address

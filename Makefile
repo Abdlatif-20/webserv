@@ -6,7 +6,7 @@
 #    By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/02/04 17:06:31 by aben-nei         ###   ########.fr        #
+#    Updated: 2024/02/09 21:03:56 by aben-nei         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,4 +26,5 @@ clean:
 	rm -rf $(OBJS)
 fclean: clean
 	rm -rf $(NAME)
+	rm -rf *.txt
 re: clean fclean all
