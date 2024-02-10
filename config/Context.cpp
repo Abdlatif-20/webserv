@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/04 15:37:37 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/09 16:14:30 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,4 +43,12 @@ void Context::addDirective(Directive _directive)
 const DirectivesMap& Context::getDirectives() const
 {
     return directives;
+}
+
+StringVector::const_iterator Context::getDirectiveByKey(const std::string& key) const
+{
+    DirectivesMap::const_iterator it = directives.find(key);
+    if (it != directives.end())
+        return it->second.cbegin();
+    return it->second.cend();
 }

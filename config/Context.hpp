@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/05 13:48:29 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/09 16:11:42 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,4 +27,5 @@ class Context
 
         void addDirective(Directive _directive);
         const DirectivesMap& getDirectives() const;
+        StringVector::const_iterator getDirectiveByKey(const std::string& key) const;
 };

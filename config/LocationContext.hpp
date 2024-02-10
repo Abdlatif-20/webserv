@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 11:30:59 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/04 15:14:26 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/09 14:02:11 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,4 +24,6 @@ class LocationContext : public Context
         LocationContext(const LocationContext& obj);
         LocationContext& operator=(const LocationContext& obj);
         ~LocationContext();
+
+        const std::string& getPrefix() const;
 };
