@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/09 22:39:49 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/10 00:10:07 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,13 +29,6 @@ enum Errors
 	NotFound = 404,
 	MovedPermanently = 301,
 	MethodNotAllowed = 405,
-	//
-	InvalidPath = 1,
-	InvalidMethod = 2,
-	InvalidVersion = 3,
-	InvalidHeader = 4,
-	InvalidBody = 5,
-	InvalidRequest = 6,
 };
 
 #define CR '\r'
@@ -55,13 +48,15 @@ class Request
 		bool _requestIsWellFormed;
 		int	_receivecount;
 		int _status;
-		std::map<std::string, std::string> _requestLine;
-		std::string	headers;
-		std::string _requestData;
-		std::string _body;
+		// content length
 		unsigned int	_contentLength;
+		//maps
 		std::map<std::string, std::string> _headers;
+		std::map<std::string, std::string> _requestLine;
+		//strings
+		std::string _body;
 		std::string _params;
+		std::string	headers;
 		std::string _boundaryName;
 	public:
 	/* *************************** constructors *************************** */

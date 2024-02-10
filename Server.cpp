@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:58 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/09 19:17:44 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/10 00:01:14 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ int runServer(char *av)
 		catch (const std::exception &e)
 		{
 			std::cerr << e.what() << '\n';
+			exit(1);
 		}
 	}
 	close(serverSocket);

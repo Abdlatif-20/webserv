@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/09 23:02:59 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/10 00:09:05 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,16 +214,15 @@ void	Request::separateRequest(std::string receivedRequest)
 
 void	Request::parseRequest(const std::string& receivedRequest)
 {
-	std::vector<std::string> requestLineVector;
 	std::srand(time(0));
 	if (!_requestLineDone && !_headersDone && !_requestIsWellFormed)
 	{
+		std::vector<std::string> requestVector;
 		separateRequest(receivedRequest); //separate the request line from the headers
-		requestLineVector = Utils::splitRequest(headers, CRLF);
-		fillRequestLine(requestLineVector[0]); //fill the request line
-		fillHeaders(requestLineVector); //fill the headers
+		requestVector = Utils::splitRequest(headers, CRLF);
+		fillRequestLine(requestVector[0]); //fill the request line
+		fillHeaders(requestVector); //fill the headers
 		requestIsWellFormed(); //check if the request is well formed
-		_requestData = receivedRequest;
 		_receivecount++;
 	}
 	// matchUriRequest();
