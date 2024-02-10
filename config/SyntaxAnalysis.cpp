@@ -6,11 +6,13 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 15:16:11 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/07 20:15:13 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/10 15:53:26 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "SyntaxAnalysis.hpp"
+
+#pragma region "EXCEPTION"
 
 SyntaxErrorException::SyntaxErrorException(const std::string& str)
 {
@@ -36,111 +38,128 @@ const char *SyntaxErrorException::what() const throw()
     return str.c_str();
 }
 
-static int countArgs(const TokensVector &tokens, TokensVector::const_iterator& i, t_type t)
+#pragma endregion
+
+/* The `countDirectiveArgs` function is used to count the number of arguments for a directive in the
+server configuration file.*/
+static size_t countDirectiveArgs(const TokensVector& tokens, TokensVector::const_iterator& i)
 {
-    int counter = 0;
-    i++;
-    while (i != tokens.end() && i->getType() != SEMICOLON && i->getType() != CLOSED_BRACKET && i->getType() != OPEN_BRACKET)
+    size_t counter = 0;
+    while (i != tokens.end() && i->getType() != SEMICOLON)
     {
+        if (i->getType() != WORD)
+            throw SyntaxErrorException("unexpected `" + i->getContent() + "` at line: ", i->getLineIndex());
         counter++;
         i++;
     }
     return counter;
 }
 
-static void checkDirective(t_directive d, const TokensVector &tokens,
+/* The `checkDirective` function is responsible for checking the syntax of a directive in the server
+configuration file. It takes a directive `d`, a vector of tokens `tokens`, and an iterator `i` as
+input. */
+static void checkDirective(t_directive d, const TokensVector& tokens,
     TokensVector::const_iterator& i)
 {
-    if (d == ROOT || d == LISTEN || d == CLIENT_MAX_BODY_SIZE || d == AUTO_INDEX)
+    size_t currLineIndex = i->getLineIndex();
+    size_t count = countDirectiveArgs(tokens, ++i);
+    switch (d)
     {
-        if (countArgs(tokens, i, SEMICOLON) != 1)
-            throw SyntaxErrorException("invalid number of args for `" + ConfigUtils::getTokenNameFromDirective(d) + "` directive at line: ", i->getLineIndex());
+        case ROOT: case AUTO_INDEX: case CLIENT_MAX_BODY_SIZE: case LISTEN:
+            if (count != 1)
+                throw SyntaxErrorException("invalid number of args at line: ", currLineIndex);
+            break;
+        case INDEX: case SERVER_NAME:
+            if (count == 0)
+                throw SyntaxErrorException("invalid number of args at line: ", currLineIndex);
+            break;
+        case ERROR_PAGE: case RETURN:
+            if (count != 2)
+                throw SyntaxErrorException("invalid number of args at line: ", currLineIndex);
+            break;
+        case ALLOWED_METHODS:
+            if (count == 0 || count > 3)
+                throw SyntaxErrorException("invalid number of args at line: ", currLineIndex);
+            break;
+        default:
+            break;
     }
-    else if (d == INDEX || d == SERVER_NAME)
-    {
-        if (countArgs(tokens, i, SEMICOLON) == 0)
-            throw SyntaxErrorException("invalid number of args for `" + ConfigUtils::getTokenNameFromDirective(d) + "` directive at line: ", i->getLineIndex());
-    }
-    else if (d == ERROR_PAGE || d == RETURN)
-    {
-        if (countArgs(tokens, i, SEMICOLON) != 2)
-            throw SyntaxErrorException("invalid number of args for `" + ConfigUtils::getTokenNameFromDirective(d) + "` directive at line: ", i->getLineIndex());
-    }
-    else if (d == ALLOWED_METHODS)
-    {
-        int count = countArgs(tokens, i, SEMICOLON);
-        if (count == 0 || count > 3)
-            throw SyntaxErrorException("invalid number of args for `" + ConfigUtils::getTokenNameFromDirective(d) + "` directive at line: ", i->getLineIndex());
-    }
-    if (i->getType() != SEMICOLON)
-        throw SyntaxErrorException("missing `;` at line: ", i->getLineIndex());
 }
 
-static void checkLocation(const TokensVector &tokens,
-    TokensVector::const_iterator& i, int& brackets)
+/* The `checkLocation` function is responsible for checking the syntax of a location block in the
+server configuration file. It takes a vector of tokens and an iterator as input. */
+static void checkLocation(const TokensVector& tokens,
+    TokensVector::const_iterator& i)
 {
-    if ((i + 1) == tokens.end() || (i + 1)->getType() != WORD)
-        throw SyntaxErrorException("expected word after `location` at line: ", i + 1 == tokens.end() ? i->getLineIndex() : (i + 1)->getLineIndex());
-    if ((i + 2) == tokens.end() || (i + 2)->getType() != OPEN_BRACKET)
-        throw SyntaxErrorException("missing `{` at line: ", i + 1 == tokens.end() ? i->getLineIndex() : (i + 1)->getLineIndex());
-    while (i != tokens.end() && i->getType() != OPEN_BRACKET)
-        i++;
-    // if (countArgs(tokens, i, OPEN_BRACKET) != 1)
-    //     throw SyntaxErrorException("invalid number of args for `location` directive at line: ", i->getLineIndex());
-    brackets++;
+    size_t currLineIndex = i->getLineIndex();
+    t_directive d;
+
+    if (++i == tokens.end() || i->getType() != WORD)
+        throw SyntaxErrorException("expected word after `location` directive at line: ", currLineIndex);
+    if (++i == tokens.end())
+        throw SyntaxErrorException("expected `{` at line: ", currLineIndex);
+    else if (i->getType() != OPEN_BRACKET)
+        throw SyntaxErrorException("unexpected `" + i->getContent() + "` at line: ", currLineIndex);
     i++;
     while (i != tokens.end() && i->getType() != CLOSED_BRACKET)
     {
-        t_directive d = ConfigUtils::getDirectiveFromTokenName(i->getContent());
-        if (!(d == ROOT || d == INDEX || d == AUTO_INDEX
-            || d == ERROR_PAGE || d == CLIENT_MAX_BODY_SIZE
-            || d == ALLOWED_METHODS || d == RETURN))
+        currLineIndex = i->getLineIndex();
+        d = ConfigUtils::getDirectiveFromTokenName(i->getContent());
+        if (d == LOCATION || d == LISTEN || d == SERVER_NAME || d == UNKNOWN)
             throw SyntaxErrorException("unexpected `" + i->getContent() + "` at line: ", i->getLineIndex());
         checkDirective(d, tokens, i);
-        if (i != tokens.end())
-            i++;
+        i++;
     }
-    if (i != tokens.end() && i->getType() == CLOSED_BRACKET)
-        brackets--;
+    if (i == tokens.end() || i->getType() != CLOSED_BRACKET)
+        throw SyntaxErrorException("expected `}` at line: ", currLineIndex);
 }
 
-void checkSyntax(const TokensVector &tokens)
+/* The `checkServer` function is responsible for checking the syntax of a server block in the server
+configuration file. It takes a vector of tokens and an iterator as input. */
+static void checkServer(const TokensVector& tokens, TokensVector::const_iterator& i)
+{
+    size_t currLineIndex;
+    t_directive d;
+
+    currLineIndex = (i++)->getLineIndex();
+    if (i == tokens.end() || i->getType() != OPEN_BRACKET)
+        throw SyntaxErrorException("expected `{` at line: ", currLineIndex);
+    i++;
+    while (i != tokens.end() && i->getType() != CLOSED_BRACKET)
+    {
+        currLineIndex = i->getLineIndex();
+        d = ConfigUtils::getDirectiveFromTokenName(i->getContent());
+        if (d == LOCATION)
+            checkLocation(tokens, i);
+        else if (d == UNKNOWN)
+            throw SyntaxErrorException("unknown directive `" + i->getContent() + "` at line: ", currLineIndex);
+        else
+            checkDirective(d, tokens, i);
+        if (i != tokens.end())
+            i++;
+    }
+    if (i == tokens.end() || i->getType() != CLOSED_BRACKET)
+        throw SyntaxErrorException("expected `}` at line: ", currLineIndex);
+}
+
+/** The `checkSyntax` function takes a vector of tokens as input and checks the syntax of the server
+configuration file. It iterates through the tokens and checks for the correct usage of directives
+and keywords according to the server configuration syntax. If any syntax error is found, it throws a
+`SyntaxErrorException` with a descriptive error message indicating the line number and the specific
+error. 
+* @param tokens tokens vector
+* @return Nothing
+*/
+void checkSyntax(const TokensVector& tokens)
 {
     TokensVector::const_iterator i = tokens.cbegin();
-    int brackets = 0;
-    if (tokens.empty())
-        throw SyntaxErrorException("config file must contain at least one server");
     while (i != tokens.cend())
     {
-        if (i->getContent() == "server")
-        {
-            if (++i == tokens.end()) i--;
-            if (i->getType() != OPEN_BRACKET)
-                throw SyntaxErrorException("expected `{` at line: ", i->getLineIndex());
-            i++;
-            brackets++;
-            while (i != tokens.end() && i->getType() != CLOSED_BRACKET)
-            {
-                t_directive d = ConfigUtils::getDirectiveFromTokenName(i->getContent());
-                if (d == LOCATION)
-                    checkLocation(tokens, i, brackets);
-                else if (d == UNKNOWN)
-                    throw SyntaxErrorException("unexpected `" + i->getContent() + "` at line: ", i->getLineIndex());
-                else
-                    checkDirective(d, tokens, i);
-                if (i != tokens.end())
-                    i++;
-            }
-        }
+        if (i->getType() == WORD && i->getContent() == "server")
+            checkServer(tokens, i);
         else
-            throw SyntaxErrorException("unexpected `" + i->getContent() + "` at line: ", i->getLineIndex());
+            throw SyntaxErrorException("expected `server` keyword at line: ", i->getLineIndex());
         if (i != tokens.end())
-        {
-            if (i->getType() == CLOSED_BRACKET)
-                brackets--;
             i++;
-        }
     }
-    if (brackets != 0)
-        throw SyntaxErrorException("each opened bracket should be closed");
 }

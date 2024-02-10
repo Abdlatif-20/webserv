@@ -6,28 +6,19 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/01/31 18:13:57 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/03 14:31:46 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Lexer.hpp"
+#include "Config.hpp"
 
-int main(int argc, char **argv)
+static void __unused showTokens(std::vector<Token>& tokens)
 {
-    std::string configPath = "webserv.conf";
-    try
+    std::vector<Token>::iterator iter = tokens.begin();
+    while (iter != tokens.end())
     {
-        if (argc == 2)
-            configPath = argv[1];
-        else if (argc > 2)
-            throw "Error: invalid number of args";
-        std::list<Token> tokens = Lexer::tokenize(configPath);
-
-        std::list<Token>::iterator iter = tokens.begin();
-        while (iter != tokens.end())
+        switch (iter->getType())
         {
-            switch (iter->getType())
-            {
             case WORD:
                 std::cout << "WORD =>\t\t\t" + iter->getContent() << std::endl;
                 break;
@@ -42,9 +33,21 @@ int main(int argc, char **argv)
                 break;           
             default:
                 break;
-            }
-            iter++;
         }
+        iter++;
+    }
+}
+
+int main(int argc, char **argv)
+{
+    std::string configPath = "webserv.conf";
+    try
+    {
+        if (argc == 2)
+            configPath = argv[1];
+        else if (argc > 2)
+            throw "Error: invalid number of args";
+        Config _config(configPath);
     }
     catch(const std::exception& e)
     {

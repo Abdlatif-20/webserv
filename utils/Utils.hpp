@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/01/29 20:28:08 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/01 15:21:44 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,7 @@
 
 #include <string>
 
-class Utils
+namespace Utils
 {
-    private:
-        Utils();
-    public:
-        static std::string strTrim(const std::string& str, char c);
+    std::string strTrim(const std::string& str, char c);
 };

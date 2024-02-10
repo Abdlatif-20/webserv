@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 17:13:18 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/05 17:13:59 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/06 12:08:49 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,4 +23,34 @@ t_directive ConfigUtils::getDirectiveFromTokenName(const std::string& tokenName)
         if (tokenName == tokens[i])
             return static_cast<t_directive>(i);
     return UNKNOWN;
+}
+
+std::string ConfigUtils::getTokenNameFromDirective(t_directive d)
+{
+    switch (d)
+    {
+        case ROOT:
+            return "root";
+        case INDEX:
+            return "index";
+        case AUTO_INDEX:
+            return "auto_index";
+        case ERROR_PAGE:
+            return "error_page";
+        case CLIENT_MAX_BODY_SIZE:
+            return "client_max_body_size";
+        case ALLOWED_METHODS:
+            return "allowed_methods";
+        case LISTEN:
+            return "listen";
+        case SERVER_NAME:
+            return "server_name";
+        case RETURN:
+            return "return";
+        case LOCATION:
+            return "location";
+        default:
+            break;
+    }
+    return "unknown";
 }

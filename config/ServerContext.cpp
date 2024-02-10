@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 10:40:09 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/04 15:12:59 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/04 16:55:27 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,4 +39,9 @@ ServerContext::~ServerContext()
 void ServerContext::addLocation(LocationContext location)
 {
     this->locations.push_back(location);
+}
+
+const LocationsVector& ServerContext::getLocations() const
+{
+    return locations;
 }

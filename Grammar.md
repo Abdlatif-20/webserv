@@ -5,7 +5,6 @@
 <server_directives> = {<server_directive> ";"}
 <location_directives> = {<location_directive> ";"}
 <http_directives> = {<http_directive> ";"}
-
 <http_directive> = "root" <WORD>
                     | "index" <WORD>+
                     | "auto_index" {"on" OR "off"}
