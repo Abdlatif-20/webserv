@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:08 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/07 19:49:46 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/09 10:12:46 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,8 @@ class Config
         ServersVector servers;
 
         Config();
-        void parseDirective(const t_directive& d,
-            TokensVector::iterator& tok_iter, Context& serverCtx);
-        void parseLocation(t_directive& d,
-            TokensVector::iterator& tok_iter, ServerContext& serverCtx);
+        void parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx);
+        void parseLocation(TokensVector::iterator& tok_iter, ServerContext& serverCtx);
         void parseServers();
         void printDirectives(const Context& ctx);
     public:
@@ -37,4 +35,6 @@ class Config
         Config(const Config& obj);
         Config& operator=(const Config& obj);
         ~Config();
+        
+        const ServersVector& getServers() const;
 };
