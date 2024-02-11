@@ -1,0 +1,8 @@
+server:
+	server class:
+		☐ create a sample server @started(24-02-04 15:41)
+	☐ create a class for server manging sockets ...
+	☐ make server multi-client
+	☐ create client obj for each client, which will contain the request
+	☐ setup server as config file require
+	☐ listen to clients, create a client for each reques and send back its reponce

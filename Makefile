@@ -3,27 +3,34 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+         #
+#    By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/01/29 13:21:10 by mel-yous         ###   ########.fr        #
+#    Updated: 2024/02/04 13:40:01 by houmanso         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserv
-CPPFLAGS = -Wall -Wextra -Werror -std=c++98
 SRCS = $(wildcard *.cpp) $(wildcard */*.cpp)
+INC  = $(wildcard *.hpp) $(wildcard */*.hpp)
 OBJS = $(SRCS:.cpp=.o)
-INC = $(wildcard *.hpp) $(wildcard */*.hpp)
-COMPILER = c++ -I config -I utils
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98
+CPPFLAGS += -I config -I utils -I server
 
 all: $(NAME)
+
 $(NAME): $(OBJS)
-	$(COMPILER) $(CPPFLAGS) $(OBJS) -o $(NAME)
+	c++ $(CPPFLAGS) $(OBJS) -o $(NAME)
+
 %.o: %.cpp $(INC)
-	$(COMPILER) $(CPPFLAGS) -c $< -o $@
+	c++ $(CPPFLAGS) -c $< -o $@
+
 clean:
 	rm -rf $(OBJS)
+
 fclean: clean
 	rm -rf $(NAME)
+
 re: clean fclean all
+
+.PHONY: clean server utils config

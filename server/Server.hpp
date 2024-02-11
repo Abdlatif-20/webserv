@@ -1,28 +1,40 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/05 17:39:19 by houmanso         ###   ########.fr       */
+/*   Created: 2024/02/03 22:57:14 by houmanso          #+#    #+#             */
+/*   Updated: 2024/02/04 15:50:43 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
+#ifndef SERVER_HPP
+#define SERVER_HPP
 
-int main(int __unused argc, char __unused **argv)
+#include "Utils.hpp"
+#include <iostream>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
+class Server
 {
-	Server	webver;
+	private:
+		int	socketID;
+		sockaddr_in	addr;
+	public:
+		Server(void);
+		Server(const Server& cpy);
 
-	try
-	{
-		webver.run();
-	}
-	catch (const std::exception& e)
-	{
-		std::cerr << "Error: " << e.what() << std::endl;
-	}
-	return (0);
-}
+		Server	&operator=(const Server& cpy);
+
+		void	run(void);
+		void	setupAddr(void);
+
+		~Server(void);
+};
+
+#endif
+
