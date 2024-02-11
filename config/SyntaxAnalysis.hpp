@@ -1,32 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Lexer.hpp                                          :+:      :+:    :+:   */
+/*   SyntaxAnalysis.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/29 11:15:12 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/08 14:19:37 by mel-yous         ###   ########.fr       */
+/*   Created: 2024/02/01 15:16:10 by mel-yous          #+#    #+#             */
+/*   Updated: 2024/02/09 10:12:14 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <exception>
+#include "Lexer.hpp"
+#include <sstream>
 #include "Defs.hpp"
-#include "Token.hpp"
-#include "Utils.hpp"
+#include "ConfigUtils.hpp"
 
-class Lexer
+class SyntaxErrorException : public std::exception
 {
     private:
-        Lexer();
-        static bool isSpecialChar(char c);
-        static void getToken(const std::string& line, size_t lineIndex);
-
-        static TokensVector tokens;
+        std::string str;
     public:
-        static TokensVector tokenize(const std::string& configFile);
+        SyntaxErrorException(const std::string& str);
+        SyntaxErrorException(const std::string& str, size_t lineIndex);
+        const char* what() const throw();
+        ~SyntaxErrorException() throw();
 };
+
+void checkSyntax(const TokensVector& tokenList);

@@ -6,23 +6,56 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/05 17:39:19 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/11 13:36:11 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Server.hpp"
+#include "Config.hpp"
 
-int main(int __unused argc, char __unused **argv)
+static void __unused showTokens(std::vector<Token>& tokens)
 {
-	Server	webver;
+	std::vector<Token>::iterator iter = tokens.begin();
+	while (iter != tokens.end())
+	{
+		switch (iter->getType())
+		{
+			case WORD:
+				std::cout << "WORD =>\t\t\t" + iter->getContent() << std::endl;
+				break;
+			case SEMICOLON:
+				std::cout << "SEMICOLON =>\t\t" + iter->getContent() << std::endl;
+				break;
+			case OPEN_BRACKET:
+				std::cout << "OPEN_BRACKET =>\t\t" + iter->getContent() << std::endl;
+				break;
+			case CLOSED_BRACKET:
+				std::cout << "CLOSE_BRACKET =>\t" + iter->getContent() << std::endl;
+				break;
+			default:
+				break;
+		}
+		iter++;
+	}
+}
 
+int main(int argc, char **argv)
+{
+	std::string configPath = "webserv.conf";
 	try
 	{
-		webver.run();
+		if (argc == 2)
+			configPath = argv[1];
+		else if (argc > 2)
+			throw "Error: invalid number of args";
+		Config _config(configPath);
 	}
-	catch (const std::exception& e)
+	catch(const std::exception& e)
 	{
-		std::cerr << "Error: " << e.what() << std::endl;
+		std::cerr << e.what() << '\n';
 	}
-	return (0);
+	catch(const char* msg)
+	{
+		std::cerr << msg << std::endl;
+	}
+	return 0;
 }
