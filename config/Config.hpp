@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:08 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/09 10:12:46 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/11 12:10:31 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ class Config
         void parseLocation(TokensVector::iterator& tok_iter, ServerContext& serverCtx);
         void parseServers();
         void printDirectives(const Context& ctx);
+        
+        void setDefaultDirectives();
     public:
         Config(const std::string& configPath);
         Config(const Config& obj);
