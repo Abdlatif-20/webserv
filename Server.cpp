@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:58 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/10 00:01:14 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/10 21:46:17 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 	6. close sockets
 */
 
-int runServer(char *av)
+int Utils::runServer(char **av)
 {
 	int serverSocket = socket(AF_INET, SOCK_STREAM, 0); // IPv4, TCP, default protocol
 	if (serverSocket < 0)
@@ -32,7 +32,7 @@ int runServer(char *av)
 		std::cerr << "Error creating socket\n";
 		return 1;
 	}
-	int port = std::stoi(av);
+	int port = std::stoi(av[1]);
 	
 	struct sockaddr_in serverAddr;// IPv4 address structure
 	memset(&serverAddr, 0, sizeof(serverAddr));
@@ -72,7 +72,7 @@ int runServer(char *av)
 
 		try
 		{
-			client.parseRequest(buffer);
+			client.parseRequest(buffer, av[2]);
 		}
 		catch (const std::exception &e)
 		{

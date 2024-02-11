@@ -1,32 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Lexer.hpp                                          :+:      :+:    :+:   */
+/*   ServerContext.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/29 11:15:12 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/08 14:19:37 by mel-yous         ###   ########.fr       */
+/*   Created: 2024/02/02 10:40:11 by mel-yous          #+#    #+#             */
+/*   Updated: 2024/02/10 15:38:06 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <exception>
 #include "Defs.hpp"
-#include "Token.hpp"
-#include "Utils.hpp"
+#include "Context.hpp"
+#include "LocationContext.hpp"
 
-class Lexer
+class ServerContext : public Context
 {
     private:
-        Lexer();
-        static bool isSpecialChar(char c);
-        static void getToken(const std::string& line, size_t lineIndex);
-
-        static TokensVector tokens;
+        LocationsVector locations;
     public:
-        static TokensVector tokenize(const std::string& configFile);
+        ServerContext();
+        ServerContext(const ServerContext& obj);
+        ServerContext& operator=(const ServerContext& obj);
+        ~ServerContext();
+
+        void addLocation(LocationContext location);
+        const LocationsVector& getLocations() const;
 };

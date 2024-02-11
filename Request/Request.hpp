@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/10 00:10:07 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/11 17:22:14 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include "Config.hpp"
 
 enum Errors
 {
@@ -37,7 +38,6 @@ enum Errors
 #define ALLOWED_CHARACTERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJ\
 							KLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%"
 
-							//?t=hello\&k=cvfv&l=dcdc
 class Request
 {
 	private:
@@ -46,6 +46,7 @@ class Request
 		bool _headersDone;
 		bool _requestLineDone;
 		bool _requestIsWellFormed;
+		bool _foundUri;
 		int	_receivecount;
 		int _status;
 		// content length
@@ -58,6 +59,7 @@ class Request
 		std::string _params;
 		std::string	headers;
 		std::string _boundaryName;
+		char		*_configPath;
 	public:
 	/* *************************** constructors *************************** */
 		Request();
@@ -66,19 +68,22 @@ class Request
 	typedef std::invalid_argument InvalidRequest;
 	/* *************************** methods *************************** */
 		void	separateRequest(std::string receivedRequest);
-		void	parseRequest(const std::string& receivedRequest);
+		void	parseRequest(const std::string& receivedRequest, char *configPath);
 		void	fillHeaders(std::vector<std::string> headers);
 		void	requestIsWellFormed();
 		void	fillRequestLine(const std::string& requestLine);
 		void	parseContentLength();
 		void	parseContentType();
 		void	parseTransferEncoding();
-		void	matchUriRequest();
 		void	parseBody();
 		// function to parse boundary
 		void	ContentLength();
 		void	parseBoundary();
 		void	boundary();
+		//Uri
+		void	findUri();
+		void	matchUriRequest();
+		
 
 	/* *************************** getters *************************** */
 		std::string getBody();

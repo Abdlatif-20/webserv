@@ -6,13 +6,13 @@
 #    By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/02/09 21:03:56 by aben-nei         ###   ########.fr        #
+#    Updated: 2024/02/11 17:30:17 by aben-nei         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserv
 CPPFLAGS = -Wall -Wextra -Werror -std=c++98
-SRCS = $(wildcard *.cpp) $(wildcard */*.cpp)
+SRCS = $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
 OBJS = $(SRCS:.cpp=.o)
 INC = $(wildcard *.hpp) $(wildcard */*.hpp)
 COMPILER = c++ -I config -I utils -I Request
@@ -26,5 +26,4 @@ clean:
 	rm -rf $(OBJS)
 fclean: clean
 	rm -rf $(NAME)
-	rm -rf *.txt
 re: clean fclean all

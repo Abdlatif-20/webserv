@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Client.hpp                                         :+:      :+:    :+:   */
+/*   client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 21:51:52 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/08 21:43:42 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/10 18:42:38 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ class Client
 	public:
 		Client();
 		~Client();
-		void parseRequest(std::string receivedRequest);
+		void parseRequest(std::string receivedRequest, char *configPath);
 		// void parseRequest(std::string request);
 		// void parseHeaders(std::string headers);
 		// void fillHeaders(std::vector<std::string> headers);

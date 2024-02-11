@@ -1,32 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Lexer.hpp                                          :+:      :+:    :+:   */
+/*   Context.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/29 11:15:12 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/08 14:19:37 by mel-yous         ###   ########.fr       */
+/*   Created: 2024/02/03 22:24:35 by mel-yous          #+#    #+#             */
+/*   Updated: 2024/02/09 16:11:42 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <exception>
 #include "Defs.hpp"
-#include "Token.hpp"
-#include "Utils.hpp"
+#include <string>
 
-class Lexer
+class Context
 {
-    private:
-        Lexer();
-        static bool isSpecialChar(char c);
-        static void getToken(const std::string& line, size_t lineIndex);
-
-        static TokensVector tokens;
+    protected:
+        DirectivesMap directives;
     public:
-        static TokensVector tokenize(const std::string& configFile);
+        Context();
+        Context(const Context& obj);
+        Context& operator=(const Context& obj);
+        ~Context();
+
+        void addDirective(Directive _directive);
+        const DirectivesMap& getDirectives() const;
+        StringVector::const_iterator getDirectiveByKey(const std::string& key) const;
 };
