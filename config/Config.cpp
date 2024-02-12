@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/11 20:46:11 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/12 11:24:36 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx
     std::string key = tok_iter->getContent();
     StringVector value;
     t_directive d = ConfigUtils::getDirectiveFromTokenName(tok_iter->getContent());
-    if (d == LISTEN || d == ROOT || d == CLIENT_MAX_BODY_SIZE || d == AUTO_INDEX)
+    if (d == ROOT || d == CLIENT_MAX_BODY_SIZE || d == AUTO_INDEX)
     {
         if (serverCtx.getDirectives().count(tok_iter->getContent()) != 0)
             throw SyntaxErrorException("`" + tok_iter->getContent() + "` directive is duplicated at line: ", tok_iter->getLineIndex());
@@ -114,7 +114,7 @@ void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx
         value.push_back(tok_iter->getContent());
         serverCtx.addDirective(Directive(key, value));
     }
-    else if (d == INDEX || d == ERROR_PAGE
+    else if (d == LISTEN || d == INDEX || d == ERROR_PAGE
         || d == ALLOWED_METHODS || d == SERVER_NAME || d == RETURN)
     {
         TokensVector::iterator tmp_iter = tok_iter;
