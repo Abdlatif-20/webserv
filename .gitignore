@@ -2,3 +2,4 @@
 *.pdf
 *.tldr
 *.txt
+obj/
