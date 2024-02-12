@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/11 23:39:35 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/12 02:06:51 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,6 @@ void	Request::parseRequest(const std::string& receivedRequest, char *configPath)
 	// std::cout <<"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"<< std::endl;
 	// std::cout << "Request:\n" << receivedRequest << std::endl;
 	// std::cout <<"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"<< std::endl;
-	// exit(0);
 	_configPath = configPath;
 	std::srand(time(0));
 	if (!_requestLineDone && !_headersDone && !_requestIsWellFormed)
@@ -144,9 +143,12 @@ void	Request::parseRequest(const std::string& receivedRequest, char *configPath)
 		separateRequest(receivedRequest); //separate the request line from the headers
 		requestVector = Utils::splitRequest(headers, CRLF);
 		fillRequestLine(requestVector[0]); //fill the request line
-		fillHeaders(requestVector); //fill the headers
-		requestIsWellFormed(); //check if the request is well formed
-		_receivecount++;
+		if (_foundUri)
+		{
+			fillHeaders(requestVector); //fill the headers
+			requestIsWellFormed(); //check if the request is well formed	
+			_receivecount++;
+		}
 	}
 	if (!_bodyDone)
 	{
