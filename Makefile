@@ -6,7 +6,7 @@
 #    By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/02/02 16:48:44 by mel-yous         ###   ########.fr        #
+#    Updated: 2024/02/12 12:24:09 by mel-yous         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,13 +17,35 @@ OBJS = $(SRCS:.cpp=.o)
 INC = $(wildcard *.hpp) $(wildcard */*.hpp)
 COMPILER = c++ -g -I config -I utils
 
-all: $(NAME)
+COLOR_GREEN = \033[0;32m
+COLOR_RED = \033[0;31m
+COLOR_BLUE = \033[0;34m
+END_COLOR = \033[0m
+
+RULE = MYRULE
+
+all: $(RULE) $(NAME)
+	@printf "\n\n"
+	@printf "[+] COMPILATION FINISHED\n"
+	@printf "[+] EXECUTABLE CREATED \`$(NAME)\`\n"
+	@printf "[+] ENJOY !\n"
+
+$(RULE):
+	@printf "\n\n$(COLOR_BLUE)██╗    ██╗███████╗██████╗ ███████╗███████╗██████╗ ██╗   ██╗\n\
+██║    ██║██╔════╝██╔══██╗██╔════╝██╔════╝██╔══██╗██║   ██║\n\
+██║ █╗ ██║█████╗  ██████╔╝███████╗█████╗  ██████╔╝██║   ██║\n\
+██║███╗██║██╔══╝  ██╔══██╗╚════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝\n\
+╚███╔███╔╝███████╗██████╔╝███████║███████╗██║  ██║ ╚████╔╝ \n\
+ ╚══╝╚══╝ ╚══════╝╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝$(END_COLOR)\n\n\
+[+] COMPILATION IN PROGRESS\n\n"
+
 $(NAME): $(OBJS)
-	$(COMPILER) $(CPPFLAGS) $(OBJS) -o $(NAME)
+	@$(COMPILER) $(CPPFLAGS) $(OBJS) -o $(NAME)
 %.o: %.cpp $(INC)
-	$(COMPILER) $(CPPFLAGS) -c $< -o $@
+	@$(COMPILER) $(CPPFLAGS) -c $< -o $@
+	@printf "$(COLOR_GREEN)██████$(END_COLOR)"
 clean:
-	rm -rf $(OBJS)
+	@rm -rf $(OBJS)
 fclean: clean
-	rm -rf $(NAME)
+	@rm -rf $(NAME)
 re: clean fclean all
