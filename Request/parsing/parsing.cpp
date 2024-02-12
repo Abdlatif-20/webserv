@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/11 19:26:49 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/11 23:39:35 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,9 +118,24 @@ void	Request::separateRequest(std::string receivedRequest)
 
 }
 
+//function to parse the Body of the request
+void	Request::parseBody()
+{
+	if (_requestLine["method"] == "POST"
+			&& _headers.find("content-length") != _headers.end())
+			ContentLength();
+	else if (_requestLine["method"] == "POST"
+			&& _headers.find("content-type") != _headers.end())
+			parseBoundary();
+}
+
 //main function to parse the request
 void	Request::parseRequest(const std::string& receivedRequest, char *configPath)
 {
+	// std::cout <<"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"<< std::endl;
+	// std::cout << "Request:\n" << receivedRequest << std::endl;
+	// std::cout <<"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"<< std::endl;
+	// exit(0);
 	_configPath = configPath;
 	std::srand(time(0));
 	if (!_requestLineDone && !_headersDone && !_requestIsWellFormed)
@@ -141,15 +156,4 @@ void	Request::parseRequest(const std::string& receivedRequest, char *configPath)
 	}
 	// matchUriRequest();
 	// Utils::printFile("boundary.txt");
-}
-
-//function to parse the Body of the request
-void	Request::parseBody()
-{
-	if (_requestLine["method"] == "POST"
-			&& _headers.find("content-length") != _headers.end())
-			ContentLength();
-	else if (_requestLine["method"] == "POST"
-			&& _headers.find("content-type") != _headers.end())
-			parseBoundary();
 }

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/11 17:22:14 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/11 19:40:29 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ class Request
 		std::string _params;
 		std::string	headers;
 		std::string _boundaryName;
-		char		*_configPath;
+		std::string	_configPath;
 	public:
 	/* *************************** constructors *************************** */
 		Request();

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/11 01:24:37 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/12 00:12:53 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,17 +39,17 @@ void	Request::ContentLength()
 	}
 	if (_bodyDone == false)
 	{
-		if (_contentLength > _body.size())
-		{
-			file << _body;
-			_contentLength -= _body.size();
-			_receivecount++;
-		}
-		else if (_contentLength < _body.size())
+		if (_contentLength < _body.size())
 		{
 			file << _body.substr(0, _contentLength);
 			_body = _body.substr(_contentLength);
 			_contentLength = 0;
+		}
+		else
+		{
+			file << _body;
+			_contentLength -= _body.size();
+			_receivecount++;
 		}
 	}
 	if (_contentLength == 0)

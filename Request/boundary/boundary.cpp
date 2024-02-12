@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/11 04:06:52 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/11 21:30:34 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,13 @@ static std::string pripareFileName(std::string line, bool &initialFile)
 	{
 		filename = line.substr(line.find("filename=") + 10,
 			line.find_last_of("\"") - line.find("filename=") - 10);
-		std::cout << "filename: " << filename << std::endl;
+		// std::cout << "filename: " << filename << std::endl;
 	}
 	else if (line.find("name") != std::string::npos)
 	{
 		filename = line.substr(line.find("name=") + 6,
 			line.find_last_of("\"") - line.find("name=") - 6);
-		std::cout << "name: " << filename << std::endl;
+		// std::cout << "name: " << filename << std::endl;
 	}
 	initialFile = true;
 	extension = filename.substr(filename.find_last_of(".") + 1);
@@ -45,6 +45,18 @@ static std::string pripareFileName(std::string line, bool &initialFile)
 	filename = filename.substr(0, filename.find_last_of("."));
 	filename = filename + "_" + Utils::intToString(random) + "." + extension;
 	return (filename);
+}
+
+static void	ignoredLines(std::ifstream &file)
+{
+	std::string line;
+	while (std::getline(file, line))
+	{
+		if (line.find("Content-Type:") != std::string::npos)
+			continue;
+		else
+			break;
+	}
 }
 
 void	Request::boundary()
@@ -66,27 +78,29 @@ void	Request::boundary()
 	}
 	while (std::getline(file, line))
 	{
-		// std::cout << "line: " << line << std::endl;
 		if (line.find("Content-Disposition") != std::string::npos)
 		{
 			filename = pripareFileName(line, initialFile);
+			ignoredLines(file);
 			continue;
 		}
 		if (line.find(boundaryEnd) != std::string::npos)
 		{
 			isComplete = true;
+			std::remove(_boundaryName.c_str());
 		}
-			if (initialFile && !isComplete)
+		if (initialFile && !isComplete)
+		{
+			std::ofstream file(filename, std::ios::app);
+			if (!file.is_open())
 			{
-				std::ofstream file(filename, std::ios::app);
-				if (!file.is_open())
-				{
-					_status = BadRequest;
-					throw InvalidRequest("can't open file");
-				}
-				file << line;
+				_status = BadRequest;
+				throw InvalidRequest("can't open file");
 			}
+			file << line << std::endl;
+		}
 	}
+	file.close();
 }
 
 void	Request::parseBoundary()
