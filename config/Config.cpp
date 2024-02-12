@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/12 11:24:36 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/12 18:13:53 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx
     std::string key = tok_iter->getContent();
     StringVector value;
     t_directive d = ConfigUtils::getDirectiveFromTokenName(tok_iter->getContent());
-    if (d == ROOT || d == CLIENT_MAX_BODY_SIZE || d == AUTO_INDEX)
+    if (d == ROOT || d == CLIENT_MAX_BODY_SIZE || d == AUTO_INDEX || d == UPLOAD_STORE)
     {
         if (serverCtx.getDirectives().count(tok_iter->getContent()) != 0)
             throw SyntaxErrorException("`" + tok_iter->getContent() + "` directive is duplicated at line: ", tok_iter->getLineIndex());

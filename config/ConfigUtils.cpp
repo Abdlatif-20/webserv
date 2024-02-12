@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/05 17:13:18 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/06 12:08:49 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/12 18:15:18 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 
 t_directive ConfigUtils::getDirectiveFromTokenName(const std::string& tokenName)
 {
-    std::string tokens[10] = 
+    std::string tokens[11] = 
     {
         "root", "index", "auto_index", "error_page", "client_max_body_size",
-        "allowed_methods", "listen", "server_name", "return", "location"
+        "allowed_methods", "listen", "server_name", "return", "location", "upload_store"
     };
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 11; i++)
         if (tokenName == tokens[i])
             return static_cast<t_directive>(i);
     return UNKNOWN;
@@ -49,6 +49,8 @@ std::string ConfigUtils::getTokenNameFromDirective(t_directive d)
             return "return";
         case LOCATION:
             return "location";
+        case UPLOAD_STORE:
+            return "upload_store";
         default:
             break;
     }
