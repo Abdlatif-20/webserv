@@ -1,33 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/14 20:06:05 by houmanso         ###   ########.fr       */
+/*   Created: 2024/02/14 19:55:56 by houmanso          #+#    #+#             */
+/*   Updated: 2024/02/14 20:07:21 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#include "Server.hpp"
 
-#include <iostream>
-
-class Server
+Server::Server(void)
 {
-	private:
-		int	sockId;
-		Server	serverCTX;
+}
 
-	public:
-		Server(void);
-		Server(const Server& cpy);
+Server::Server(const Server &cpy)
+{
+	*this = cpy;
+}
 
-		Server&	operator=(const Server& cpy);
+Server &Server::operator=(const Server &cpy)
+{
+	if (this != &cpy)
+	{
+		// ...
+	}
+	return (*this);
+}
 
-		~Server(void);
-};
-
-#endif
+Server::~Server(void)
+{
+}
