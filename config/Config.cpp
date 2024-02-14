@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/12 18:13:53 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/14 17:47:23 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,22 +30,22 @@ Config::Config(const std::string& configPath)
     checkSyntax(tokens);
     parseServers();
     setDefaultDirectives();
-    ServersVector::iterator s_iter = servers.begin();
-    while (s_iter != servers.end())
-    {
-        std::cout << "server {" << std::endl;
-        printDirectives(*s_iter);
-        LocationsVector::const_iterator location_iter = s_iter->getLocations().cbegin();
-        while (location_iter != s_iter->getLocations().cend())
-        {
-            std::cout << " location " << location_iter->getPrefix() << " {" << std::endl;
-            printDirectives(*location_iter);
-            std::cout << " }" << std::endl;
-            location_iter++;
-        }
-        std::cout << "}" << std::endl;
-        s_iter++;
-    }
+    // ServersVector::iterator s_iter = servers.begin();
+    // while (s_iter != servers.end())
+    // {
+    //     std::cout << "server {" << std::endl;
+    //     printDirectives(*s_iter);
+    //     LocationsVector::const_iterator location_iter = s_iter->getLocations().cbegin();
+    //     while (location_iter != s_iter->getLocations().cend())
+    //     {
+    //         std::cout << " location " << location_iter->getPrefix() << " {" << std::endl;
+    //         printDirectives(*location_iter);
+    //         std::cout << " }" << std::endl;
+    //         location_iter++;
+    //     }
+    //     std::cout << "}" << std::endl;
+    //     s_iter++;
+    // }
 }
 
 Config::Config(const Config& obj)
@@ -80,14 +80,14 @@ void Config::parseLocation(TokensVector::iterator& tok_iter, ServerContext& serv
 {
     if (tok_iter == tokens.end())
         return ;
-    t_directive d = ConfigUtils::getDirectiveFromTokenName(tok_iter->getContent());
+    t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
     if (d == LOCATION)
     {
         tok_iter++;
         LocationContext locationCtx(tok_iter->getContent()); /*Create location object with -prefix-*/
         while (tok_iter != tokens.end() && tok_iter->getType() != CLOSED_BRACKET)
         {
-            d = ConfigUtils::getDirectiveFromTokenName(tok_iter->getContent());
+            d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
             parseDirective(tok_iter, locationCtx);
             tok_iter++;
         }
@@ -105,8 +105,8 @@ void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx
         return ;
     std::string key = tok_iter->getContent();
     StringVector value;
-    t_directive d = ConfigUtils::getDirectiveFromTokenName(tok_iter->getContent());
-    if (d == ROOT || d == CLIENT_MAX_BODY_SIZE || d == AUTO_INDEX || d == UPLOAD_STORE)
+    t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
+    if (d == LISTEN || d == ROOT || d == CLIENT_MAX_BODY_SIZE || d == AUTO_INDEX || d == UPLOAD_STORE)
     {
         if (serverCtx.getDirectives().count(tok_iter->getContent()) != 0)
             throw SyntaxErrorException("`" + tok_iter->getContent() + "` directive is duplicated at line: ", tok_iter->getLineIndex());
@@ -114,7 +114,7 @@ void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx
         value.push_back(tok_iter->getContent());
         serverCtx.addDirective(Directive(key, value));
     }
-    else if (d == LISTEN || d == INDEX || d == ERROR_PAGE
+    else if (d == INDEX || d == ERROR_PAGE
         || d == ALLOWED_METHODS || d == SERVER_NAME || d == RETURN)
     {
         TokensVector::iterator tmp_iter = tok_iter;
@@ -178,4 +178,11 @@ void Config::setDefaultDirectives()
 const ServersVector& Config::getServers() const
 {
     return servers;
+}
+
+ServersVector::const_iterator Config::getServerByHost(const std::string& host) const
+{
+    (void)host;
+    ServersVector::const_iterator serv_iter = servers.cbegin();
+    return serv_iter;
 }

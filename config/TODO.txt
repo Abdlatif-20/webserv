@@ -1,3 +1,3 @@
 1- Setup default values for missing directives | Setup default server if no server found
 2- Check for logical errors, `Example: listen hello;`
-3- Adding `upload_store && CGI` directives
+3- Adding `CGI` directives
