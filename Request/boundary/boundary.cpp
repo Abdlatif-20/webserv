@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/11 21:30:34 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/14 04:21:11 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ void	Request::boundary()
 	std::string extension;
 	std::string line;
 	std::map<std::string, std::string> boundaryMap;
-	std::string boundary = _headers["content-type"].substr(30);
+	std::string boundary = _headers["content-type"].substr(31);
 	std::string boundaryEnd = "--" + boundary + "--";
 	bool isComplete = false;
 
@@ -109,7 +109,7 @@ void	Request::parseBoundary()
 	_boundaryName = "/tmp/boundary" + randomStr + ".txt";
 	std::ofstream file(_boundaryName, std::ios::app);
 	bool isComplete = false;
-	std::string StartBoundary = "--" + _headers["content-type"].substr(30);
+	std::string StartBoundary = "--" + _headers["content-type"].substr(31);
 	std::string EndBoundary = StartBoundary + "--";
 	if (!file.is_open())
 	{

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:58 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/10 21:46:17 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/14 04:22:50 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,12 @@ int Utils::runServer(char **av)
 	if (serverSocket < 0)
 	{
 		std::cerr << "Error creating socket\n";
+		return 1;
+	}
+	int opt = 1;
+	if (setsockopt(serverSocket, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+	{
+		std::cerr << "Error setting socket options\n";
 		return 1;
 	}
 	int port = std::stoi(av[1]);
@@ -63,7 +69,7 @@ int Utils::runServer(char **av)
 	{
 		char buffer[1024];
 		memset(buffer, 0, sizeof(buffer));
-		bytesRead = recv(clientSocket, buffer, sizeof(buffer), 0);
+		bytesRead = recv(clientSocket, buffer, sizeof(buffer) -1, 0);
 		if (bytesRead < 0)
 		{
 			std::cerr << "Error receiving data" << std::endl;
