@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/09 17:49:55 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/14 18:30:59 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ int main(int argc, char **argv)
         else if (argc > 2)
             throw "Error: invalid number of args";
         Config _config(configPath);
+        std::cout << _config.getServerByHost("localhost")->getClientMaxBodySize() << std::endl;
     }
     catch(const std::exception& e)
     {
