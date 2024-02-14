@@ -1,29 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   ServerManger.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/13 16:24:04 by houmanso         ###   ########.fr       */
+/*   Created: 2024/02/13 16:21:59 by houmanso          #+#    #+#             */
+/*   Updated: 2024/02/14 15:17:58 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#ifndef SERVERMANGER_HPP
+#define SERVERMANGER_HPP
 
 #include <iostream>
+#include "Config.hpp"
+#include "Server.hpp"
 
-class Server
+class ServerManger
 {
+	private:
+		Config	config;
+		std::vector<Server>	servers;
+
 	public:
-		Server(void);
-		Server(const Server& cpy);
+		ServerManger(void);
+		ServerManger(const Config &conf);
+		ServerManger(const ServerManger& cpy);
 
-		Server&	operator=(const Server& cpy);
+		ServerManger&	operator=(const ServerManger& cpy);
 
-		~Server(void);
+		~ServerManger(void);
 };
 
 #endif

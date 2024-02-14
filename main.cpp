@@ -6,11 +6,12 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/11 13:36:11 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/13 15:05:51 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
+#include "Server.hpp"
 
 static void __unused showTokens(std::vector<Token>& tokens)
 {
@@ -46,16 +47,13 @@ int main(int argc, char **argv)
 		if (argc == 2)
 			configPath = argv[1];
 		else if (argc > 2)
-			throw "Error: invalid number of args";
+			throw Fail("Error: invalid number of args");
 		Config _config(configPath);
+		Server(_config);
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << e.what() << '\n';
-	}
-	catch(const char* msg)
-	{
-		std::cerr << msg << std::endl;
+		std::cerr << "ERROR : " << e.what() << '\n';
 	}
 	return 0;
 }

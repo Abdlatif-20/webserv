@@ -1,29 +1,42 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   ServerManger.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/13 16:24:04 by houmanso         ###   ########.fr       */
+/*   Created: 2024/02/13 16:25:30 by houmanso          #+#    #+#             */
+/*   Updated: 2024/02/14 13:26:17 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#include "ServerManger.hpp"
 
-#include <iostream>
-
-class Server
+ServerManger::ServerManger(void)
 {
-	public:
-		Server(void);
-		Server(const Server& cpy);
+	// nothing
+}
 
-		Server&	operator=(const Server& cpy);
+ServerManger::ServerManger(const Config &conf)
+{
+	config = conf;
+}
 
-		~Server(void);
-};
+ServerManger::ServerManger(const ServerManger &cpy)
+{
+	*this = cpy;
+}
 
-#endif
+ServerManger	&ServerManger::operator=(const ServerManger &cpy)
+{
+	if (this != &cpy)
+	{
+		config = cpy.config;
+		servers = cpy.servers;
+	}
+	return (*this);
+}
+
+ServerManger::~ServerManger(void)
+{
+}

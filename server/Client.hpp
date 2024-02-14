@@ -1,29 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/13 16:24:04 by houmanso         ###   ########.fr       */
+/*   Created: 2024/02/14 19:50:55 by houmanso          #+#    #+#             */
+/*   Updated: 2024/02/14 19:52:11 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#ifndef CLIENT_HPP
+#define CLIENT_HPP
 
 #include <iostream>
 
-class Server
+class Client
 {
 	public:
-		Server(void);
-		Server(const Server& cpy);
+		Client(void);
+		Client(const Client& cpy);
 
-		Server&	operator=(const Server& cpy);
+		Client&	operator=(const Client& cpy);
 
-		~Server(void);
+		~Client(void);
 };
 
 #endif

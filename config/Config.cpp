@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/10 15:36:14 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/11 15:11:30 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,22 +29,22 @@ Config::Config(const std::string& configPath)
     tokens = Lexer::tokenize(configPath);
     checkSyntax(tokens);
     parseServers();
-    ServersVector::iterator s_iter = servers.begin();
-    while (s_iter != servers.end())
-    {
-        std::cout << "server {" << std::endl;
-        printDirectives(*s_iter);
-        LocationsVector::const_iterator location_iter = s_iter->getLocations().cbegin();
-        while (location_iter != s_iter->getLocations().cend())
-        {
-            std::cout << " location " << location_iter->getPrefix() << " {" << std::endl;
-            printDirectives(*location_iter);
-            std::cout << " }" << std::endl;
-            location_iter++;
-        }
-        std::cout << "}" << std::endl;
-        s_iter++;
-    }
+    // ServersVector::iterator s_iter = servers.begin();
+    // while (s_iter != servers.end())
+    // {
+    //     std::cout << "server {" << std::endl;
+    //     printDirectives(*s_iter);
+    //     LocationsVector::const_iterator location_iter = s_iter->getLocations().cbegin();
+    //     while (location_iter != s_iter->getLocations().cend())
+    //     {
+    //         std::cout << " location " << location_iter->getPrefix() << " {" << std::endl;
+    //         printDirectives(*location_iter);
+    //         std::cout << " }" << std::endl;
+    //         location_iter++;
+    //     }
+    //     std::cout << "}" << std::endl;
+    //     s_iter++;
+    // }
 }
 
 Config::Config(const Config& obj)

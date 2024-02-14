@@ -1,29 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Server.hpp                                         :+:      :+:    :+:   */
+/*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/13 16:24:04 by houmanso         ###   ########.fr       */
+/*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
+/*   Updated: 2024/02/14 19:52:16 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SERVER_HPP
-#define SERVER_HPP
+#include "Client.hpp"
 
-#include <iostream>
-
-class Server
+Client::Client(void)
 {
-	public:
-		Server(void);
-		Server(const Server& cpy);
+}
 
-		Server&	operator=(const Server& cpy);
+Client::Client(const Client &cpy)
+{
+	
+}
 
-		~Server(void);
-};
+Client	&Client::operator=(const Client &cpy)
+{
+	if (this != &cpy)
+	{
+		// ...
+	}
+	return (*this);
+}
 
-#endif
+Client::~Client(void)
+{
+	
+}

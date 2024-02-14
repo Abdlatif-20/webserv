@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:08 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/09 10:12:46 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/13 20:36:22 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,12 @@ class Config
         TokensVector tokens;
         ServersVector servers;
 
-        Config();
         void parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx);
         void parseLocation(TokensVector::iterator& tok_iter, ServerContext& serverCtx);
         void parseServers();
         void printDirectives(const Context& ctx);
     public:
+        Config();
         Config(const std::string& configPath);
         Config(const Config& obj);
         Config& operator=(const Config& obj);
