@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 15:16:11 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/12 18:16:33 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/14 11:13:01 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ static void checkLocation(const TokensVector& tokens,
     while (i != tokens.end() && i->getType() != CLOSED_BRACKET)
     {
         currLineIndex = i->getLineIndex();
-        d = ConfigUtils::getDirectiveFromTokenName(i->getContent());
+        d = Utils::getDirectiveFromTokenName(i->getContent());
         if (d == LOCATION || d == LISTEN || d == SERVER_NAME || d == UNKNOWN)
             throw SyntaxErrorException("unexpected `" + i->getContent() + "` at line: ", i->getLineIndex());
         checkDirective(d, tokens, i);
@@ -128,7 +128,7 @@ static void checkServer(const TokensVector& tokens, TokensVector::const_iterator
     while (i != tokens.end() && i->getType() != CLOSED_BRACKET)
     {
         currLineIndex = i->getLineIndex();
-        d = ConfigUtils::getDirectiveFromTokenName(i->getContent());
+        d = Utils::getDirectiveFromTokenName(i->getContent());
         if (d == LOCATION)
             checkLocation(tokens, i);
         else if (d == UNKNOWN)
