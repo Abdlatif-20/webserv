@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/11 17:29:11 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/14 04:12:11 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,26 @@
 #include "Request.hpp"
 
 /* *************************** Constructors *************************** */
+
 Request::Request()
 {
 	_status = 200;
+	_detectHost = 0;
 	_bodyDone = false;
+	_foundUri = false;
 	_receivecount = 0;
 	_contentLength = 0;
 	_headersDone = false;
+	_detectRequestLine = 0;
 	_requestLineDone = false;
+	_receivedProgress = false;
 	_requestIsWellFormed = false;
-	_foundUri = false;
+	_body = "";
+	_params = "";
+	headers = "";
+	_configPath = "";
+	_requestData = "";
+	_boundaryName = "";
 }
 
 Request::~Request()

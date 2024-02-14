@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/11 19:29:55 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/14 04:13:16 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,11 @@
 //function to fill the headers to the map
 void	Request::fillHeaders(std::vector<std::string> headers)
 {
+	int requeriedHeaders = 0;
 	std::vector<std::string>::iterator it;
 	it = headers.begin();
-	it++;
+	if (_receivedProgress == false)
+		it++;
 	for (; it != headers.end(); it++)
 	{
 		Utils::toLower(*it);
@@ -27,9 +29,16 @@ void	Request::fillHeaders(std::vector<std::string> headers)
 		if (pos != std::string::npos)
 		{
 			key = it->substr(0, pos);
-			value = Utils::strTrim(it->substr(pos + 2), CR);
+			if (key == "host" || key == "connection")
+				requeriedHeaders++;
+			value = Utils::strTrim(it->substr(pos + 1), CR);
 			_headers[key] = value;
 		}
+	}
+	if (requeriedHeaders != 2)
+	{
+		_status = BadRequest;
+		throw InvalidRequest("Bad Request(Invalid headers)");
 	}
 	_headersDone = true;
 }

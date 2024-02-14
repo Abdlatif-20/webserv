@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/12 02:06:51 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/14 10:01:07 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,15 +107,14 @@ void	Request::separateRequest(std::string receivedRequest)
 	size_t pos = receivedRequest.find(CRLF CRLF);
 	if (pos != std::string::npos)
 	{
-		headers = receivedRequest.substr(0, pos + 4);
+		this->headers = receivedRequest.substr(0, pos + 4);
 		_body = receivedRequest.substr(pos + 4);
 	}
 	else
 	{
 		_status = BadRequest;
-		throw InvalidRequest("Invalid request");
+		throw InvalidRequest("Invalid request...");
 	}
-
 }
 
 //function to parse the Body of the request
@@ -129,33 +128,69 @@ void	Request::parseBody()
 			parseBoundary();
 }
 
+int	Request::parseRequestLine(const std::string& requestLine)
+{
+	if (requestLine.find(CRLF) != std::string::npos
+		&& requestLine.find(CRLF CRLF) == std::string::npos)
+	{
+		_requestVector = Utils::splitRequest(requestLine, CRLF);
+		fillRequestLine(_requestVector[0]); //fill the request line
+		_receivedProgress = true;
+		return 1;
+	}
+	else
+	{
+		_requestVector = Utils::splitRequest(requestLine, CRLF);
+		fillRequestLine(_requestVector[0]); //fill the request line
+	}
+	return 0;
+}
+
+int	Request::takingRequests(const std::string& receivedRequest)
+{
+	if (!_requestLineDone)
+	{
+		if (parseRequestLine(receivedRequest))
+			return 1;
+	}
+	if (!_headersDone)
+	{
+		if (receivedRequest != "\r\n" && _receivedProgress)
+			return (_requestData += receivedRequest,1);
+	}
+	if (_foundUri)
+	{
+		if (_receivedProgress)
+			_requestVector = Utils::splitRequest(_requestData, CRLF);
+		else
+		{
+			separateRequest(receivedRequest);
+			_requestVector = Utils::splitRequest(headers, CRLF);
+		}
+		fillHeaders(_requestVector); //fill the headers to the map
+		requestIsWellFormed(); //check if the request is well formed	
+		_receivecount++;
+		std::cout << "Request is parsed" << std::endl;
+	}
+	return 0;
+}
+
 //main function to parse the request
 void	Request::parseRequest(const std::string& receivedRequest, char *configPath)
 {
-	// std::cout <<"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"<< std::endl;
-	// std::cout << "Request:\n" << receivedRequest << std::endl;
-	// std::cout <<"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"<< std::endl;
 	_configPath = configPath;
+
 	std::srand(time(0));
-	if (!_requestLineDone && !_headersDone && !_requestIsWellFormed)
+	if (!_requestLineDone || !_headersDone || !_requestIsWellFormed)
 	{
-		std::vector<std::string> requestVector;
-		separateRequest(receivedRequest); //separate the request line from the headers
-		requestVector = Utils::splitRequest(headers, CRLF);
-		fillRequestLine(requestVector[0]); //fill the request line
-		if (_foundUri)
-		{
-			fillHeaders(requestVector); //fill the headers
-			requestIsWellFormed(); //check if the request is well formed	
-			_receivecount++;
-		}
+		if (takingRequests(receivedRequest))
+			return;
 	}
-	if (!_bodyDone)
+	if (_requestLine["method"] == "POST" && !_bodyDone)
 	{
 		if (_receivecount > 1)
 			_body = receivedRequest;
 		parseBody();
 	}
 	// matchUriRequest();
-	// Utils::printFile("boundary.txt");
 }

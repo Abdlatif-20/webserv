@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/10 16:16:14 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/14 04:21:59 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 std::string Utils::strTrim(const std::string& str, char c)
 {
     if (str.empty())
-        return "";
+        return str;
     size_t i = str.find_first_not_of(c);
     size_t j = str.find_last_not_of(c);
     if (i == std::string::npos)
@@ -34,7 +34,7 @@ std::vector<std::string> Utils::splitRequest(const std::string& str, const char 
 	{
 		std::string _sep = sep;
 		result.push_back(str.substr(start, (pos - start)));
-		start = pos + 2;
+		start = pos + _sep.size();
 		pos = str.find(sep, start);
 	}
 	result.push_back(str.substr(start, (pos - start)));
@@ -45,8 +45,7 @@ std::vector<std::string> Utils::split(const std::string& str, const char sep)
 {
 	std::vector<std::string> result;
 	std::string token;
-	std::string newStr = strTrim(str, '\r');
-	std::istringstream tokenStream(newStr);
+	std::istringstream tokenStream(str);
 	while (std::getline(tokenStream, token, sep))
 	{
 		if(token.empty() || token == "\n" || token == "\r" || token == "\r\n" || token == "\n\r")
