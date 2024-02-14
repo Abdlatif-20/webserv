@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/14 10:01:07 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/14 11:15:38 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ int	Request::parseRequestLine(const std::string& requestLine)
 	{
 		_requestVector = Utils::splitRequest(requestLine, CRLF);
 		fillRequestLine(_requestVector[0]); //fill the request line
-		_receivedProgress = true;
+		requestInProgress = true;
 		return 1;
 	}
 	else
@@ -146,6 +146,35 @@ int	Request::parseRequestLine(const std::string& requestLine)
 	return 0;
 }
 
+int	Request::checkDuplicate(const std::string& receivedRequest)
+{
+	if (receivedRequest != CRLF && requestInProgress)
+	{
+		size_t pos = receivedRequest.find(" ");
+		if (pos != std::string::npos)
+		{
+			std::string value = receivedRequest.substr(0, pos);
+			if (value.find("GET") != std::string::npos
+				|| value.find("POST") != std::string::npos
+				|| value.find("DELETE") != std::string::npos
+				|| value.find("HEAD") != std::string::npos
+				|| value.find("PUT") != std::string::npos
+				|| value.find("CONNECT") != std::string::npos
+				|| value.find("OPTIONS") != std::string::npos
+				|| value.find("TRACE") != std::string::npos)
+				{
+					_status = BadRequest;
+					throw InvalidRequest("Invalid request line");
+				}
+		}
+		if (receivedRequest.find("host") != std::string::npos)
+			_detectHost++;
+		return (_requestData += receivedRequest, 1);
+	}
+	return 0;
+}
+
+//function to take the separated request or complete request and parse it
 int	Request::takingRequests(const std::string& receivedRequest)
 {
 	if (!_requestLineDone)
@@ -155,12 +184,12 @@ int	Request::takingRequests(const std::string& receivedRequest)
 	}
 	if (!_headersDone)
 	{
-		if (receivedRequest != "\r\n" && _receivedProgress)
-			return (_requestData += receivedRequest,1);
+		if (checkDuplicate(receivedRequest))
+			return 1;
 	}
 	if (_foundUri)
 	{
-		if (_receivedProgress)
+		if (requestInProgress)
 			_requestVector = Utils::splitRequest(_requestData, CRLF);
 		else
 		{
@@ -184,7 +213,14 @@ void	Request::parseRequest(const std::string& receivedRequest, char *configPath)
 	if (!_requestLineDone || !_headersDone || !_requestIsWellFormed)
 	{
 		if (takingRequests(receivedRequest))
+		{
+			if (_detectHost > 1)
+			{
+				_status = BadRequest;
+				throw InvalidRequest("Bad Request(Invalid headers)");
+			}
 			return;
+		}
 	}
 	if (_requestLine["method"] == "POST" && !_bodyDone)
 	{

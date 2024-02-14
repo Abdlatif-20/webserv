@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/14 09:50:24 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/14 11:13:26 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ class Request
 		bool _headersDone;
 		bool _requestLineDone;
 		int	_detectRequestLine;
-		bool _receivedProgress;
+		bool requestInProgress;
 		bool _requestIsWellFormed;
 		// content length
 		unsigned int	_contentLength;
@@ -99,6 +99,7 @@ class Request
 		int		parseRequestLine(const std::string& requestLine);
 		int		takingRequests(const std::string& receivedRequest);
 		void	parseRequest(const std::string& receivedRequest, char *configPath);
+		int		checkDuplicate(const std::string& receivedRequest);
 	/* *************************** getters *************************** */
 		int getStatus();
 		std::string getBody();

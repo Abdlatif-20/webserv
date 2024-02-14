@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/14 04:13:16 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/14 10:35:31 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	Request::fillHeaders(std::vector<std::string> headers)
 	int requeriedHeaders = 0;
 	std::vector<std::string>::iterator it;
 	it = headers.begin();
-	if (_receivedProgress == false)
+	if (requestInProgress == false)
 		it++;
 	for (; it != headers.end(); it++)
 	{
