@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/14 20:41:36 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/15 16:50:48 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ std::string Context::getRoot() const
     DirectivesMap::const_iterator it = directives.find("root");
     if (it != directives.end())
         return *it->second.cbegin();
-    return "";
+    return "assets/www";
 }
 
 std::string Context::getIndex() const
@@ -81,6 +81,8 @@ std::string Context::getIndex() const
             vec_iter++;
         }
     }
+    else
+        indexPath = "html/index.html";
     return indexPath;
 }
 
@@ -110,7 +112,7 @@ std::array<std::string, 3> Context::getAllowedMethods() const
         int i = 0;
         while (vec_it != it->second.cend())
         {
-            if (*vec_it == "POST" || *vec_it == "GET" || *vec_it == "DELETE")
+            if (*vec_it == "GET" || *vec_it == "POST" || *vec_it == "DELETE")
                 arr[i++] = *vec_it;
             vec_it++;
         }
@@ -129,5 +131,5 @@ std::string Context::getUploadStore() const
     DirectivesMap::const_iterator it = directives.find("upload_store");
     if (it != directives.cend())
         return *it->second.cbegin();
-    return "";
+    return "assets/upload";
 }
