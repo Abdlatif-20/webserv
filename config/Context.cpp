@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/14 18:43:00 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/14 20:41:36 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,13 +104,30 @@ std::array<std::string, 3> Context::getAllowedMethods() const
 {
     DirectivesMap::const_iterator it = directives.find("allowed_methods");
     std::array<std::string, 3> arr;
-    int i = 0;
     if (it != directives.cend())
     {
         StringVector::const_iterator vec_it = it->second.cbegin();
+        int i = 0;
         while (vec_it != it->second.cend())
         {
+            if (*vec_it == "POST" || *vec_it == "GET" || *vec_it == "DELETE")
+                arr[i++] = *vec_it;
             vec_it++;
         }
     }
+    else
+    {
+        arr[0] = "GET";
+        arr[1] = "POST";
+        arr[2] = "DELETE";
+    }
+    return arr;
+}
+
+std::string Context::getUploadStore() const
+{
+    DirectivesMap::const_iterator it = directives.find("upload_store");
+    if (it != directives.cend())
+        return *it->second.cbegin();
+    return "";
 }

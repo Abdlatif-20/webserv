@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 10:40:09 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/09 17:53:41 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/15 13:23:44 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,4 +44,22 @@ void ServerContext::addLocation(LocationContext location)
 const LocationsVector& ServerContext::getLocations() const
 {
     return locations;
+}
+
+std::string ServerContext::getListen() const
+{
+    DirectivesMap::const_iterator it = directives.find("listen");
+    if (it != directives.cend())
+        return *it->second.cbegin();
+    return "8080";
+}
+
+StringVector ServerContext::getServerName() const
+{
+    DirectivesMap::const_iterator it = directives.find("server_name");
+    if (it != directives.cend())
+        return it->second;
+    StringVector vec;
+    vec.push_back("localhost");
+    return vec;
 }
