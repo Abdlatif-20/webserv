@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/15 17:44:44 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/15 19:24:46 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,9 @@ Client::Client(void)
 {
 }
 
-Client::Client(const Client __unused &cpy)
+Client::Client(const Client &cpy)
 {
-	
+	*this = cpy;
 }
 
 Client	&Client::operator=(const Client &cpy)

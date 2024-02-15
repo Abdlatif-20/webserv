@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/15 17:45:09 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/15 19:15:40 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,21 @@
 #define SERVER_HPP
 
 #include <iostream>
-#include "Server.hpp"
+#include "ServerContext.hpp"
 
 class Server
 {
 	private:
-		int	__unused sockId;
+		// std::string	port;
+		// int	sockID;
+		ServerContext	serverCTX;
 
 	public:
 		Server(void);
+		Server(const ServerContext& _serverCTX);
 		Server(const Server& cpy);
+
+		std::string	getPORT_tmp(void) const;
 
 		Server&	operator=(const Server& cpy);
 

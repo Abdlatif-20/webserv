@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:50:55 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/14 19:52:11 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/15 19:26:06 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,13 @@
 #define CLIENT_HPP
 
 #include <iostream>
+#include "Server.hpp"
 
 class Client
 {
+	private:
+		Server	serverCTX;
+
 	public:
 		Client(void);
 		Client(const Client& cpy);
