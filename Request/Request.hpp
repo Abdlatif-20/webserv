@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/15 07:44:17 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/15 13:15:00 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,9 @@
 /*
 
 GET / HTTP/1.1
+
 POST / HTTP/1.1
+
 host:localhost:5002
 connection:keep-alive
 accept-encoding:gzip, deflate, br
@@ -78,13 +80,13 @@ class Request
 		std::string	_requestData;
 		std::string _boundaryName;
 	public:
-	/* *************************** constructors *************************** */
+	/* *************************** constructors ****************************** */
 		Request();
 		~Request();
 
 	typedef std::invalid_argument InvalidRequest;
 
-	/* *************************** methods *************************** */
+	/* *************************** methods ********************************* */
 		void	findUri();
 		void	boundary();
 		void	parseBody();
@@ -99,10 +101,10 @@ class Request
 		void	fillHeaders(std::vector<std::string> headers);
 		void	fillRequestLine(const std::string& requestLine);
 		int		parseRequestLine(const std::string& requestLine);
+		int		checkDuplicate(const std::string& receivedRequest);
 		int		takingRequests(const std::string& receivedRequest);
 		void	parseRequest(const std::string& receivedRequest, char *configPath);
-		int		checkDuplicate(const std::string& receivedRequest);
-	/* *************************** getters *************************** */
+	/* *************************** getters ************************************ */
 		int getStatus();
 		std::string getBody();
 		std::map<std::string, std::string> getHeaders();

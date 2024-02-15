@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/15 11:20:46 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/15 13:18:17 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,16 +130,15 @@ void	Request::parseBody()
 //function to parse the request line and fill it to the map and return 1 if the request line is separated
 int	Request::parseRequestLine(const std::string& requestLine)
 {
-	if (requestLine.find(CRLF) != std::string::npos
-		&& requestLine.find("\r\n\r\n") == std::string::npos)
-	{puts("parseRequestLine Enter<if>");
+	if (requestLine.find("\r\n\r\n") == std::string::npos)
+	{
 		_requestVector = Utils::splitRequest(requestLine, CRLF);
 		fillRequestLine(_requestVector[0]); //fill the request line
 		requestInProgress = true;
 		return 1;
 	}
 	else
-	{puts("parseRequestLine Enter<else>");
+	{
 		_requestVector = Utils::splitRequest(requestLine, CRLF);
 		fillRequestLine(_requestVector[0]); //fill the request line
 	}
@@ -199,7 +198,7 @@ int	Request::takingRequests(const std::string& receivedRequest)
 			_requestVector = Utils::splitRequest(headers, CRLF);
 		}
 		fillHeaders(_requestVector); //fill the headers to the map
-		requestIsWellFormed(); //check if the request is well formed	
+		requestIsWellFormed(); //check if the request is well formed
 		_receivecount++;
 	}
 	return 0;
@@ -236,6 +235,11 @@ void	Request::parseRequest(const std::string& receivedRequest, char *configPath)
 		if (!_body.empty())
 			parseBody();
 	}
-	std::cout << "Request is well formed" << std::endl;
+	std::cout << "-------- RequestLine --------" << std::endl;
+	Utils::printMap(_requestLine);
+	std::cout << "-------- Headers --------" << std::endl;
+	Utils::printMap(_headers);
+	std::cout << "---------------------------" << std::endl;
+	// std::cout << "Request is well formed" << std::endl;
 	// matchUriRequest();
 }
