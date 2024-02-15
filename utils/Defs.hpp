@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 14:36:15 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/13 16:04:05 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/15 17:38:07 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,5 +41,6 @@ typedef enum e_directive
     SERVER_NAME,
     RETURN,
     LOCATION,
+    UPLOAD_STORE,
     UNKNOWN
 } t_directive;

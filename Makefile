@@ -6,7 +6,7 @@
 #    By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/02/11 13:38:04 by houmanso         ###   ########.fr        #
+#    Updated: 2024/02/15 17:44:19 by houmanso         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ SRCS = $(wildcard *.cpp) $(wildcard */*.cpp)
 INC  = $(wildcard *.hpp) $(wildcard */*.hpp)
 OBJS = $(SRCS:.cpp=.o)
 CPPFLAGS = -Wall -Wextra -Werror -std=c++98
-CPPFLAGS += -I config -I utils -I server
+CPPFLAGS += -I config -I utils -I core
 
 all: $(NAME)
 

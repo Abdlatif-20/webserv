@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/15 17:34:14 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/15 17:44:56 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ Core::Core(void)
 {
 }
 
-Core::Core(const Core &cpy)
+Core::Core(const Core __unused &cpy)
 {
 }
 

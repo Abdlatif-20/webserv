@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/11 15:11:30 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/15 17:44:27 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ Config::Config(const std::string& configPath)
     tokens = Lexer::tokenize(configPath);
     checkSyntax(tokens);
     parseServers();
+    checkLogicalErrors();
+    setDefaultDirectives();
     // ServersVector::iterator s_iter = servers.begin();
     // while (s_iter != servers.end())
     // {
@@ -79,14 +81,14 @@ void Config::parseLocation(TokensVector::iterator& tok_iter, ServerContext& serv
 {
     if (tok_iter == tokens.end())
         return ;
-    t_directive d = ConfigUtils::getDirectiveFromTokenName(tok_iter->getContent());
+    t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
     if (d == LOCATION)
     {
         tok_iter++;
         LocationContext locationCtx(tok_iter->getContent()); /*Create location object with -prefix-*/
         while (tok_iter != tokens.end() && tok_iter->getType() != CLOSED_BRACKET)
         {
-            d = ConfigUtils::getDirectiveFromTokenName(tok_iter->getContent());
+            d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
             parseDirective(tok_iter, locationCtx);
             tok_iter++;
         }
@@ -104,9 +106,11 @@ void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx
         return ;
     std::string key = tok_iter->getContent();
     StringVector value;
-    t_directive d = ConfigUtils::getDirectiveFromTokenName(tok_iter->getContent());
-    if (d == LISTEN || d == ROOT || d == CLIENT_MAX_BODY_SIZE)
+    t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
+    if (d == LISTEN || d == ROOT || d == CLIENT_MAX_BODY_SIZE || d == AUTO_INDEX || d == UPLOAD_STORE)
     {
+        if (serverCtx.getDirectives().count(tok_iter->getContent()) != 0)
+            throw SyntaxErrorException("`" + tok_iter->getContent() + "` directive is duplicated at line: ", tok_iter->getLineIndex());
         tok_iter++;
         value.push_back(tok_iter->getContent());
         serverCtx.addDirective(Directive(key, value));
@@ -114,10 +118,14 @@ void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx
     else if (d == INDEX || d == ERROR_PAGE
         || d == ALLOWED_METHODS || d == SERVER_NAME || d == RETURN)
     {
+        TokensVector::iterator tmp_iter = tok_iter;
         tok_iter++;
         while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)
             value.push_back((tok_iter++)->getContent());
-        serverCtx.addDirective(Directive(key, value));
+        if (serverCtx.getDirectives().count(tmp_iter->getContent()) != 0)
+            serverCtx.appendDirective(Directive(key, value));
+        else
+            serverCtx.addDirective(Directive(key, value));
     }
 }
 
@@ -149,6 +157,16 @@ void Config::parseServers()
     }
 }
 
+void Config::checkLogicalErrors()
+{
+    ServersVector::const_iterator it = servers.cbegin();
+    while (it != servers.cend())
+    {
+        it->getListen();
+        it++;
+    }
+}
+
 void Config::printDirectives(const Context &ctx)
 {
     DirectivesMap::const_iterator directive_iter = ctx.getDirectives().cbegin();
@@ -163,7 +181,23 @@ void Config::printDirectives(const Context &ctx)
     }
 }
 
+void Config::setDefaultDirectives()
+{
+    ServersVector::iterator serv_it = servers.begin();
+    while (serv_it != servers.end())
+    {
+        serv_it++;
+    }
+}
+
 const ServersVector& Config::getServers() const
 {
     return servers;
+}
+
+ServersVector::const_iterator Config::getServerByHost(const std::string& host) const
+{
+    (void)host;
+    ServersVector::const_iterator serv_iter = servers.cbegin();
+    return serv_iter;
 }

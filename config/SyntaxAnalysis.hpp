@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 15:16:10 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/09 10:12:14 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/14 11:13:01 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include "Lexer.hpp"
 #include <sstream>
 #include "Defs.hpp"
-#include "ConfigUtils.hpp"
+#include "Utils.hpp"
 
 class SyntaxErrorException : public std::exception
 {

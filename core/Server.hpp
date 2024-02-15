@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/15 17:20:55 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/15 17:45:09 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 class Server
 {
 	private:
-		int	sockId;
+		int	__unused sockId;
 
 	public:
 		Server(void);

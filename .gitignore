@@ -1,4 +1,5 @@
 *.o
+*.pdf
 */*.o
 .vscode
 webserv
