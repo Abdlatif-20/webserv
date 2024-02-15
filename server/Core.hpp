@@ -1,42 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ServerManger.cpp                                   :+:      :+:    :+:   */
+/*   Core.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/13 16:25:30 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/14 13:26:17 by houmanso         ###   ########.fr       */
+/*   Created: 2024/02/15 17:21:50 by houmanso          #+#    #+#             */
+/*   Updated: 2024/02/15 17:26:03 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ServerManger.hpp"
+#ifndef CORE_HPP
+#define CORE_HPP
 
-ServerManger::ServerManger(void)
-{
-	// nothing
-}
+#include <iostream>
+#include "Config.hpp"
+#include "Server.hpp"
 
-ServerManger::ServerManger(const Config &conf)
+class Core
 {
-	config = conf;
-}
+	private:
+		ServersVector	serversConf;
+		std::vector<Server>	servers;
+	public:
+		Core(void);
+		Core(const Core& cpy);
+		Core(const Config& conf);
 
-ServerManger::ServerManger(const ServerManger &cpy)
-{
-	*this = cpy;
-}
+		Core&	operator=(const Core& cpy);
 
-ServerManger	&ServerManger::operator=(const ServerManger &cpy)
-{
-	if (this != &cpy)
-	{
-		config = cpy.config;
-		servers = cpy.servers;
-	}
-	return (*this);
-}
+		~Core(void);
+};
 
-ServerManger::~ServerManger(void)
-{
-}
+#endif

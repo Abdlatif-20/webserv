@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/14 20:06:05 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/15 17:20:55 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 #define SERVER_HPP
 
 #include <iostream>
+#include "Server.hpp"
 
 class Server
 {
 	private:
 		int	sockId;
-		Server	serverCTX;
 
 	public:
 		Server(void);
