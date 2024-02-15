@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/14 10:35:31 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/15 07:45:52 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,10 @@
 //function to fill the headers to the map
 void	Request::fillHeaders(std::vector<std::string> headers)
 {
-	int requeriedHeaders = 0;
+	int checkHostIsFound = 0;
 	std::vector<std::string>::iterator it;
 	it = headers.begin();
-	if (requestInProgress == false)
-		it++;
+	requestInProgress == false ? it++ : it;
 	for (; it != headers.end(); it++)
 	{
 		Utils::toLower(*it);
@@ -29,16 +28,17 @@ void	Request::fillHeaders(std::vector<std::string> headers)
 		if (pos != std::string::npos)
 		{
 			key = it->substr(0, pos);
-			if (key == "host" || key == "connection")
-				requeriedHeaders++;
+			if (key == "host")
+				checkHostIsFound++;
 			value = Utils::strTrim(it->substr(pos + 1), CR);
+			value = Utils::strTrim(value, ' ');
 			_headers[key] = value;
 		}
 	}
-	if (requeriedHeaders != 2)
+	if (checkHostIsFound != 1)
 	{
 		_status = BadRequest;
-		throw InvalidRequest("Bad Request(Invalid headers)");
+		throw InvalidRequest("Host not found");
 	}
 	_headersDone = true;
 }

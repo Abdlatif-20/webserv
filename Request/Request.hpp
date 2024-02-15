@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/14 11:13:26 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/15 07:44:17 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,11 @@
 /*
 
 GET / HTTP/1.1
+POST / HTTP/1.1
 host:localhost:5002
 connection:keep-alive
+accept-encoding:gzip, deflate, br
+Content-Length: 11
 
 */
 
@@ -58,7 +61,6 @@ class Request
 		int	_receivecount;
 		bool _headersDone;
 		bool _requestLineDone;
-		int	_detectRequestLine;
 		bool requestInProgress;
 		bool _requestIsWellFormed;
 		// content length

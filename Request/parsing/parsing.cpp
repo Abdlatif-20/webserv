@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/14 11:15:38 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/15 11:20:46 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,7 +117,7 @@ void	Request::separateRequest(std::string receivedRequest)
 	}
 }
 
-//function to parse the Body of the request
+//function to parse the Body of the request if method is POST
 void	Request::parseBody()
 {
 	if (_requestLine["method"] == "POST"
@@ -127,25 +127,26 @@ void	Request::parseBody()
 			&& _headers.find("content-type") != _headers.end())
 			parseBoundary();
 }
-
+//function to parse the request line and fill it to the map and return 1 if the request line is separated
 int	Request::parseRequestLine(const std::string& requestLine)
 {
 	if (requestLine.find(CRLF) != std::string::npos
-		&& requestLine.find(CRLF CRLF) == std::string::npos)
-	{
+		&& requestLine.find("\r\n\r\n") == std::string::npos)
+	{puts("parseRequestLine Enter<if>");
 		_requestVector = Utils::splitRequest(requestLine, CRLF);
 		fillRequestLine(_requestVector[0]); //fill the request line
 		requestInProgress = true;
 		return 1;
 	}
 	else
-	{
+	{puts("parseRequestLine Enter<else>");
 		_requestVector = Utils::splitRequest(requestLine, CRLF);
 		fillRequestLine(_requestVector[0]); //fill the request line
 	}
 	return 0;
 }
 
+//check if the request line or host is duplicated
 int	Request::checkDuplicate(const std::string& receivedRequest)
 {
 	if (receivedRequest != CRLF && requestInProgress)
@@ -164,14 +165,14 @@ int	Request::checkDuplicate(const std::string& receivedRequest)
 				|| value.find("TRACE") != std::string::npos)
 				{
 					_status = BadRequest;
-					throw InvalidRequest("Invalid request line");
+					throw InvalidRequest("Duplicate request line");
 				}
 		}
 		if (receivedRequest.find("host") != std::string::npos)
 			_detectHost++;
-		return (_requestData += receivedRequest, 1);
+		return (_requestData += receivedRequest, _receivecount++, 1);
 	}
-	return 0;
+	return (0);
 }
 
 //function to take the separated request or complete request and parse it
@@ -193,13 +194,13 @@ int	Request::takingRequests(const std::string& receivedRequest)
 			_requestVector = Utils::splitRequest(_requestData, CRLF);
 		else
 		{
+			puts(receivedRequest.c_str());
 			separateRequest(receivedRequest);
 			_requestVector = Utils::splitRequest(headers, CRLF);
 		}
 		fillHeaders(_requestVector); //fill the headers to the map
 		requestIsWellFormed(); //check if the request is well formed	
 		_receivecount++;
-		std::cout << "Request is parsed" << std::endl;
 	}
 	return 0;
 }
@@ -217,16 +218,24 @@ void	Request::parseRequest(const std::string& receivedRequest, char *configPath)
 			if (_detectHost > 1)
 			{
 				_status = BadRequest;
-				throw InvalidRequest("Bad Request(Invalid headers)");
+				throw InvalidRequest("Duplicate Host");
 			}
 			return;
 		}
 	}
 	if (_requestLine["method"] == "POST" && !_bodyDone)
 	{
-		if (_receivecount > 1)
+		if (_receivecount > 1 && !requestInProgress)
 			_body = receivedRequest;
-		parseBody();
+		if (_receivecount > 1 && requestInProgress)
+		{
+			if (receivedRequest == CRLF)
+				return;
+			_body = receivedRequest;
+		}
+		if (!_body.empty())
+			parseBody();
 	}
+	std::cout << "Request is well formed" << std::endl;
 	// matchUriRequest();
 }

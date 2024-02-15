@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/14 08:52:51 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/14 11:50:04 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ void	Request::parseContentType()
 	}
 }
 
+//function to prepare the filename and return it
 static std::string pripareFileName(std::string line, bool &initialFile)
 {
 	std::string filename;
@@ -59,6 +60,7 @@ static void	ignoredLines(std::ifstream &file)
 	}
 }
 
+//function to parse the boundary and write the body to a file
 void	Request::boundary()
 {
 	std::ifstream file(_boundaryName);

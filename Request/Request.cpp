@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/14 10:35:27 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/14 11:26:48 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ Request::Request()
 	_receivecount = 0;
 	_contentLength = 0;
 	_headersDone = false;
-	_detectRequestLine = 0;
 	_requestLineDone = false;
 	requestInProgress = false;
 	_requestIsWellFormed = false;
