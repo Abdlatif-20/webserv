@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/14 17:47:23 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/15 17:28:54 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ Config::Config(const std::string& configPath)
     tokens = Lexer::tokenize(configPath);
     checkSyntax(tokens);
     parseServers();
+    checkLogicalErrors();
     setDefaultDirectives();
     // ServersVector::iterator s_iter = servers.begin();
     // while (s_iter != servers.end())
@@ -156,6 +157,16 @@ void Config::parseServers()
     }
 }
 
+void Config::checkLogicalErrors()
+{
+    ServersVector::const_iterator it = servers.cbegin();
+    while (it != servers.cend())
+    {
+        it->getListen()
+        it++;
+    }
+}
+
 void Config::printDirectives(const Context &ctx)
 {
     DirectivesMap::const_iterator directive_iter = ctx.getDirectives().cbegin();
@@ -172,7 +183,11 @@ void Config::printDirectives(const Context &ctx)
 
 void Config::setDefaultDirectives()
 {
-
+    ServersVector::iterator serv_it = servers.begin();
+    while (serv_it != servers.end())
+    {
+        serv_it++;
+    }
 }
 
 const ServersVector& Config::getServers() const
