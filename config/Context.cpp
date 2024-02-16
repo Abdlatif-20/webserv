@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/15 16:50:48 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/16 11:33:33 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,11 @@ void Context::appendDirective(Directive _directive)
 {
     DirectivesMap::iterator it = directives.find(_directive.first);
     it->second.insert(it->second.end(), _directive.second.begin(), _directive.second.end());
+}
+
+void Context::addErrorPage(StringVector error_page)
+{
+    errorPages.push_back(error_page);
 }
 
 const DirectivesMap& Context::getDirectives() const
@@ -132,4 +137,11 @@ std::string Context::getUploadStore() const
     if (it != directives.cend())
         return *it->second.cbegin();
     return "assets/upload";
+}
+
+std::string Context::getErrorPage(std::string status) const
+{
+    DirectivesMap::const_iterator it = directives.find("error_page");
+    StringVector vec = it->second;
+    StringVector::const_iterator vec_iter = std::find(vec.cbegin(), vec.cend(), status);
 }

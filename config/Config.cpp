@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/15 17:28:54 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/16 11:49:45 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,24 +29,22 @@ Config::Config(const std::string& configPath)
     tokens = Lexer::tokenize(configPath);
     checkSyntax(tokens);
     parseServers();
-    checkLogicalErrors();
-    setDefaultDirectives();
-    // ServersVector::iterator s_iter = servers.begin();
-    // while (s_iter != servers.end())
-    // {
-    //     std::cout << "server {" << std::endl;
-    //     printDirectives(*s_iter);
-    //     LocationsVector::const_iterator location_iter = s_iter->getLocations().cbegin();
-    //     while (location_iter != s_iter->getLocations().cend())
-    //     {
-    //         std::cout << " location " << location_iter->getPrefix() << " {" << std::endl;
-    //         printDirectives(*location_iter);
-    //         std::cout << " }" << std::endl;
-    //         location_iter++;
-    //     }
-    //     std::cout << "}" << std::endl;
-    //     s_iter++;
-    // }
+    ServersVector::iterator s_iter = servers.begin();
+    while (s_iter != servers.end())
+    {
+        std::cout << "server {" << std::endl;
+        printDirectives(*s_iter);
+        LocationsVector::const_iterator location_iter = s_iter->getLocations().cbegin();
+        while (location_iter != s_iter->getLocations().cend())
+        {
+            std::cout << " location " << location_iter->getPrefix() << " {" << std::endl;
+            printDirectives(*location_iter);
+            std::cout << " }" << std::endl;
+            location_iter++;
+        }
+        std::cout << "}" << std::endl;
+        s_iter++;
+    }
 }
 
 Config::Config(const Config& obj)
@@ -100,6 +98,7 @@ void Config::parseLocation(TokensVector::iterator& tok_iter, ServerContext& serv
 adding it to the server context. 
 * @return Nothing
 */
+
 void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx)
 {
     if (tok_iter == tokens.end())
@@ -115,8 +114,7 @@ void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx
         value.push_back(tok_iter->getContent());
         serverCtx.addDirective(Directive(key, value));
     }
-    else if (d == INDEX || d == ERROR_PAGE
-        || d == ALLOWED_METHODS || d == SERVER_NAME || d == RETURN)
+    else if (d == INDEX || d == ALLOWED_METHODS || d == SERVER_NAME || d == RETURN)
     {
         TokensVector::iterator tmp_iter = tok_iter;
         tok_iter++;
@@ -126,6 +124,13 @@ void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx
             serverCtx.appendDirective(Directive(key, value));
         else
             serverCtx.addDirective(Directive(key, value));
+    }
+    else if (d == ERROR_PAGE)
+    {
+        tok_iter++;
+        while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)
+            value.push_back((tok_iter++)->getContent());
+        serverCtx.addErrorPage(value);
     }
 }
 
@@ -157,16 +162,6 @@ void Config::parseServers()
     }
 }
 
-void Config::checkLogicalErrors()
-{
-    ServersVector::const_iterator it = servers.cbegin();
-    while (it != servers.cend())
-    {
-        it->getListen()
-        it++;
-    }
-}
-
 void Config::printDirectives(const Context &ctx)
 {
     DirectivesMap::const_iterator directive_iter = ctx.getDirectives().cbegin();
@@ -178,15 +173,6 @@ void Config::printDirectives(const Context &ctx)
             std::cout << " " << *(i++);
         std::cout << std::endl;
         directive_iter++;
-    }
-}
-
-void Config::setDefaultDirectives()
-{
-    ServersVector::iterator serv_it = servers.begin();
-    while (serv_it != servers.end())
-    {
-        serv_it++;
     }
 }
 
