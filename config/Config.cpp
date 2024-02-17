@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/17 13:03:37 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/17 16:14:01 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,18 +95,11 @@ void Config::parseLocation(TokensVector::iterator& tok_iter, ServerContext& serv
     }
 }
 
-/** The `parseDirective` function is responsible for parsing a directive in the configuration file and
-adding it to the server context. 
-* @return Nothing
-*/
-
-void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx)
+void Config::parseSingleValueDirectives(TokensVector::iterator& tok_iter, Context& serverCtx)
 {
-    if (tok_iter == tokens.end())
-        return ;
+    t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
     std::string key = tok_iter->getContent();
     StringVector value;
-    t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
     if (d == LISTEN || d == ROOT || d == CLIENT_MAX_BODY_SIZE || d == AUTO_INDEX || d == UPLOAD_STORE)
     {
         if (serverCtx.getDirectives().count(tok_iter->getContent()) != 0)
@@ -115,7 +108,14 @@ void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx
         value.push_back(tok_iter->getContent());
         serverCtx.addDirective(Directive(key, value));
     }
-    else if (d == INDEX || d == ALLOWED_METHODS || d == SERVER_NAME || d == RETURN)
+}
+
+void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context& serverCtx)
+{
+    t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
+    std::string key = tok_iter->getContent();
+    StringVector value;
+    if (d == INDEX || d == ALLOWED_METHODS || d == SERVER_NAME || d == RETURN)
     {
         size_t j = serverCtx.getDirectives().count(tok_iter->getContent());
         if ((d == ALLOWED_METHODS || d == RETURN) && j > 0)
@@ -135,6 +135,19 @@ void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx
             value.push_back((tok_iter++)->getContent());
         serverCtx.addErrorPage(std::vector<std::string>(value));
     }
+}
+
+/** The `parseDirective` function is responsible for parsing a directive in the configuration file and
+adding it to the server context. 
+* @return Nothing
+*/
+
+void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx)
+{
+    if (tok_iter == tokens.end())
+        return ;
+    parseSingleValueDirectives(tok_iter, serverCtx);
+    parseMultiValueDirectives(tok_iter, serverCtx);
 }
 
 
