@@ -1,4 +1,2 @@
-1- Setup default values for missing directives | Setup default server if no server found
-2- Check for logical errors, `Example: listen hello;`
-3- Adding `CGI` directives
-4- Complete context getters
+1- Test the whole Config_file & comment each method on it
+2- Adding `CGI` directives

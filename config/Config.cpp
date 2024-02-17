@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/17 16:14:01 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/17 18:52:33 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,45 +95,45 @@ void Config::parseLocation(TokensVector::iterator& tok_iter, ServerContext& serv
     }
 }
 
-void Config::parseSingleValueDirectives(TokensVector::iterator& tok_iter, Context& serverCtx)
+void Config::parseSingleValueDirectives(TokensVector::iterator& tok_iter, Context& ctx)
 {
     t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
     std::string key = tok_iter->getContent();
     StringVector value;
     if (d == LISTEN || d == ROOT || d == CLIENT_MAX_BODY_SIZE || d == AUTO_INDEX || d == UPLOAD_STORE)
     {
-        if (serverCtx.getDirectives().count(tok_iter->getContent()) != 0)
+        if (ctx.getDirectives().count(tok_iter->getContent()) != 0)
             throw SyntaxErrorException("`" + tok_iter->getContent() + "` directive is duplicated at line: ", tok_iter->getLineIndex());
         tok_iter++;
         value.push_back(tok_iter->getContent());
-        serverCtx.addDirective(Directive(key, value));
+        ctx.addDirective(Directive(key, value));
     }
 }
 
-void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context& serverCtx)
+void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context& ctx)
 {
     t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
     std::string key = tok_iter->getContent();
     StringVector value;
     if (d == INDEX || d == ALLOWED_METHODS || d == SERVER_NAME || d == RETURN)
     {
-        size_t j = serverCtx.getDirectives().count(tok_iter->getContent());
+        size_t j = ctx.getDirectives().count(tok_iter->getContent());
         if ((d == ALLOWED_METHODS || d == RETURN) && j > 0)
             throw SyntaxErrorException("`" + tok_iter->getContent() + "` directive is duplicated at line: ", tok_iter->getLineIndex());
         tok_iter++;
         while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)
             value.push_back((tok_iter++)->getContent());
         if (j > 0)
-            serverCtx.appendDirective(Directive(key, value));
+            ctx.appendDirective(Directive(key, value));
         else
-            serverCtx.addDirective(Directive(key, value));
+            ctx.addDirective(Directive(key, value));
     }
     else if (d == ERROR_PAGE)
     {
         tok_iter++;
         while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)
             value.push_back((tok_iter++)->getContent());
-        serverCtx.addErrorPage(std::vector<std::string>(value));
+        ctx.addErrorPage(std::vector<std::string>(value));
     }
 }
 
@@ -142,12 +142,12 @@ adding it to the server context.
 * @return Nothing
 */
 
-void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx)
+void Config::parseDirective(TokensVector::iterator& tok_iter, Context& ctx)
 {
     if (tok_iter == tokens.end())
         return ;
-    parseSingleValueDirectives(tok_iter, serverCtx);
-    parseMultiValueDirectives(tok_iter, serverCtx);
+    parseSingleValueDirectives(tok_iter, ctx);
+    parseMultiValueDirectives(tok_iter, ctx);
 }
 
 
