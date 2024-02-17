@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/17 11:40:23 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/17 17:02:43 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,5 +160,5 @@ std::string Context::getErrorPage(const std::string& status) const
         }
         it++;
     }
-    return "";
+    return Utils::getDefaultErrorPage(status);
 }

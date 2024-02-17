@@ -6,13 +6,14 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/17 11:38:43 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/17 17:02:30 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include "Defs.hpp"
+#include "Utils.hpp"
 #include <array>
 #include <string>
 #include <fstream>
