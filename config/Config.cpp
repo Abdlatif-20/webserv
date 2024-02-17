@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/15 17:44:27 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/17 16:34:06 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,7 @@ Config::Config(const std::string& configPath)
     tokens = Lexer::tokenize(configPath);
     checkSyntax(tokens);
     parseServers();
-    checkLogicalErrors();
-    setDefaultDirectives();
+    checkLogicalErrors(servers);
     // ServersVector::iterator s_iter = servers.begin();
     // while (s_iter != servers.end())
     // {
@@ -96,17 +95,11 @@ void Config::parseLocation(TokensVector::iterator& tok_iter, ServerContext& serv
     }
 }
 
-/** The `parseDirective` function is responsible for parsing a directive in the configuration file and
-adding it to the server context. 
-* @return Nothing
-*/
-void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx)
+void Config::parseSingleValueDirectives(TokensVector::iterator& tok_iter, Context& serverCtx)
 {
-    if (tok_iter == tokens.end())
-        return ;
+    t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
     std::string key = tok_iter->getContent();
     StringVector value;
-    t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
     if (d == LISTEN || d == ROOT || d == CLIENT_MAX_BODY_SIZE || d == AUTO_INDEX || d == UPLOAD_STORE)
     {
         if (serverCtx.getDirectives().count(tok_iter->getContent()) != 0)
@@ -115,18 +108,46 @@ void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx
         value.push_back(tok_iter->getContent());
         serverCtx.addDirective(Directive(key, value));
     }
-    else if (d == INDEX || d == ERROR_PAGE
-        || d == ALLOWED_METHODS || d == SERVER_NAME || d == RETURN)
+}
+
+void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context& serverCtx)
+{
+    t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
+    std::string key = tok_iter->getContent();
+    StringVector value;
+    if (d == INDEX || d == ALLOWED_METHODS || d == SERVER_NAME || d == RETURN)
     {
-        TokensVector::iterator tmp_iter = tok_iter;
+        size_t j = serverCtx.getDirectives().count(tok_iter->getContent());
+        if ((d == ALLOWED_METHODS || d == RETURN) && j > 0)
+            throw SyntaxErrorException("`" + tok_iter->getContent() + "` directive is duplicated at line: ", tok_iter->getLineIndex());
         tok_iter++;
         while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)
             value.push_back((tok_iter++)->getContent());
-        if (serverCtx.getDirectives().count(tmp_iter->getContent()) != 0)
+        if (j > 0)
             serverCtx.appendDirective(Directive(key, value));
         else
             serverCtx.addDirective(Directive(key, value));
     }
+    else if (d == ERROR_PAGE)
+    {
+        tok_iter++;
+        while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)
+            value.push_back((tok_iter++)->getContent());
+        serverCtx.addErrorPage(std::vector<std::string>(value));
+    }
+}
+
+/** The `parseDirective` function is responsible for parsing a directive in the configuration file and
+adding it to the server context. 
+* @return Nothing
+*/
+
+void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx)
+{
+    if (tok_iter == tokens.end())
+        return ;
+    parseSingleValueDirectives(tok_iter, serverCtx);
+    parseMultiValueDirectives(tok_iter, serverCtx);
 }
 
 
@@ -157,16 +178,6 @@ void Config::parseServers()
     }
 }
 
-void Config::checkLogicalErrors()
-{
-    ServersVector::const_iterator it = servers.cbegin();
-    while (it != servers.cend())
-    {
-        it->getListen();
-        it++;
-    }
-}
-
 void Config::printDirectives(const Context &ctx)
 {
     DirectivesMap::const_iterator directive_iter = ctx.getDirectives().cbegin();
@@ -178,15 +189,6 @@ void Config::printDirectives(const Context &ctx)
             std::cout << " " << *(i++);
         std::cout << std::endl;
         directive_iter++;
-    }
-}
-
-void Config::setDefaultDirectives()
-{
-    ServersVector::iterator serv_it = servers.begin();
-    while (serv_it != servers.end())
-    {
-        serv_it++;
     }
 }
 

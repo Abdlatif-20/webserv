@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 10:40:09 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/15 13:23:44 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/16 15:04:26 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ ServerContext::ServerContext()
 
 }
 
-ServerContext::ServerContext(const ServerContext& obj)
+ServerContext::ServerContext(const ServerContext& obj) : Context(obj)
 {
     *this = obj;
 }
@@ -27,6 +27,7 @@ ServerContext& ServerContext::operator=(const ServerContext& obj)
     if (this == &obj)
         return *this;
     directives = obj.directives;
+    errorPages = obj.errorPages;
     locations = obj.locations;
     return *this;
 }

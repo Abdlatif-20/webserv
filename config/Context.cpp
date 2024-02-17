@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/15 16:50:48 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/17 11:40:23 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ Context& Context::operator=(const Context& obj)
     if (this == &obj)
         return *this;
     directives = obj.directives;
+    errorPages = obj.errorPages;
     return *this;
 }
 
@@ -46,9 +47,19 @@ void Context::appendDirective(Directive _directive)
     it->second.insert(it->second.end(), _directive.second.begin(), _directive.second.end());
 }
 
+void Context::addErrorPage(StringVector error_page)
+{
+    errorPages.push_back(error_page);
+}
+
 const DirectivesMap& Context::getDirectives() const
 {
     return directives;
+}
+
+const std::vector<StringVector>& Context::getErrorPages() const
+{
+    return errorPages;
 }
 
 std::string Context::getRoot() const
@@ -102,28 +113,27 @@ int Context::getClientMaxBodySize() const
     return 1;
 }
 
-std::array<std::string, 3> Context::getAllowedMethods() const
+StringVector Context::getAllowedMethods() const
 {
     DirectivesMap::const_iterator it = directives.find("allowed_methods");
-    std::array<std::string, 3> arr;
+    StringVector vec;
     if (it != directives.cend())
     {
         StringVector::const_iterator vec_it = it->second.cbegin();
-        int i = 0;
         while (vec_it != it->second.cend())
         {
             if (*vec_it == "GET" || *vec_it == "POST" || *vec_it == "DELETE")
-                arr[i++] = *vec_it;
+                vec.push_back(*vec_it);
             vec_it++;
         }
     }
     else
     {
-        arr[0] = "GET";
-        arr[1] = "POST";
-        arr[2] = "DELETE";
+        vec.push_back("GET");
+        vec.push_back("POST");
+        vec.push_back("DELETE");
     }
-    return arr;
+    return vec;
 }
 
 std::string Context::getUploadStore() const
@@ -132,4 +142,23 @@ std::string Context::getUploadStore() const
     if (it != directives.cend())
         return *it->second.cbegin();
     return "assets/upload";
+}
+
+std::string Context::getErrorPage(const std::string& status) const
+{
+    std::vector<StringVector>::const_iterator it = errorPages.cbegin();
+    StringVector vec;
+    while (it != errorPages.cend())
+    {
+        vec = *it;
+        StringVector::const_iterator vec_it = std::find(vec.cbegin(), vec.cend(), status);
+        if (vec_it != vec.cend())
+        {
+            while (vec_it != (vec.cend() - 1))
+                vec_it++;
+            return *vec_it;
+        }
+        it++;
+    }
+    return "";
 }
