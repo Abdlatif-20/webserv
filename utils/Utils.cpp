@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/14 11:12:08 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/17 17:01:51 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,4 +68,17 @@ std::string Utils::getTokenNameFromDirective(t_directive d)
             break;
     }
     return "unknown";
+}
+
+std::string Utils::getDefaultErrorPage(const std::string& status)
+{
+    std::string errors[12] =
+    {
+        "400", "403", "404", "405", "408", "411",
+        "414", "429", "500", "501", "502", "505"
+    };
+    for (size_t i = 0; i < 12; i++)
+        if (status == errors[i])
+            return "assets/www/error/" + status + ".html";
+    return "";
 }
