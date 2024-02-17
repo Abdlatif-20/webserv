@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/16 11:32:07 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/17 11:38:43 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include <array>
 #include <string>
 #include <fstream>
+#include <iostream>
 
 class Context
 {
@@ -34,11 +35,12 @@ class Context
 
         /*Useful getters for request*/
         const DirectivesMap& getDirectives() const;
+        const std::vector<StringVector>& getErrorPages() const;
         std::string getRoot() const;
         std::string getIndex() const;
         bool getAutoIndex() const;
         int getClientMaxBodySize() const;
-        std::array<std::string, 3> getAllowedMethods() const;
+        StringVector getAllowedMethods() const;
         std::string getUploadStore() const;
-        std::string getErrorPage(std::string status) const;
+        std::string getErrorPage(const std::string& status) const;
 };
