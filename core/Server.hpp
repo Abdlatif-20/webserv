@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/15 19:15:40 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/17 16:17:13 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,15 @@
 #define SERVER_HPP
 
 #include <iostream>
+#include <arpa/inet.h>
+#include <sys/socket.h>
 #include "ServerContext.hpp"
 
 class Server
 {
 	private:
-		// std::string	port;
 		// int	sockID;
+		// sockaddr_in	addr;
 		ServerContext	serverCTX;
 
 	public:
