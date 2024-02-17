@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/16 11:49:45 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/17 13:03:37 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,22 +29,23 @@ Config::Config(const std::string& configPath)
     tokens = Lexer::tokenize(configPath);
     checkSyntax(tokens);
     parseServers();
-    ServersVector::iterator s_iter = servers.begin();
-    while (s_iter != servers.end())
-    {
-        std::cout << "server {" << std::endl;
-        printDirectives(*s_iter);
-        LocationsVector::const_iterator location_iter = s_iter->getLocations().cbegin();
-        while (location_iter != s_iter->getLocations().cend())
-        {
-            std::cout << " location " << location_iter->getPrefix() << " {" << std::endl;
-            printDirectives(*location_iter);
-            std::cout << " }" << std::endl;
-            location_iter++;
-        }
-        std::cout << "}" << std::endl;
-        s_iter++;
-    }
+    checkLogicalErrors(servers);
+    // ServersVector::iterator s_iter = servers.begin();
+    // while (s_iter != servers.end())
+    // {
+    //     std::cout << "server {" << std::endl;
+    //     printDirectives(*s_iter);
+    //     LocationsVector::const_iterator location_iter = s_iter->getLocations().cbegin();
+    //     while (location_iter != s_iter->getLocations().cend())
+    //     {
+    //         std::cout << " location " << location_iter->getPrefix() << " {" << std::endl;
+    //         printDirectives(*location_iter);
+    //         std::cout << " }" << std::endl;
+    //         location_iter++;
+    //     }
+    //     std::cout << "}" << std::endl;
+    //     s_iter++;
+    // }
 }
 
 Config::Config(const Config& obj)
@@ -116,11 +117,13 @@ void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx
     }
     else if (d == INDEX || d == ALLOWED_METHODS || d == SERVER_NAME || d == RETURN)
     {
-        TokensVector::iterator tmp_iter = tok_iter;
+        size_t j = serverCtx.getDirectives().count(tok_iter->getContent());
+        if ((d == ALLOWED_METHODS || d == RETURN) && j > 0)
+            throw SyntaxErrorException("`" + tok_iter->getContent() + "` directive is duplicated at line: ", tok_iter->getLineIndex());
         tok_iter++;
         while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)
             value.push_back((tok_iter++)->getContent());
-        if (serverCtx.getDirectives().count(tmp_iter->getContent()) != 0)
+        if (j > 0)
             serverCtx.appendDirective(Directive(key, value));
         else
             serverCtx.addDirective(Directive(key, value));
@@ -130,7 +133,7 @@ void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx
         tok_iter++;
         while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)
             value.push_back((tok_iter++)->getContent());
-        serverCtx.addErrorPage(value);
+        serverCtx.addErrorPage(std::vector<std::string>(value));
     }
 }
 

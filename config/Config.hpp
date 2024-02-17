@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:08 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/16 10:17:04 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/16 16:13:48 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 #include "ServerContext.hpp"
 #include "SyntaxAnalysis.hpp"
 #include "Utils.hpp"
-#include "netdb.h"
+#include "LogicalErrors.hpp"
 
 class Config
 {
