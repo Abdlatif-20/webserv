@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/17 16:17:18 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/17 16:40:17 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ Core::Core(const Config &conf)
 	while (it != serversConf.end())
 	{
 		servers.push_back(Server(*it));
-		std::cout << it->getListen() << std::endl;
 		it++;
 	}
 	std::vector<Server>::iterator	s_it = servers.begin();
