@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/16 15:14:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/17 12:11:47 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/17 14:27:17 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,13 +111,24 @@ static void checkErrorPages(const Context& ctx)
     }
 }
 
+static void checkReturn(const Context& ctx)
+{
+    DirectivesMap::const_iterator it = ctx.getDirectives().find("return");
+    if (it != ctx.getDirectives().cend())
+    {
+        StringVector::const_iterator vec_it = it->second.cbegin();
+        if (!isNumber(*vec_it))
+            throw LogicalErrorException("invalid value for `return` directive");
+    }
+}
+
 static void checkHttpDirectives(const Context& ctx)
 {
-    DirectivesMap::const_iterator it = ctx.getDirectives().find("auto_index");
     checkAutoIndex(ctx);
     checkMaxClientBodySize(ctx);
     checkAllowedMethods(ctx);
     checkErrorPages(ctx);
+    checkReturn(ctx);
 }
 
 void checkLogicalErrors(const ServersVector& servers)
