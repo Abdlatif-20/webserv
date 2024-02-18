@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 10:40:09 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/16 15:04:26 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/18 13:49:55 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,14 @@ ServerContext::ServerContext()
 
 ServerContext::ServerContext(const ServerContext& obj) : Context(obj)
 {
-    *this = obj;
+    locations = obj.locations;
 }
 
 ServerContext& ServerContext::operator=(const ServerContext& obj)
 {
     if (this == &obj)
         return *this;
-    directives = obj.directives;
-    errorPages = obj.errorPages;
+    Context::operator=(obj);
     locations = obj.locations;
     return *this;
 }
@@ -37,16 +36,23 @@ ServerContext::~ServerContext()
 
 }
 
+/* The `void ServerContext::addLocation(LocationContext location)` function in the `ServerContext`
+class is used to add a `LocationContext` object to the `locations` vector within the `ServerContext` object.*/
 void ServerContext::addLocation(LocationContext location)
 {
     this->locations.push_back(location);
 }
 
+/* The `const LocationsVector& ServerContext::getLocations() const` function in the `ServerContext`
+class is a getter method that returns a constant reference to the `locations` vector within the `ServerContext` object.*/
 const LocationsVector& ServerContext::getLocations() const
 {
     return locations;
 }
 
+/* The `std::string ServerContext::getListen() const` function in the `ServerContext` class is a getter
+method that retrieves the value associated with the "listen" directive from the `directives` map
+within the `ServerContext` object. */
 std::string ServerContext::getListen() const
 {
     DirectivesMap::const_iterator it = directives.find("listen");
@@ -55,6 +61,9 @@ std::string ServerContext::getListen() const
     return "8080";
 }
 
+/* The `StringVector ServerContext::getServerName() const` function in the `ServerContext` class is a
+getter method that retrieves the value associated with the "server_name" directive from the
+`directives` map within the `ServerContext` object. */
 StringVector ServerContext::getServerName() const
 {
     DirectivesMap::const_iterator it = directives.find("server_name");

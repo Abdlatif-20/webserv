@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 11:15:21 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/08 14:19:55 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/18 13:34:13 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,10 @@ Lexer::Lexer()
 
 }
 
+/* The `bool Lexer::isSpecialChar(char c)` function is checking if the given character `c` is a special
+character. It returns `true` if the character is one of the following: '{', '}', ';', '#', or if it
+is a whitespace character. Otherwise, it returns `false`. This function is used in the process of
+tokenizing input strings in the Lexer class. */
 bool Lexer::isSpecialChar(char c)
 {
     if (c == '{' || c == '}' || c == ';' || c == '#' || std::isspace(c))
@@ -26,6 +30,8 @@ bool Lexer::isSpecialChar(char c)
     return false;
 }
 
+/* The `void Lexer::getToken(const std::string& line, size_t lineIndex)` function in the `Lexer` class
+is responsible for tokenizing a given input line from a file.*/
 void Lexer::getToken(const std::string& line, size_t lineIndex)
 {
     std::string s = Utils::strTrim(line, ' ');
@@ -50,6 +56,9 @@ void Lexer::getToken(const std::string& line, size_t lineIndex)
     }
 }
 
+/* The `TokensVector Lexer::tokenize(const std::string& configFile)` function in the `Lexer` class is
+responsible for reading a configuration file specified by `configFile`, tokenizing each line of the
+file, and returning a vector of tokens. */
 TokensVector Lexer::tokenize(const std::string& configFile)
 {
     std::ifstream ifs(configFile);

@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/18 11:04:15 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/18 13:20:59 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,10 @@ Config::Config()
 
 /**
 * `Parameterized constructor` that takes the path of config file.
-* Tokenize the config file, check for syntax errors and finally parse the servers.
-* If any syntax error occured an exception is throwed with an appropriate message.
+* Tokenize the config file, check for syntax. Finally parse the servers.
+* If no server found in config file I setup my default server.
+* If no location found in one of the servers I setup a default location for that server.
+* Check for logical errors.
 * @param const std::string& configPath
 * @return nothing
 */
@@ -97,6 +99,10 @@ void Config::parseLocation(TokensVector::iterator& tok_iter, ServerContext& serv
     }
 }
 
+/* The `parseSingleValueDirectives` function in the `Config` class is responsible for parsing
+directives that have a single value in the configuration file. It checks the type of directive based
+on the token content, such as `LISTEN`, `ROOT`, `CLIENT_MAX_BODY_SIZE`, `AUTO_INDEX`, and
+`UPLOAD_STORE`. */
 void Config::parseSingleValueDirectives(TokensVector::iterator& tok_iter, Context& ctx)
 {
     t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
@@ -112,6 +118,9 @@ void Config::parseSingleValueDirectives(TokensVector::iterator& tok_iter, Contex
     }
 }
 
+/* The `parseMultiValueDirectives` function in the `Config` class is responsible for parsing directives
+that have multiple values in the configuration file. It checks the type of directive based on the
+token content, such as `INDEX`, `ALLOWED_METHODS`, `SERVER_NAME`, and `RETURN`. */
 void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context& ctx)
 {
     t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
@@ -140,10 +149,8 @@ void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context
 }
 
 /** The `parseDirective` function is responsible for parsing a directive in the configuration file and
-adding it to the server context. 
-* @return Nothing
+adding it to the server context.
 */
-
 void Config::parseDirective(TokensVector::iterator& tok_iter, Context& ctx)
 {
     if (tok_iter == tokens.end())
@@ -180,6 +187,8 @@ void Config::parseServers()
     }
 }
 
+/* The `void Config::setupDefaultServer()` function is responsible for setting up a default server in
+case no servers are found in the configuration file.*/
 void Config::setupDefaultServer()
 {
     if (servers.empty())
@@ -190,6 +199,8 @@ void Config::setupDefaultServer()
     }
 }
 
+/* The `void Config::setupDefaultLocation()` function is responsible for setting up a default location
+for each server in case no locations are found in the configuration file.*/
 void Config::setupDefaultLocation()
 {
     ServersVector::iterator serv_it = servers.begin();
@@ -215,6 +226,8 @@ void Config::printDirectives(const Context &ctx)
     }
 }
 
+/* The `const ServersVector& Config::getServers() const` function is a getter method in the `Config`
+class that returns a constant reference to the vector of servers (`ServersVector`). */
 const ServersVector& Config::getServers() const
 {
     return servers;
