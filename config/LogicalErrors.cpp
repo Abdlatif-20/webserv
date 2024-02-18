@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/16 15:14:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/17 14:27:17 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/18 11:23:39 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,12 @@ static void checkErrorPages(const Context& ctx)
         {
             StringVector::const_iterator vec_it = it->cbegin();
             while (vec_it != it->cend() && isNumber(*vec_it))
+            {
+                int statu = std::atoi(vec_it->c_str());
+                if (statu < 400 || statu > 507)
+                    throw LogicalErrorException("invalid value status code `error_page` directive");
                 vec_it++;
+            }
             if (vec_it != it->cend() && ++vec_it != it->cend())
                 throw LogicalErrorException("invalid value for `error_page` directive");
             it++;
