@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/15 17:41:52 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/18 13:35:19 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,14 @@ t_directive Utils::getDirectiveFromTokenName(const std::string& tokenName)
         if (tokenName == tokens[i])
             return static_cast<t_directive>(i);
     return UNKNOWN;
+}
+
+void	Utils::setupAddr(sockaddr_in *addr, int port)
+{
+	std::memset(addr, 0, sizeof(sockaddr_in));
+	addr->sin_port = port;
+	addr->sin_family = AF_INET;
+	addr->sin_addr.s_addr = INADDR_ANY;
 }
 
 std::string Utils::getTokenNameFromDirective(t_directive d)
