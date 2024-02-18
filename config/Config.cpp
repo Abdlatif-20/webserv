@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/17 18:52:33 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/18 10:47:27 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ Config::Config(const std::string& configPath)
     tokens = Lexer::tokenize(configPath);
     checkSyntax(tokens);
     parseServers();
+    setupDefaultServer();
     checkLogicalErrors(servers);
     // ServersVector::iterator s_iter = servers.begin();
     // while (s_iter != servers.end())
@@ -175,6 +176,18 @@ void Config::parseServers()
         }
         if (tok_iter != tokens.end())
             tok_iter++;
+    }
+}
+
+void Config::setupDefaultServer()
+{
+    if (servers.empty())
+    {
+        ServerContext defaultServer;
+        LocationContext defaultLocation("/");
+        defaultServer.addLocation(defaultLocation);
+        servers.push_back(defaultServer);
+        return;
     }
 }
 
