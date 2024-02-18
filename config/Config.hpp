@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:08 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/18 10:46:41 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/18 10:51:56 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ class Config
         void parseLocation(TokensVector::iterator& tok_iter, ServerContext& serverCtx);
         void parseServers();
         void setupDefaultServer();
+        void setupDefaultLocation();
         void printDirectives(const Context& ctx);
     public:
         Config();

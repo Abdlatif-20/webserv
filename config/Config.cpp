@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/18 10:47:27 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/18 11:04:15 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ Config::Config(const std::string& configPath)
     checkSyntax(tokens);
     parseServers();
     setupDefaultServer();
+    setupDefaultLocation();
     checkLogicalErrors(servers);
     // ServersVector::iterator s_iter = servers.begin();
     // while (s_iter != servers.end())
@@ -184,10 +185,19 @@ void Config::setupDefaultServer()
     if (servers.empty())
     {
         ServerContext defaultServer;
-        LocationContext defaultLocation("/");
-        defaultServer.addLocation(defaultLocation);
         servers.push_back(defaultServer);
         return;
+    }
+}
+
+void Config::setupDefaultLocation()
+{
+    ServersVector::iterator serv_it = servers.begin();
+    while (serv_it != servers.end())
+    {
+        if (serv_it->getLocations().empty())
+            serv_it->addLocation(LocationContext("/"));
+        serv_it++;
     }
 }
 
