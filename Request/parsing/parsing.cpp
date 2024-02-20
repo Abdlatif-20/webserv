@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/15 13:18:17 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/20 14:13:18 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,26 +78,6 @@ void	Request::findUri()
 	{
 		_status = NotFound;
 		throw InvalidRequest("URI not found");
-	}
-}
-
-void	Request::matchUriRequest()
-{
-	Config _config(_configPath);
-	ServersVector ref = _config.getServers();
-	ServersVector::iterator s_iter = ref.begin();
-	LocationsVector loc = s_iter->getLocations();
-	LocationsVector::iterator l_iter = loc.begin();
-	std::string uri = _requestLine["path"];
-	std::string prefix = l_iter->getPrefix();
-
-	if (uri.find(prefix) != std::string::npos)
-	{
-		std::cout << "Matched" << std::endl;
-	}
-	else
-	{
-		std::cout << "Not Matched" << std::endl;
 	}
 }
 
@@ -202,44 +182,4 @@ int	Request::takingRequests(const std::string& receivedRequest)
 		_receivecount++;
 	}
 	return 0;
-}
-
-//main function to parse the request
-void	Request::parseRequest(const std::string& receivedRequest, char *configPath)
-{
-	_configPath = configPath;
-
-	std::srand(time(0));
-	if (!_requestLineDone || !_headersDone || !_requestIsWellFormed)
-	{
-		if (takingRequests(receivedRequest))
-		{
-			if (_detectHost > 1)
-			{
-				_status = BadRequest;
-				throw InvalidRequest("Duplicate Host");
-			}
-			return;
-		}
-	}
-	if (_requestLine["method"] == "POST" && !_bodyDone)
-	{
-		if (_receivecount > 1 && !requestInProgress)
-			_body = receivedRequest;
-		if (_receivecount > 1 && requestInProgress)
-		{
-			if (receivedRequest == CRLF)
-				return;
-			_body = receivedRequest;
-		}
-		if (!_body.empty())
-			parseBody();
-	}
-	std::cout << "-------- RequestLine --------" << std::endl;
-	Utils::printMap(_requestLine);
-	std::cout << "-------- Headers --------" << std::endl;
-	Utils::printMap(_headers);
-	std::cout << "---------------------------" << std::endl;
-	// std::cout << "Request is well formed" << std::endl;
-	// matchUriRequest();
 }
