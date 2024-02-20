@@ -6,11 +6,12 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/14 18:30:59 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/19 18:44:51 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
+#include "Server.hpp"
 
 static void __unused showTokens(std::vector<Token>& tokens)
 {
@@ -47,8 +48,19 @@ int main(int argc, char **argv)
             configPath = argv[1];
         else if (argc > 2)
             throw "Error: invalid number of args";
+        char buffer[1024];
         Config _config(configPath);
-        std::cout << _config.getServerByHost("localhost")->getClientMaxBodySize() << std::endl;
+        size_t sz = -1;
+        ServersVector::const_iterator firstServer = _config.getServers().cbegin();
+        Server tcpServer(firstServer->getListen());
+        tcpServer.Start();
+        tcpServer.Accept();
+        while (sz != 0)
+        {
+            bzero(buffer, 1024);
+            sz = tcpServer.Receive(buffer);
+            std::cout << buffer;
+        }
     }
     catch(const std::exception& e)
     {

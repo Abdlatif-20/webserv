@@ -6,7 +6,7 @@
 #    By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/02/12 12:24:09 by mel-yous         ###   ########.fr        #
+#    Updated: 2024/02/19 13:22:12 by mel-yous         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ CPPFLAGS = -Wall -Wextra -Werror -std=c++98
 SRCS = $(wildcard *.cpp) $(wildcard */*.cpp)
 OBJS = $(SRCS:.cpp=.o)
 INC = $(wildcard *.hpp) $(wildcard */*.hpp)
-COMPILER = c++ -g -I config -I utils
+COMPILER = c++ -g -I config -I utils -I core
 
 COLOR_GREEN = \033[0;32m
 COLOR_RED = \033[0;31m
