@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/15 13:15:00 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/20 10:27:28 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 #include "Config.hpp"
 
 
-/*
+/* 
 
 GET / HTTP/1.1
 
@@ -32,7 +32,9 @@ host:localhost:5002
 connection:keep-alive
 accept-encoding:gzip, deflate, br
 Content-Length: 11
+Content-Type: text/plain
 
+Hello world
 */
 
 enum Errors
@@ -60,6 +62,7 @@ class Request
 		bool _bodyDone;
 		bool _foundUri;
 		int	_detectHost;
+		bool _isComplete;
 		int	_receivecount;
 		bool _headersDone;
 		bool _requestLineDone;
@@ -92,7 +95,7 @@ class Request
 		void	parseBody();
 		void	parseBoundary();
 		void	ContentLength();
-		void	matchUriRequest();
+		void	parseChunkedBody();
 		void	parseContentType();
 		void	parseContentLength();
 		void	requestIsWellFormed();
@@ -106,8 +109,12 @@ class Request
 		void	parseRequest(const std::string& receivedRequest, char *configPath);
 	/* *************************** getters ************************************ */
 		int getStatus();
-		std::string getBody();
-		std::map<std::string, std::string> getHeaders();
-		std::map<std::string, std::string> getRequestLine();
-
+		const std::string& getBody();
+		const std::map<std::string, std::string>& getHeaders();
+		const std::map<std::string, std::string>& getRequestLine();
+		const bool& getRequestIsWellFormed();
+		const bool& getBodyDone();
+		const bool& getHeadersDone();
+		const bool& getRequestLineDone();
+		const bool& getFoundUri();
 };
