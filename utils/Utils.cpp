@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/20 18:15:40 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/21 11:08:50 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,4 +95,17 @@ std::string Utils::getTokenNameFromDirective(t_directive d)
             break;
     }
     return "unknown";
+}
+
+std::string Utils::getDefaultErrorPage(const std::string& status)
+{
+    std::string errors[12] =
+    {
+        "400", "403", "404", "405", "408", "411",
+        "414", "429", "500", "501", "502", "505"
+    };
+    for (size_t i = 0; i < 12; i++)
+        if (status == errors[i])
+            return "assets/www/error/" + status + ".html";
+    return "";
 }

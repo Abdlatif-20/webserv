@@ -1,4 +1,4 @@
-1- Setup default values for missing directives | Setup default server if no server found
-2- Check for logical errors, `Example: listen hello;`
+1- Test the whole Config_file & comment each method on it
+2- Adding a getter for `return` directive and check for logical errors
+3- Create a function that takes a string named `prefix OR path` and search by it for the matching location (exact matching && prefix matching)
 3- Adding `CGI` directives
-4- Complete context getters

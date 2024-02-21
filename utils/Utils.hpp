@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/18 14:21:18 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/21 11:09:47 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ namespace Utils
 {
 	std::string	strTrim(const std::string& str, char c);
 	std::string	getTokenNameFromDirective(t_directive d);
+    std::string getDefaultErrorPage(const std::string& status);
 
 	t_directive	getDirectiveFromTokenName(const std::string& tokenName);
 

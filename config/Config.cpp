@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/17 16:34:06 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/21 11:07:24 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,10 @@ Config::Config()
 
 /**
 * `Parameterized constructor` that takes the path of config file.
-* Tokenize the config file, check for syntax errors and finally parse the servers.
-* If any syntax error occured an exception is throwed with an appropriate message.
+* Tokenize the config file, check for syntax. Finally parse the servers.
+* If no server found in config file I setup my default server.
+* If no location found in one of the servers I setup a default location for that server.
+* Check for logical errors.
 * @param const std::string& configPath
 * @return nothing
 */
@@ -29,6 +31,8 @@ Config::Config(const std::string& configPath)
     tokens = Lexer::tokenize(configPath);
     checkSyntax(tokens);
     parseServers();
+    setupDefaultServer();
+    setupDefaultLocation();
     checkLogicalErrors(servers);
     // ServersVector::iterator s_iter = servers.begin();
     // while (s_iter != servers.end())
@@ -95,59 +99,64 @@ void Config::parseLocation(TokensVector::iterator& tok_iter, ServerContext& serv
     }
 }
 
-void Config::parseSingleValueDirectives(TokensVector::iterator& tok_iter, Context& serverCtx)
+/* The `parseSingleValueDirectives` function in the `Config` class is responsible for parsing
+directives that have a single value in the configuration file. It checks the type of directive based
+on the token content, such as `LISTEN`, `ROOT`, `CLIENT_MAX_BODY_SIZE`, `AUTO_INDEX`, and
+`UPLOAD_STORE`. */
+void Config::parseSingleValueDirectives(TokensVector::iterator& tok_iter, Context& ctx)
 {
     t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
     std::string key = tok_iter->getContent();
     StringVector value;
     if (d == LISTEN || d == ROOT || d == CLIENT_MAX_BODY_SIZE || d == AUTO_INDEX || d == UPLOAD_STORE)
     {
-        if (serverCtx.getDirectives().count(tok_iter->getContent()) != 0)
+        if (ctx.getDirectives().count(tok_iter->getContent()) != 0)
             throw SyntaxErrorException("`" + tok_iter->getContent() + "` directive is duplicated at line: ", tok_iter->getLineIndex());
         tok_iter++;
         value.push_back(tok_iter->getContent());
-        serverCtx.addDirective(Directive(key, value));
+        ctx.addDirective(Directive(key, value));
     }
 }
 
-void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context& serverCtx)
+/* The `parseMultiValueDirectives` function in the `Config` class is responsible for parsing directives
+that have multiple values in the configuration file. It checks the type of directive based on the
+token content, such as `INDEX`, `ALLOWED_METHODS`, `SERVER_NAME`, and `RETURN`. */
+void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context& ctx)
 {
     t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
     std::string key = tok_iter->getContent();
     StringVector value;
     if (d == INDEX || d == ALLOWED_METHODS || d == SERVER_NAME || d == RETURN)
     {
-        size_t j = serverCtx.getDirectives().count(tok_iter->getContent());
+        size_t j = ctx.getDirectives().count(tok_iter->getContent());
         if ((d == ALLOWED_METHODS || d == RETURN) && j > 0)
             throw SyntaxErrorException("`" + tok_iter->getContent() + "` directive is duplicated at line: ", tok_iter->getLineIndex());
         tok_iter++;
         while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)
             value.push_back((tok_iter++)->getContent());
         if (j > 0)
-            serverCtx.appendDirective(Directive(key, value));
+            ctx.appendDirective(Directive(key, value));
         else
-            serverCtx.addDirective(Directive(key, value));
+            ctx.addDirective(Directive(key, value));
     }
     else if (d == ERROR_PAGE)
     {
         tok_iter++;
         while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)
             value.push_back((tok_iter++)->getContent());
-        serverCtx.addErrorPage(std::vector<std::string>(value));
+        ctx.addErrorPage(std::vector<std::string>(value));
     }
 }
 
 /** The `parseDirective` function is responsible for parsing a directive in the configuration file and
-adding it to the server context. 
-* @return Nothing
+adding it to the server context.
 */
-
-void Config::parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx)
+void Config::parseDirective(TokensVector::iterator& tok_iter, Context& ctx)
 {
     if (tok_iter == tokens.end())
         return ;
-    parseSingleValueDirectives(tok_iter, serverCtx);
-    parseMultiValueDirectives(tok_iter, serverCtx);
+    parseSingleValueDirectives(tok_iter, ctx);
+    parseMultiValueDirectives(tok_iter, ctx);
 }
 
 
@@ -178,6 +187,31 @@ void Config::parseServers()
     }
 }
 
+/* The `void Config::setupDefaultServer()` function is responsible for setting up a default server in
+case no servers are found in the configuration file.*/
+void Config::setupDefaultServer()
+{
+    if (servers.empty())
+    {
+        ServerContext defaultServer;
+        servers.push_back(defaultServer);
+        return;
+    }
+}
+
+/* The `void Config::setupDefaultLocation()` function is responsible for setting up a default location
+for each server in case no locations are found in the configuration file.*/
+void Config::setupDefaultLocation()
+{
+    ServersVector::iterator serv_it = servers.begin();
+    while (serv_it != servers.end())
+    {
+        if (serv_it->getLocations().empty())
+            serv_it->addLocation(LocationContext("/"));
+        serv_it++;
+    }
+}
+
 void Config::printDirectives(const Context &ctx)
 {
     DirectivesMap::const_iterator directive_iter = ctx.getDirectives().cbegin();
@@ -192,6 +226,8 @@ void Config::printDirectives(const Context &ctx)
     }
 }
 
+/* The `const ServersVector& Config::getServers() const` function is a getter method in the `Config`
+class that returns a constant reference to the vector of servers (`ServersVector`). */
 const ServersVector& Config::getServers() const
 {
     return servers;

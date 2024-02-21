@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:08 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/17 16:34:20 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/21 11:07:39 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,13 @@ class Config
         TokensVector tokens;
         ServersVector servers;
         
-        void parseSingleValueDirectives(TokensVector::iterator& tok_iter, Context& serverCtx);
-        void parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context& serverCtx);
-        void parseDirective(TokensVector::iterator& tok_iter, Context& serverCtx);
+        void parseSingleValueDirectives(TokensVector::iterator& tok_iter, Context& ctx);
+        void parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context& ctx);
+        void parseDirective(TokensVector::iterator& tok_iter, Context& ctx);
         void parseLocation(TokensVector::iterator& tok_iter, ServerContext& serverCtx);
         void parseServers();
+        void setupDefaultServer();
+        void setupDefaultLocation();
         void printDirectives(const Context& ctx);
     public:
         Config();
