@@ -2,6 +2,11 @@
 *.pdf
 */*.o
 .vscode
+<<<<<<< HEAD
 webserv
 .vscode
 .DS_Store
+=======
+.DS_Store
+*.pdf
+>>>>>>> Simo
