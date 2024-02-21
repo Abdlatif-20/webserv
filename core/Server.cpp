@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:55:56 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/17 20:09:35 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/20 18:58:34 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,23 +18,25 @@ Server::Server(void)
 
 Server::Server(const ServerContext &_serverCTX)
 {
+	HostPort hp;
+
 	serverCTX = _serverCTX;
-	
-	// std::memset(&addr, 0, sizeof addr);
-	// addr.sin_family = AF_INET;
-	// addr.sin_port =
-	// sockID = socket(AF_INET, SOCK_STREAM, 0);
-	// if ()
+	hp = Utils::getPortAndHost(serverCTX.getListen());
+	if (!hp.first.empty())
+		serverNames.push_back(hp.first);
+	StringVector tmp = serverCTX.getServerName();
+	serverNames.insert(serverNames.end(), tmp.begin(), tmp.end());
+	host = hp.first;
+	port = hp.second;
+	std::cout << "Port "<< port << " => hosts [";
+	for (StringVector::iterator i = serverNames.begin(); i != serverNames.end(); i++)
+		std::cout << " " << *i;
+	std::cout << " ]"<< std::endl;
 }
 
 Server::Server(const Server &cpy)
 {
 	*this = cpy;
-}
-
-std::string Server::getPORT_tmp(void) const
-{
-	return (serverCTX.getListen());
 }
 
 Server &Server::operator=(const Server &cpy)

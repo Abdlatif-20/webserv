@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/17 16:40:17 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/18 15:19:29 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,6 @@ Core::Core(const Config &conf)
 		servers.push_back(Server(*it));
 		it++;
 	}
-	std::vector<Server>::iterator	s_it = servers.begin();
-	while (s_it != servers.end())
-		std::cout << s_it++->getPORT_tmp() << std::endl;
 }
 
 Core	&Core::operator=(const Core &cpy)

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/18 13:35:19 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/20 18:15:40 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,25 @@ void	Utils::setupAddr(sockaddr_in *addr, int port)
 	addr->sin_port = port;
 	addr->sin_family = AF_INET;
 	addr->sin_addr.s_addr = INADDR_ANY;
+}
+
+HostPort	Utils::getPortAndHost(const std::string &str)
+{
+	size_t	idx;
+	std::string	host;
+	std::string	port;
+
+	idx = str.find(':');
+	if (idx != std::string::npos)
+	{
+		std::stringstream ss;
+		ss << str;
+		std::getline(ss, host, ':');
+		std::getline(ss, port, ':');
+	}
+	else
+		port = str;
+	return HostPort(host, port);
 }
 
 std::string Utils::getTokenNameFromDirective(t_directive d)
