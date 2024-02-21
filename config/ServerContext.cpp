@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 10:40:09 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/20 12:05:48 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/21 11:14:40 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,27 +50,29 @@ const LocationsVector& ServerContext::getLocations() const
     return locations;
 }
 
-std::string ServerContext::getHost() const
+std::string ServerContext::getListen() const
 {
     DirectivesMap::const_iterator it = directives.find("listen");
     if (it != directives.cend())
-    {
-        size_t i = (*it->second.cbegin()).find(':');
-        if (i != std::string::npos)
-            return (*it->second.cbegin()).substr(0, i);
-    }
+        return *it->second.cbegin();
+    return "8080";
+}
+
+std::string ServerContext::getHost() const
+{
+    std::string str = getListen();
+    size_t i = str.find(':');
+    if (i != std::string::npos)
+        return str.substr(0, i);
     return "0.0.0.0";
 }
 
 std::string ServerContext::getPort() const
 {
-    DirectivesMap::const_iterator it = directives.find("listen");
-    if (it != directives.cend())
-    {
-        size_t i = (*it->second.cbegin()).find(':');
-        if (i != std::string::npos)
-            return (*it->second.cbegin()).substr(i + 1, (*it->second.cbegin()).length() - i);
-    }
+    std::string str = getListen();
+    size_t i = str.find(':');
+    if (i != std::string::npos)
+        return str.substr(i + 1, str.length() - i);
     return "8080";
 }
 
