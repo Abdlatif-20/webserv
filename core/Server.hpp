@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/21 11:08:22 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/21 16:30:08 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,9 @@
 #include <iostream>
 #include <arpa/inet.h>
 #include <sys/socket.h>
+#include <sys/types.h>
+#include <libc.h>
+#include <netdb.h>
 #include "Utils.hpp"
 #include "ServerContext.hpp"
 
@@ -26,7 +29,6 @@ class Server
 		sockaddr_in	addr;
 		std::string	port;
 		std::string	host;
-		addrinfo	x;
 		StringVector	serverNames;
 		ServerContext	serverCTX;
 
@@ -34,6 +36,8 @@ class Server
 		Server(void);
 		Server(const Server& cpy);
 		Server(const ServerContext& _serverCTX);
+
+		void	setupServer(void);
 
 		Server&	operator=(const Server& cpy);
 

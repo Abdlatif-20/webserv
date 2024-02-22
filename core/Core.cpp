@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/21 11:08:05 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/21 16:36:16 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,20 @@ Core::Core(const Config &conf)
 	while (it != serversConf.end())
 	{
 		servers.push_back(Server(*it));
+		it++;
+	}
+}
+
+void	Core::run(void)
+{
+	std::vector<Server>::iterator	it;
+
+	std::cout << "Core: running ..." << std::endl;
+	it = servers.begin();
+	while (it != servers.end())
+	{
+		std::cout << "Core: run server" << std::endl;
+		it->setupServer();
 		it++;
 	}
 }

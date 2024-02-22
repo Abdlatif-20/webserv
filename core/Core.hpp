@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:21:50 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/21 11:08:11 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/21 16:32:18 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ class Core
 		Core(void);
 		Core(const Core& cpy);
 		Core(const Config& conf);
+
+		void	run(void);
 
 		Core&	operator=(const Core& cpy);
 
