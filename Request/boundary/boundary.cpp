@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/22 21:16:13 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/22 22:55:20 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,8 +71,8 @@ void	Request::boundary()
 	std::string filename;
 	std::string beforeName;
 	std::string line;
-	std::string boundary = _headers["content-type"].substr(31);
-	std::string boundaryEnd = "--" + boundary + "--";
+	std::string boundary = "--" + _headers["content-type"].substr(31);
+	std::string boundaryEnd = boundary + "--";
 	std::ofstream ofile;
 
 	while (std::getline(file, line))
@@ -94,7 +94,7 @@ void	Request::boundary()
 		if (line.find(boundaryEnd) != std::string::npos)
 		{
 			_isComplete = true;
-			// std::remove(_boundaryName.c_str());
+			std::remove(_boundaryName.c_str());
 		}
 		if (initialFile && !_isComplete)
 		{
@@ -113,6 +113,7 @@ void	Request::boundary()
 		}
 	}
 	file.close();
+	std::cout << "Body parsed\n";
 }
 
 void	Request::parseBoundary()
@@ -147,7 +148,6 @@ void	Request::parseBoundary()
 		file.close();
 		boundary();
 		_bodyDone = true;
-		std::cout << "Body parsed" << std::endl;
 	}
 }
 /*
