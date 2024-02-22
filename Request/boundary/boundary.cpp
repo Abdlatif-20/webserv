@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/14 11:50:04 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/22 21:16:13 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,11 @@ static std::string pripareFileName(std::string line, bool &initialFile)
 	{
 		filename = line.substr(line.find("filename=") + 10,
 			line.find_last_of("\"") - line.find("filename=") - 10);
-		// std::cout << "filename: " << filename << std::endl;
 	}
 	else if (line.find("name") != std::string::npos)
 	{
 		filename = line.substr(line.find("name=") + 6,
 			line.find_last_of("\"") - line.find("name=") - 6);
-		// std::cout << "name: " << filename << std::endl;
 	}
 	initialFile = true;
 	extension = filename.substr(filename.find_last_of(".") + 1);
@@ -64,20 +62,19 @@ static void	ignoredLines(std::ifstream &file)
 void	Request::boundary()
 {
 	std::ifstream file(_boundaryName);
-	bool initialFile = false;
-	std::string filename;
-	std::string extension;
-	std::string line;
-	std::map<std::string, std::string> boundaryMap;
-	std::string boundary = _headers["content-type"].substr(31);
-	std::string boundaryEnd = "--" + boundary + "--";
-	bool isComplete = false;
-
 	if (!file.is_open())
 	{
 		_status = BadRequest;
 		throw InvalidRequest("can't open file");
 	}
+	bool initialFile = false;
+	std::string filename;
+	std::string beforeName;
+	std::string line;
+	std::string boundary = _headers["content-type"].substr(31);
+	std::string boundaryEnd = "--" + boundary + "--";
+	std::ofstream ofile;
+
 	while (std::getline(file, line))
 	{
 		if (line.find("Content-Disposition") != std::string::npos)
@@ -86,20 +83,33 @@ void	Request::boundary()
 			ignoredLines(file);
 			continue;
 		}
+		if (line.find(boundary) != std::string::npos)
+		{
+			if (ofile.is_open())
+				ofile.close();
+			initialFile = false;
+			continue;
+		}
+		// std::cout <<"line: " << line << std::endl;
 		if (line.find(boundaryEnd) != std::string::npos)
 		{
-			isComplete = true;
-			std::remove(_boundaryName.c_str());
+			_isComplete = true;
+			// std::remove(_boundaryName.c_str());
 		}
-		if (initialFile && !isComplete)
+		if (initialFile && !_isComplete)
 		{
-			std::ofstream file(filename, std::ios::app);
-			if (!file.is_open())
+			if (!ofile.is_open())
 			{
-				_status = BadRequest;
-				throw InvalidRequest("can't open file");
+				ofile.open(filename, std::ios::app | std::ios::binary);
+				if (!ofile.is_open())
+				{
+					_status = BadRequest;
+					throw InvalidRequest("can't open file");
+				}
 			}
-			file << line << std::endl;
+			ofile.write(line.c_str(), line.size());
+			ofile.write("\n", 1);
+			// ofile << line << std::endl;
 		}
 	}
 	file.close();
@@ -120,12 +130,15 @@ void	Request::parseBoundary()
 	}
 	if (_body.find(EndBoundary) == std::string::npos)
 	{
-		file << _body;
+		// std::cout <<"_body: {" << _body << "}" << std::endl;
+		// std::cout <<"EndBoundary:{" << EndBoundary << "}" << std::endl;
+		
+		file.write(_body.c_str(), _body.size());
 		_receivecount++;
 	}
 	else
 	{
-		file << _body.substr(0, _body.find(EndBoundary) + EndBoundary.size() + 2);
+		file.write(_body.c_str(), _body.find(EndBoundary) + EndBoundary.size() + 2);
 		_body = _body.substr(_body.find(EndBoundary) + EndBoundary.size() + 2);
 		isComplete = true;
 	}
@@ -137,3 +150,7 @@ void	Request::parseBoundary()
 		std::cout << "Body parsed" << std::endl;
 	}
 }
+/*
+---------------131065337970097632542736--
+---------------------------131065337970097632542736--
+*/

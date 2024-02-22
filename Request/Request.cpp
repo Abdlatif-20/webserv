@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/20 10:28:49 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/22 22:14:48 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,47 +42,47 @@ Request::~Request()
 
 /* *************************** getters *************************** */
 
-const std::string&	Request::getBody()
+const std::string&	Request::getBody() const
 {
 	return (_body);
 }
 
-const std::map<std::string, std::string>&	Request::getHeaders()
+const std::map<std::string, std::string>&	Request::getHeaders() const
 {
 	return (_headers);
 }
 
-const std::map<std::string, std::string>&	Request::getRequestLine()
+const std::map<std::string, std::string>&	Request::getRequestLine() const
 {
 	return (_requestLine);
 }
 
-int	Request::getStatus()
+const int&	Request::getStatus() const
 {
 	return (_status);
 }
 
-const bool& Request::getRequestIsWellFormed()
+const bool& Request::getRequestIsWellFormed() const
 {
 	return (_requestIsWellFormed);
 }
 
-const bool& Request::getBodyDone()
+const bool& Request::getBodyDone() const
 {
 	return (_bodyDone);
 }
 
-const bool& Request::getHeadersDone()
+const bool& Request::getHeadersDone() const
 {
 	return (_headersDone);
 }
 
-const bool& Request::getRequestLineDone()
+const bool& Request::getRequestLineDone() const
 {
 	return (_requestLineDone);
 }
 
-const bool& Request::getFoundUri()
+const bool& Request::getFoundUri() const
 {
 	return (_foundUri);
 }
@@ -112,11 +112,9 @@ void	Request::parseRequest(const std::string& receivedRequest, char *configPath)
 	}
 	if (_requestLine["method"] == "POST" && !_bodyDone)
 	{
-		if (_receivecount > 1 && !requestInProgress)
-			_body = receivedRequest;
-		if (_receivecount > 1 && requestInProgress)
+		if (_receivecount > 1)
 		{
-			if (receivedRequest == CRLF)
+			if (receivedRequest.front() == CR && requestInProgress)
 				return;
 			_body = receivedRequest;
 		}
@@ -125,10 +123,11 @@ void	Request::parseRequest(const std::string& receivedRequest, char *configPath)
 		// std::cout << "-------- Body --------" << std::endl;
 		// std::cout << _body << std::endl;
 		// std::cout << "---------------------------" << std::endl;
+		return;
 	}
 	std::cout << "-------- RequestLine --------" << std::endl;
 	Utils::printMap(_requestLine);
 	std::cout << "-------- Headers --------" << std::endl;
 	Utils::printMap(_headers);
-	// std::cout << "Request is well formed" << std::endl;
+	std::cout << "Request is well formed" << std::endl;
 }

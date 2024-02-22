@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/10 18:20:17 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/20 16:08:12 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,8 @@
 #include <map>
 #include <fstream>
 
+#define MAX_CLIENTS 10
+#define BUFFER_SIZE 1024
 namespace Utils
 {
 		std::string strTrim(const std::string& str, char c);

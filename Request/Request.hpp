@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/20 10:27:28 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/21 22:32:00 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 #include <sstream>
 #include <algorithm>
 #include "Config.hpp"
+#include <fcntl.h>
 
 
 /* 
@@ -50,7 +51,7 @@ enum Errors
 
 #define CR '\r'
 #define CRLF "\r\n"
-#define MAX_BODY_SIZE 1000000
+#define MAX_BODY_SIZE 100000000
 #define ALLOWED_CHARACTERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJ\
 							KLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%"
 
@@ -108,13 +109,13 @@ class Request
 		int		takingRequests(const std::string& receivedRequest);
 		void	parseRequest(const std::string& receivedRequest, char *configPath);
 	/* *************************** getters ************************************ */
-		int getStatus();
-		const std::string& getBody();
-		const std::map<std::string, std::string>& getHeaders();
-		const std::map<std::string, std::string>& getRequestLine();
-		const bool& getRequestIsWellFormed();
-		const bool& getBodyDone();
-		const bool& getHeadersDone();
-		const bool& getRequestLineDone();
-		const bool& getFoundUri();
+		const int& getStatus() const;
+		const std::string& getBody() const;
+		const std::map<std::string, std::string>& getHeaders() const;
+		const std::map<std::string, std::string>& getRequestLine() const;
+		const bool& getRequestIsWellFormed() const;
+		const bool& getBodyDone() const;
+		const bool& getHeadersDone() const;
+		const bool& getRequestLineDone() const;
+		const bool& getFoundUri() const;
 };

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/15 13:18:17 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/22 22:17:15 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ void	Request::requestIsWellFormed()
 	{
 		if (_headers.find("content-length") != _headers.end())
 			parseContentLength();
-		else if (_headers.find("content-type") != _headers.end())
+		else if (_headers.find("content-type") != _headers.end()
+				&& _headers.find("transfer-encoding") == _headers.end())
 			parseContentType();
 		else if (_headers.find("transfer-encoding") != _headers.end())
 			parseTransferEncoding();
@@ -81,26 +82,6 @@ void	Request::findUri()
 	}
 }
 
-void	Request::matchUriRequest()
-{
-	Config _config(_configPath);
-	ServersVector ref = _config.getServers();
-	ServersVector::iterator s_iter = ref.begin();
-	LocationsVector loc = s_iter->getLocations();
-	LocationsVector::iterator l_iter = loc.begin();
-	std::string uri = _requestLine["path"];
-	std::string prefix = l_iter->getPrefix();
-
-	if (uri.find(prefix) != std::string::npos)
-	{
-		std::cout << "Matched" << std::endl;
-	}
-	else
-	{
-		std::cout << "Not Matched" << std::endl;
-	}
-}
-
 //function to separate the request line And the headers from the request
 void	Request::separateRequest(std::string receivedRequest)
 {
@@ -124,14 +105,18 @@ void	Request::parseBody()
 			&& _headers.find("content-length") != _headers.end())
 			ContentLength();
 	else if (_requestLine["method"] == "POST"
-			&& _headers.find("content-type") != _headers.end())
+			&& _headers.find("transfer-encoding") != _headers.end())
+			parseChunkedBody();
+	else if (_requestLine["method"] == "POST")
 			parseBoundary();
 }
 //function to parse the request line and fill it to the map and return 1 if the request line is separated
 int	Request::parseRequestLine(const std::string& requestLine)
 {
+	
 	if (requestLine.find("\r\n\r\n") == std::string::npos)
 	{
+		// std::cout<<"_requestLineDoneeee: "<< _requestLineDone << std::endl;
 		_requestVector = Utils::splitRequest(requestLine, CRLF);
 		fillRequestLine(_requestVector[0]); //fill the request line
 		requestInProgress = true;
@@ -193,7 +178,6 @@ int	Request::takingRequests(const std::string& receivedRequest)
 			_requestVector = Utils::splitRequest(_requestData, CRLF);
 		else
 		{
-			puts(receivedRequest.c_str());
 			separateRequest(receivedRequest);
 			_requestVector = Utils::splitRequest(headers, CRLF);
 		}
@@ -202,44 +186,4 @@ int	Request::takingRequests(const std::string& receivedRequest)
 		_receivecount++;
 	}
 	return 0;
-}
-
-//main function to parse the request
-void	Request::parseRequest(const std::string& receivedRequest, char *configPath)
-{
-	_configPath = configPath;
-
-	std::srand(time(0));
-	if (!_requestLineDone || !_headersDone || !_requestIsWellFormed)
-	{
-		if (takingRequests(receivedRequest))
-		{
-			if (_detectHost > 1)
-			{
-				_status = BadRequest;
-				throw InvalidRequest("Duplicate Host");
-			}
-			return;
-		}
-	}
-	if (_requestLine["method"] == "POST" && !_bodyDone)
-	{
-		if (_receivecount > 1 && !requestInProgress)
-			_body = receivedRequest;
-		if (_receivecount > 1 && requestInProgress)
-		{
-			if (receivedRequest == CRLF)
-				return;
-			_body = receivedRequest;
-		}
-		if (!_body.empty())
-			parseBody();
-	}
-	std::cout << "-------- RequestLine --------" << std::endl;
-	Utils::printMap(_requestLine);
-	std::cout << "-------- Headers --------" << std::endl;
-	Utils::printMap(_headers);
-	std::cout << "---------------------------" << std::endl;
-	// std::cout << "Request is well formed" << std::endl;
-	// matchUriRequest();
 }
