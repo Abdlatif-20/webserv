@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/23 00:54:59 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/23 16:57:54 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,32 +86,32 @@ class Request
 		std::string _params;
 		std::string	_requestData;
 		std::string _boundaryName;
+		/* *************************** methods ********************************* */
+			void	findUri();
+			void	boundary();
+			void	parseBody();
+			void	parseBoundary();
+			void	ContentLength();
+			void	parseChunkedBody();
+			void	parseContentType();
+			void	parseContentLength();
+			void	requestIsWellFormed();
+			void	parseTransferEncoding();
+			void	separateRequest(std::string receivedRequest);
+			void	fillHeaders(std::vector<std::string> headers);
+			void	fillRequestLine(const std::string& requestLine);
+			int		parseRequestLine(const std::string& requestLine);
+			int		checkDuplicate(const std::string& receivedRequest);
+			int		takingRequests(const std::string& receivedRequest);
+			std::string	pripareFileName(std::string line, bool &initialFile);
 	public:
 	/* *************************** constructors ****************************** */
 		Request();
 		~Request();
 
 	typedef std::invalid_argument InvalidRequest;
+	void	parseRequest(const std::string& receivedRequest, const Config& config);
 
-	/* *************************** methods ********************************* */
-		void	findUri();
-		void	boundary();
-		void	parseBody();
-		void	parseBoundary();
-		void	ContentLength();
-		void	parseChunkedBody();
-		void	parseContentType();
-		void	parseContentLength();
-		void	requestIsWellFormed();
-		void	parseTransferEncoding();
-		void	separateRequest(std::string receivedRequest);
-		void	fillHeaders(std::vector<std::string> headers);
-		void	fillRequestLine(const std::string& requestLine);
-		int		parseRequestLine(const std::string& requestLine);
-		int		checkDuplicate(const std::string& receivedRequest);
-		int		takingRequests(const std::string& receivedRequest);
-		std::string	pripareFileName(std::string line, bool &initialFile);
-		void	parseRequest(const std::string& receivedRequest, const Config& config);
 	/* *************************** getters ************************************ */
 		const int& getStatus() const;
 		const std::string& getBody() const;
