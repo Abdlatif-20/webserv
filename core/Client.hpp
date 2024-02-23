@@ -1,34 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Core.hpp                                           :+:      :+:    :+:   */
+/*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/20 12:09:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/23 10:26:51 by mel-yous         ###   ########.fr       */
+/*   Created: 2024/02/21 12:41:43 by mel-yous          #+#    #+#             */
+/*   Updated: 2024/02/22 17:59:10 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include "Config.hpp"
-#include "Server.hpp"
-#include "Client.hpp"
-#include <poll.h>
+#include <iostream>
 
-class Core
+class Client
 {
     private:
-        Config config;
-        std::vector<Server> servers;
-        std::vector<Client> clients;
+        int client_fd;
+        ssize_t recvBytes;
     public:
-        Core();
-        Core(const Config& _config);
-        Core(const Core& obj);
-        Core& operator=(const Core& obj);
-        ~Core();
+        Client();
+        Client(int client_fd);
+        Client(const Client& obj);
+        Client& operator=(const Client& obj);
+        ~Client();
 
-        void startWorking();
+        int getClient_fd() const;
+        ssize_t getRecvBytes() const;
+        void setRecvBytes(ssize_t r);
 };

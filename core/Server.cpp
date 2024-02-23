@@ -6,42 +6,41 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 21:23:59 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/19 18:35:55 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/22 17:44:24 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include <poll.h>
 
 Server::Server()
 {
 
 }
 
-Server::Server(const std::string& host)
+Server::Server(const std::string& host, const std::string& port)
 {
-    addrinfo hints;
-    addrinfo *result = NULL;
-    size_t i = host.find(":");
-    std::string ipAddress = "0.0.0.0"; /*Default value of used IP is `ANY IPADDRESS`*/
-    std::string port = host; /*Default value of port is `listen` directive*/
-    std::memset(&hints, 0, sizeof(hints));
+    addrinfo hints, *result;
     this->host = host;
-    this->sockFD = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
-    if (this->sockFD == -1)
+    this->port = port;
+    server_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
+    if (server_fd == -1)
         throw ServerErrorException(strerror(errno));
-    if (i != std::string::npos)
-    {
-        ipAddress = host.substr(0, i);
-        port = host.substr(i + 1, host.length() - i);
-    }
+    fcntl(server_fd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+    bzero(&hints, sizeof(hints));
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
-    hints.ai_flags = AI_PASSIVE;
     hints.ai_protocol = IPPROTO_IP;
-    if (getaddrinfo(ipAddress.c_str(), port.c_str(), &hints, &result) == -1)
+    hints.ai_flags = AI_PASSIVE;
+    if (getaddrinfo(host.c_str(), port.c_str(), &hints, &result) == -1)
         throw ServerErrorException(strerror(errno));
-    sockAddrInfo = result;
+    this->serverInfo = result;
+    if (bind(server_fd, result->ai_addr, result->ai_addrlen) == -1)
+        throw ServerErrorException(strerror(errno));
+    if (listen(server_fd, 32) == -1)
+        throw ServerErrorException(strerror(errno));
 }
+
 
 Server::Server(const Server& obj)
 {
@@ -53,43 +52,35 @@ Server& Server::operator=(const Server& obj)
     if (this == &obj)
         return *this;
     host = obj.host;
-    sockFD = obj.sockFD;
+    port = obj.port;
+    serverInfo = obj.serverInfo;
+    server_fd = obj.server_fd;
     return *this;
 }
 
 Server::~Server()
 {
-    freeaddrinfo(sockAddrInfo);
-    close(sockFD);
+    // freeaddrinfo(serverInfo);
 }
 
-void Server::Start()
+const std::string& Server::getServerHost()
 {
-    if (bind(sockFD, sockAddrInfo->ai_addr, sockAddrInfo->ai_addrlen) == -1)
-        throw ServerErrorException(strerror(errno));
-    listen(sockFD, 128);
+    return host;
 }
 
-void Server::Accept()
+const std::string& Server::getServerPort()
 {
-    rw_sockFD = accept(sockFD, sockAddrInfo->ai_addr, &sockAddrInfo->ai_addrlen);
-    if (rw_sockFD == -1)
-        throw ServerErrorException(strerror(errno));
-    std::cout << "Client connected" << std::endl;
+    return port;
 }
 
-ssize_t Server::Receive(char* buffer, size_t len)
+addrinfo* Server::getServerInfo()
 {
-    ssize_t sz = recv(rw_sockFD, buffer, len, 0);
-    if (sz == -1)
-        throw ServerErrorException(strerror(errno));
-    return sz;
+    return serverInfo;
 }
 
-void Server::Send(char* buffer)
+int Server::getServer_fd()
 {
-    if (send(rw_sockFD, buffer, 1024, 0) == -1)
-        throw ServerErrorException(strerror(errno));
+    return server_fd;
 }
 
 Server::ServerErrorException::ServerErrorException(const std::string& str)

@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 21:23:57 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/19 18:34:57 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/22 18:11:03 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,25 +23,27 @@
 #include <limits>
 #include <errno.h>
 #include <iostream>
+#include <vector>
+#include <poll.h>
 
 class Server
 {
     private:
         std::string host;
-        int sockFD;
-        int rw_sockFD;
-        addrinfo* sockAddrInfo;
+        std::string port;
+        addrinfo *serverInfo; //to be added to assigment operator
+        int server_fd;
     public:
         Server();
-        Server(const std::string& host);
+        Server(const std::string& host, const std::string& port);
         Server(const Server& obj);
         Server& operator=(const Server& obj);
         ~Server();
 
-        void Start();
-        void Accept();
-        ssize_t Receive(char* buffer, size_t len = 1023);
-        void Send(char* buffer);
+        const std::string& getServerHost();
+        const std::string& getServerPort();
+        addrinfo* getServerInfo();
+        int getServer_fd();
         
         class ServerErrorException : public std::exception
         {
