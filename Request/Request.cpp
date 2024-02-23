@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/23 22:39:56 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/23 23:28:23 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,11 @@ const bool& Request::getBodyDone() const
 const bool& Request::getHeadersDone() const
 {
 	return (_headersDone);
+}
+
+const std::string& Request::getHeaderByName(const std::string& name) const
+{
+	return (_headers.at(name));
 }
 
 const bool& Request::getRequestLineDone() const
