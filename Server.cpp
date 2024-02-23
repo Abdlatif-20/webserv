@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:58 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/22 22:04:06 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/23 00:37:10 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,9 @@
 int Utils::runServer(char **av)
 {
 	Client client;
+	Config config(av[1]);
+	ServersVector ref = config.getServers();
+	ServersVector::iterator s_iter = ref.begin();
 	int serverSocket = socket(AF_INET, SOCK_STREAM, 0); // IPv4, TCP, default protocol
 	if (serverSocket < 0)
 	{
@@ -105,7 +108,7 @@ int Utils::runServer(char **av)
 		std::cerr << "Error setting socket options\n";
 		return 1;
 	}
-	int port = std::stoi(av[1]);
+	int port = std::stoi(s_iter->getListen().c_str());
 	struct sockaddr_in serverAddr; // IPv4 address structure
 	memset(&serverAddr, 0, sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;           // IPv4
@@ -195,7 +198,7 @@ int Utils::runServer(char **av)
 				{
 					try
 					{
-						client.parseRequest(std::string(buffer, bytesRead), av[2]);
+						client.parseRequest(std::string(buffer, bytesRead), config);
 					}
 					catch (const std::exception &e)
 					{

@@ -3,6 +3,7 @@
         "iostream": "cpp",
         "string": "cpp",
         "ostream": "cpp",
+        "list": "cpp",
         "__bit_reference": "cpp",
         "__config": "cpp",
         "__debug": "cpp",
@@ -46,7 +47,6 @@
         "istream": "cpp",
         "iterator": "cpp",
         "limits": "cpp",
-        "list": "cpp",
         "locale": "cpp",
         "memory": "cpp",
         "mutex": "cpp",
@@ -65,8 +65,8 @@
         "unordered_map": "cpp",
         "utility": "cpp",
         "vector": "cpp",
-        "__tree": "cpp",
         "filesystem": "cpp",
+        "__tree": "cpp",
         "map": "cpp"
     }
 }

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/20 16:08:12 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/23 00:07:59 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <arpa/inet.h>
+#include "Defs.hpp"
 #include <string>
 #include <vector>
 #include <sstream>
@@ -38,4 +39,8 @@ namespace Utils
 		std::string intToString(int number);
 		int     runServer(char **av);
     	std::string strTrim(const std::string& str, char c);
+    	std::string strTrim(const std::string& str, char c);
+    	t_directive getDirectiveFromTokenName(const std::string& tokenName);
+    	std::string getTokenNameFromDirective(t_directive d);
+    	std::string getDefaultErrorPage(const std::string& status);
 };

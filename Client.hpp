@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 21:51:52 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/21 22:32:44 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/23 00:15:46 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ class Client
 	public:
 		Client();
 		~Client();
-		void parseRequest(std::string receivedRequest, char *configPath);
+		void parseRequest(std::string receivedRequest, const Config& config);
 		// void parseRequest(std::string request);
 		// void parseHeaders(std::string headers);
 		// void fillHeaders(std::vector<std::string> headers);

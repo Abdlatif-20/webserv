@@ -11,6 +11,7 @@
                     | "error_page" <STATUS_CODE> <WORD>
                     | "client_max_body_size" <WORD> <!-- To be checked later, example: 20MB, 2GB -->
                     | "allowed_methods" {"GET" | "POST" | "DELETE"}
+                    | "upload_store" <WORD>
 
 <server_directive> = "listen" <WORD>
                     | "server_name" <WORD>+

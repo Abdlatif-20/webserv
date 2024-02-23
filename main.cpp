@@ -6,16 +6,17 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/21 20:41:46 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/23 00:31:07 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
 #include "Config.hpp"
+// #include "Server.hpp"
 
 int main(int __attribute__((unused)) ac, __attribute__((unused)) char **av)
 {
-	if (ac != 3)
+	if (ac != 2)
 	{
 		std::cerr << "Error: Invalid number of arguments" << std::endl;
 		return 1;

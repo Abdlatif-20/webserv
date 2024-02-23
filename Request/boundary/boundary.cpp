@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/22 22:55:20 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/23 01:11:45 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,29 @@ void	Request::parseContentType()
 	}
 }
 
+//check if the directory exists
+bool directoryExists(const char* path) {
+    struct stat st;
+    if (stat(path, &st) == 0)
+	{
+        if (S_ISDIR(st.st_mode)) {
+            return true; // Directory exists
+        }
+    }
+    return false; // Directory does not exist
+}
+
 //function to prepare the filename and return it
-static std::string pripareFileName(std::string line, bool &initialFile)
+std::string Request::pripareFileName(std::string line, bool &initialFile)
 {
 	std::string filename;
 	std::string extension;
-
+	std::string path;
+	ServersVector ref = _config.getServers();
+	path = ref[0].getUploadStore();
+	if (!directoryExists(path.c_str()))
+		mkdir(path.c_str(), 0777);
+	path += "/";
 	if (line.find("filename") != std::string::npos)
 	{
 		filename = line.substr(line.find("filename=") + 10,
@@ -42,7 +59,7 @@ static std::string pripareFileName(std::string line, bool &initialFile)
 	extension = filename.substr(filename.find_last_of(".") + 1);
 	int random = std::rand() % 1000;
 	filename = filename.substr(0, filename.find_last_of("."));
-	filename = filename + "_" + Utils::intToString(random) + "." + extension;
+	filename = path + filename + "_" + Utils::intToString(random) + "." + extension;
 	return (filename);
 }
 
@@ -100,7 +117,7 @@ void	Request::boundary()
 		{
 			if (!ofile.is_open())
 			{
-				ofile.open(filename, std::ios::app | std::ios::binary);
+				ofile.open(filename, std::ios::out | std::ios::app | std::ios::binary);
 				if (!ofile.is_open())
 				{
 					_status = BadRequest;
@@ -109,11 +126,9 @@ void	Request::boundary()
 			}
 			ofile.write(line.c_str(), line.size());
 			ofile.write("\n", 1);
-			// ofile << line << std::endl;
 		}
 	}
 	file.close();
-	std::cout << "Body parsed\n";
 }
 
 void	Request::parseBoundary()

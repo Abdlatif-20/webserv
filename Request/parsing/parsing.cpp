@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/22 22:17:15 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/23 00:22:39 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,6 @@ void	Request::requestIsWellFormed()
 void	Request::findUri()
 {
 	std::string uri = _requestLine["path"];
-	Config _config(_configPath);
 	ServersVector ref = _config.getServers();
 	ServersVector::iterator s_iter = ref.begin();
 

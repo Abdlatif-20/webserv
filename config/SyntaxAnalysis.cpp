@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 15:16:11 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/10 15:53:26 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/17 11:32:32 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ static void checkDirective(t_directive d, const TokensVector& tokens,
     size_t count = countDirectiveArgs(tokens, ++i);
     switch (d)
     {
-        case ROOT: case AUTO_INDEX: case CLIENT_MAX_BODY_SIZE: case LISTEN:
+        case ROOT: case AUTO_INDEX: case CLIENT_MAX_BODY_SIZE: case LISTEN: case UPLOAD_STORE:
             if (count != 1)
                 throw SyntaxErrorException("invalid number of args at line: ", currLineIndex);
             break;
@@ -73,7 +73,11 @@ static void checkDirective(t_directive d, const TokensVector& tokens,
             if (count == 0)
                 throw SyntaxErrorException("invalid number of args at line: ", currLineIndex);
             break;
-        case ERROR_PAGE: case RETURN:
+        case ERROR_PAGE:
+            if (count < 2)
+                throw SyntaxErrorException("invalid number of args at line: ", currLineIndex);
+            break;
+        case RETURN:
             if (count != 2)
                 throw SyntaxErrorException("invalid number of args at line: ", currLineIndex);
             break;
@@ -104,7 +108,7 @@ static void checkLocation(const TokensVector& tokens,
     while (i != tokens.end() && i->getType() != CLOSED_BRACKET)
     {
         currLineIndex = i->getLineIndex();
-        d = ConfigUtils::getDirectiveFromTokenName(i->getContent());
+        d = Utils::getDirectiveFromTokenName(i->getContent());
         if (d == LOCATION || d == LISTEN || d == SERVER_NAME || d == UNKNOWN)
             throw SyntaxErrorException("unexpected `" + i->getContent() + "` at line: ", i->getLineIndex());
         checkDirective(d, tokens, i);
@@ -128,7 +132,7 @@ static void checkServer(const TokensVector& tokens, TokensVector::const_iterator
     while (i != tokens.end() && i->getType() != CLOSED_BRACKET)
     {
         currLineIndex = i->getLineIndex();
-        d = ConfigUtils::getDirectiveFromTokenName(i->getContent());
+        d = Utils::getDirectiveFromTokenName(i->getContent());
         if (d == LOCATION)
             checkLocation(tokens, i);
         else if (d == UNKNOWN)

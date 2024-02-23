@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 21:51:55 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/21 22:48:16 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/23 00:16:18 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ Client::~Client()
 {
 }
 
-void Client::parseRequest(std::string receivedRequest, char *configPath)
+void Client::parseRequest(std::string receivedRequest, const Config& config)
 {
-	this->request.parseRequest(receivedRequest, configPath);
+	this->request.parseRequest(receivedRequest, config);
 }

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/21 22:32:00 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/23 00:54:59 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@
 #include <algorithm>
 #include "Config.hpp"
 #include <fcntl.h>
+#include <sys/stat.h> // For mkdir
 
 
 /* 
@@ -55,6 +56,8 @@ enum Errors
 #define ALLOWED_CHARACTERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJ\
 							KLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%"
 
+class Config;
+
 class Request
 {
 	private:
@@ -71,6 +74,7 @@ class Request
 		bool _requestIsWellFormed;
 		// content length
 		unsigned int	_contentLength;
+		Config _config;
 		//maps
 		std::map<std::string, std::string> _headers;
 		std::map<std::string, std::string> _requestLine;
@@ -80,7 +84,6 @@ class Request
 		std::string _body;
 		std::string	headers;
 		std::string _params;
-		std::string	_configPath;
 		std::string	_requestData;
 		std::string _boundaryName;
 	public:
@@ -107,7 +110,8 @@ class Request
 		int		parseRequestLine(const std::string& requestLine);
 		int		checkDuplicate(const std::string& receivedRequest);
 		int		takingRequests(const std::string& receivedRequest);
-		void	parseRequest(const std::string& receivedRequest, char *configPath);
+		std::string	pripareFileName(std::string line, bool &initialFile);
+		void	parseRequest(const std::string& receivedRequest, const Config& config);
 	/* *************************** getters ************************************ */
 		const int& getStatus() const;
 		const std::string& getBody() const;
