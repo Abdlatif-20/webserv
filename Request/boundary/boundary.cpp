@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/23 02:22:30 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/23 22:37:01 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,6 @@ void	Request::boundary()
 	std::string boundary = "--" + _headers["content-type"].substr(31);
 	std::string boundaryEnd = boundary + "--";
 	std::ofstream ofile;
-	bool lastLine = false;
 
 	while (std::getline(file, line))
 	{
@@ -113,7 +112,6 @@ void	Request::boundary()
 			_isComplete = true;
 			std::remove(_boundaryName.c_str());
 		}
-		lastLine = file.peek() == EOF && file.eof();
 		if (initialFile && !_isComplete)
 		{
 			if (!ofile.is_open())
@@ -127,10 +125,6 @@ void	Request::boundary()
 			}
 			ofile.write(line.c_str(), line.size());
 			ofile.write("\n", 1);
-			if (lastLine && line[line.size() - 1] == '\n')
-			{
-            	line.erase(line.size() - 1);
-			}
 		}
 	}
 	file.close();

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/23 00:20:27 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/23 22:39:56 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,39 @@ Request::Request()
 	headers = "";
 	_requestData = "";
 	_boundaryName = "";
+}
+
+Request::Request(const Request& obj)
+{
+	*this = obj;
+}
+
+Request& Request::operator=(const Request& obj)
+{
+	if (this != &obj)
+	{
+		_status = obj._status;
+		_detectHost = obj._detectHost;
+		_bodyDone = obj._bodyDone;
+		_foundUri = obj._foundUri;
+		_receivecount = obj._receivecount;
+		_contentLength = obj._contentLength;
+		_isComplete = obj._isComplete;
+		_headersDone = obj._headersDone;
+		_requestLineDone = obj._requestLineDone;
+		requestInProgress = obj.requestInProgress;
+		_requestIsWellFormed = obj._requestIsWellFormed;
+		_config = obj._config;
+		_headers = obj._headers;
+		_requestLine = obj._requestLine;
+		_requestVector = obj._requestVector;
+		_body = obj._body;
+		_params = obj._params;
+		headers = obj.headers;
+		_requestData = obj._requestData;
+		_boundaryName = obj._boundaryName;
+	}
+	return (*this);
 }
 
 Request::~Request()

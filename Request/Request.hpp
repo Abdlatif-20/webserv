@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/23 16:57:54 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/23 22:37:43 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,8 @@ class Request
 	/* *************************** constructors ****************************** */
 		Request();
 		~Request();
+		Request(const Request& obj);
+		Request& operator=(const Request& obj);
 
 	typedef std::invalid_argument InvalidRequest;
 	void	parseRequest(const std::string& receivedRequest, const Config& config);
