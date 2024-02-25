@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/23 23:28:23 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/25 18:16:57 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,10 +139,7 @@ void	Request::parseRequest(const std::string& receivedRequest, const Config& con
 		if (takingRequests(receivedRequest))
 		{
 			if (_detectHost > 1)
-			{
 				_status = BadRequest;
-				throw InvalidRequest("Duplicate Host");
-			}
 			return;
 		}
 	}
@@ -156,6 +153,7 @@ void	Request::parseRequest(const std::string& receivedRequest, const Config& con
 		}
 		if (!_body.empty())
 			parseBody();
+		// std::cout <<this->getHeaderByName("content-type") << std::endl;
 		// std::cout << "-------- Body --------" << std::endl;
 		// std::cout << _body << std::endl;
 		// std::cout << "---------------------------" << std::endl;
@@ -167,3 +165,6 @@ void	Request::parseRequest(const std::string& receivedRequest, const Config& con
 	Utils::printMap(_headers);
 	std::cout << "Request is well formed" << std::endl;
 }
+/*
+multipart/form-data; boundary=--------------------------564951535606361587268060
+*/

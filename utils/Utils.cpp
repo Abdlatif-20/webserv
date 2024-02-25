@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/23 00:08:13 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/24 02:07:10 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ void    Utils::printMap(const std::map<std::string, std::string>& map)
 void    Utils::printVector(std::vector<std::string> vec)
 {
 	for (std::vector<std::string>::iterator it = vec.begin(); it != vec.end(); it++)
-		std::cout << "req[" << *it << "]" << std::endl;
+		std::cout << "req[" << *it << "]";
 }
 
 void    Utils::toLower(std::string& str)

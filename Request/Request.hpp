@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/23 22:44:50 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/25 00:49:50 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,8 @@ class Request
 			int		parseRequestLine(const std::string& requestLine);
 			int		checkDuplicate(const std::string& receivedRequest);
 			int		takingRequests(const std::string& receivedRequest);
-			std::string	pripareFileName(std::string line, bool &initialFile);
+			std::string	prepareFileName(std::string line, bool &initialFile);
+			void	processFile(const std::string& filename, std::ifstream& file);
 	public:
 	/* *************************** constructors ****************************** */
 		Request();
