@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/23 15:10:46 by mel-yous         ###   ########.fr       */
+/*   Created: 2024/02/03 21:51:55 by aben-nei          #+#    #+#             */
+/*   Updated: 2024/02/20 14:13:50 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,51 +14,14 @@
 
 Client::Client()
 {
-
-}
-
-Client::Client(int client_fd)
-{
-    this->client_fd = client_fd;
-    this->recvBytes = -1;
-}
-
-Client::Client(const Client& obj)
-{
-    *this = obj;
-}
-
-Client& Client::operator=(const Client& obj)
-{
-    if (this == &obj)
-        return *this;
-    client_fd = obj.client_fd;
-    recvBytes = obj.recvBytes;
-    req = obj.req;
-    return *this;
+	_clientStatus = 200;
 }
 
 Client::~Client()
 {
-
 }
 
-int Client::getClient_fd() const
+void Client::parseRequest(std::string receivedRequest, char *configPath)
 {
-    return client_fd;
-}
-
-ssize_t Client::getRecvBytes() const
-{
-    return recvBytes;
-}
-
-void Client::setRecvBytes(ssize_t r)
-{
-    recvBytes = r;
-}
-
-Request& Client::getRequest()
-{
-    return req;
+	this->request.parseRequest(receivedRequest, configPath);
 }

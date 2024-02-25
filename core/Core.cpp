@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:09:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/23 09:16:07 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/25 17:26:27 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,10 @@ Core& Core::operator=(const Core& obj)
 {
     if (this == &obj)
         return *this;
+    config = obj.config;
     servers = obj.servers;
+    clients = obj.clients;
+    poll_fds = obj.poll_fds;
     return *this;
 }
 
@@ -52,7 +55,6 @@ void Core::startWorking()
     std::vector<Server>::iterator it;
     int client_fd;
     char buffer[1024];
-    std::vector<pollfd> poll_fds;
     std::vector<pollfd>::iterator pollfd_it;
 
     while (true)
@@ -60,30 +62,31 @@ void Core::startWorking()
         it = servers.begin();
         while (it != servers.end())
         {
-            // std::cout << it->getPoll_fd()->fd << std::endl;
             client_fd = accept(it->getServer_fd(), it->getServerInfo()->ai_addr, &it->getServerInfo()->ai_addrlen);
             if (client_fd != -1)
             {
                 std::cout << "Client: " << client_fd << " accepted" << std::endl;
-                Client newClient(client_fd);
-                clients.push_back(newClient);
-                pollfd p;
-                p.fd = client_fd;
-                p.events = POLL_IN;
-                p.revents = 0;
-                poll_fds.push_back(p);
+                clients.push_back(Client(client_fd));
+                poll_fds.push_back((pollfd){client_fd, POLLIN | POLLOUT, 0});
             }
             it++;
         }
-        poll(poll_fds.data(), poll_fds.size(), 100);
+        poll(poll_fds.data(), poll_fds.size(), 0);
         for (size_t i = 0; i < poll_fds.size(); i++)
         {
-            if (poll_fds[i].revents == POLLIN)
+            if (poll_fds[i].revents & POLLIN)
             {
                 bzero(buffer, sizeof(buffer));
                 clients[i].setRecvBytes(recv(poll_fds[i].fd, buffer, 1023, 0));
-                std::cout << buffer;
+                clients[i].getRequest().parseRequest(buffer , config);
             }
+            if ((poll_fds[i].revents & POLLOUT) && clients[i].getRequest()._requestIsDone)
+            {
+                std::cout << "Client [" << clients[i].getClient_fd() << "] REQUEST DONE" << std::endl;
+                clients[i].getRequest()._requestIsDone = false;
+            }
+            if (poll_fds[i].fd > 0 && (poll_fds[i].revents & POLLHUP))
+                close(clients[i].getClient_fd());
         }
     }
 }

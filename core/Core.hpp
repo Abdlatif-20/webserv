@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:09:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/23 10:26:51 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/23 15:28:00 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ class Core
         Config config;
         std::vector<Server> servers;
         std::vector<Client> clients;
+        std::vector<pollfd> poll_fds;
     public:
         Core();
         Core(const Config& _config);

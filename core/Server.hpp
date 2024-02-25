@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 21:23:57 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/22 18:11:03 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/24 18:34:00 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ class Server
         const std::string& getServerPort();
         addrinfo* getServerInfo();
         int getServer_fd();
-        
+
         class ServerErrorException : public std::exception
         {
             private:

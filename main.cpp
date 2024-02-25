@@ -6,39 +6,14 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/23 10:37:10 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/23 10:47:27 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "Utils.hpp"
 #include "Config.hpp"
 #include "Server.hpp"
 #include "Core.hpp"
-
-static void __unused showTokens(std::vector<Token>& tokens)
-{
-    std::vector<Token>::iterator iter = tokens.begin();
-    while (iter != tokens.end())
-    {
-        switch (iter->getType())
-        {
-            case WORD:
-                std::cout << "WORD =>\t\t\t" + iter->getContent() << std::endl;
-                break;
-            case SEMICOLON:
-                std::cout << "SEMICOLON =>\t\t" + iter->getContent() << std::endl;
-                break;           
-            case OPEN_BRACKET:
-                std::cout << "OPEN_BRACKET =>\t\t" + iter->getContent() << std::endl;
-                break;           
-            case CLOSED_BRACKET:
-                std::cout << "CLOSE_BRACKET =>\t" + iter->getContent() << std::endl;
-                break;           
-            default:
-                break;
-        }
-        iter++;
-    }
-}
 
 int main(int argc, char **argv)
 {
