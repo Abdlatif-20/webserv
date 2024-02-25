@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:21:50 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/24 15:05:10 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/25 16:05:48 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 #include <sys/types.h>
 #include <libc.h>
 #include <netdb.h>
+#include <climits>
 #include <netdb.h>
 #include "Config.hpp"
 #include "Server.hpp"
@@ -34,11 +35,15 @@
 class Core
 {
 	private:
+		int	kq;
+		long	size;
 		ServersVector	serversConf;
 		std::vector<Server>	servers;
-		std::vector<Client>	clients;
-		struct kevent		*checklist;
-		struct kevent		*triggered;
+		std::map<int, Client>	clients;
+		struct kevent	triggered[OPEN_MAX];
+		struct kevent	checklist[OPEN_MAX];
+
+		typedef std::vector<Server>::iterator	v_it;
 
 	public:
 		Core(void);
@@ -46,6 +51,7 @@ class Core
 		Core(const Config& conf);
 
 		void	run(void);
+		void	traceEvents(void);
 
 		Core&	operator=(const Core& cpy);
 

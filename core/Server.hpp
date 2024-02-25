@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/24 13:29:11 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/24 16:46:23 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,6 @@ class Server
 
 		int		getSocketId(void) const;
 		void	setupServer(void);
-
-
 		Server&	operator=(const Server& cpy);
 
 		~Server(void);

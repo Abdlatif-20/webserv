@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:50:55 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/19 18:44:09 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/25 17:40:36 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,11 +19,20 @@
 class Client
 {
 	private:
-		Server	serverCTX;
+		int		sockId;
+		// Server	serverCTX;
+		std::stringstream	ss;
 
 	public:
 		Client(void);
+		Client(int sock);
+		// Client(const Server& serverCTX);
 		Client(const Client& cpy);
+
+		void	recvRequest(void);
+		void	sendResponse(void);
+
+		void	setSockId(int sock);
 
 		Client&	operator=(const Client& cpy);
 
