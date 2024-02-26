@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:55:56 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/22 13:25:23 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/26 16:59:16 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ void Server::setupServer(void)
 	sockID = socket(PF_INET, SOCK_STREAM, 0);
 	if (sockID == -1)
 		throw(Fail(strerror(errno)));
+	int a = 1;
+	setsockopt(sockID, SOL_SOCKET, SO_REUSEADDR,&a, sizeof a);
 	std::cout << "Server: Socket : " << sockID << std::endl;
 	if (bind(sockID, (sockaddr *)&addr, sizeof addr) == -1)
 		throw(Fail(strerror(errno)));
@@ -72,8 +74,6 @@ Server::~Server(void)
 {
 	if (sockID != -1)
 	{
-		int a = 1;
-		setsockopt(sockID, SOL_SOCKET, SO_REUSEADDR,&a, sizeof a);
 		close(sockID);
 		std::cout << "clossing socket :" << sockID << std::endl;
 	}

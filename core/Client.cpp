@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/25 17:39:05 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/26 17:13:07 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,8 +40,12 @@ void	Client::recvRequest(void)
 	if (len <= -1)
 		return ;
 	buff[len] = '\0';
-	ss << len;
-	std::cout << buff;
+	// ss << len;
+}
+
+void	Client::sendResponse(void)
+{
+	send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
 }
 
 void	Client::setSockId(int sock)
