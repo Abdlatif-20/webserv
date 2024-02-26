@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/20 14:13:18 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/23 00:22:39 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,8 @@ void	Request::requestIsWellFormed()
 	{
 		if (_headers.find("content-length") != _headers.end())
 			parseContentLength();
-		else if (_headers.find("content-type") != _headers.end())
+		else if (_headers.find("content-type") != _headers.end()
+				&& _headers.find("transfer-encoding") == _headers.end())
 			parseContentType();
 		else if (_headers.find("transfer-encoding") != _headers.end())
 			parseTransferEncoding();
@@ -56,7 +57,6 @@ void	Request::requestIsWellFormed()
 void	Request::findUri()
 {
 	std::string uri = _requestLine["path"];
-	Config _config(_configPath);
 	ServersVector ref = _config.getServers();
 	ServersVector::iterator s_iter = ref.begin();
 
@@ -104,14 +104,18 @@ void	Request::parseBody()
 			&& _headers.find("content-length") != _headers.end())
 			ContentLength();
 	else if (_requestLine["method"] == "POST"
-			&& _headers.find("content-type") != _headers.end())
+			&& _headers.find("transfer-encoding") != _headers.end())
+			parseChunkedBody();
+	else if (_requestLine["method"] == "POST")
 			parseBoundary();
 }
 //function to parse the request line and fill it to the map and return 1 if the request line is separated
 int	Request::parseRequestLine(const std::string& requestLine)
 {
+	
 	if (requestLine.find("\r\n\r\n") == std::string::npos)
 	{
+		// std::cout<<"_requestLineDoneeee: "<< _requestLineDone << std::endl;
 		_requestVector = Utils::splitRequest(requestLine, CRLF);
 		fillRequestLine(_requestVector[0]); //fill the request line
 		requestInProgress = true;
@@ -173,7 +177,6 @@ int	Request::takingRequests(const std::string& receivedRequest)
 			_requestVector = Utils::splitRequest(_requestData, CRLF);
 		else
 		{
-			puts(receivedRequest.c_str());
 			separateRequest(receivedRequest);
 			_requestVector = Utils::splitRequest(headers, CRLF);
 		}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/20 10:27:28 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/25 14:08:21 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 #include <sstream>
 #include <algorithm>
 #include "Config.hpp"
+#include <fcntl.h>
+#include <sys/stat.h> // For mkdir
 
 
 /* 
@@ -50,9 +52,11 @@ enum Errors
 
 #define CR '\r'
 #define CRLF "\r\n"
-#define MAX_BODY_SIZE 1000000
+#define MAX_BODY_SIZE 100000000
 #define ALLOWED_CHARACTERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJ\
 							KLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%"
+
+class Config;
 
 class Request
 {
@@ -70,6 +74,7 @@ class Request
 		bool _requestIsWellFormed;
 		// content length
 		unsigned int	_contentLength;
+		Config _config;
 		//maps
 		std::map<std::string, std::string> _headers;
 		std::map<std::string, std::string> _requestLine;
@@ -79,42 +84,47 @@ class Request
 		std::string _body;
 		std::string	headers;
 		std::string _params;
-		std::string	_configPath;
 		std::string	_requestData;
 		std::string _boundaryName;
+		/* *************************** methods ********************************* */
+			void	findUri();
+			void	boundary();
+			void	parseBody();
+			void	parseBoundary();
+			void	ContentLength();
+			void	parseChunkedBody();
+			void	parseContentType();
+			void	parseContentLength();
+			void	requestIsWellFormed();
+			void	parseTransferEncoding();
+			void	separateRequest(std::string receivedRequest);
+			void	fillHeaders(std::vector<std::string> headers);
+			void	fillRequestLine(const std::string& requestLine);
+			int		parseRequestLine(const std::string& requestLine);
+			int		checkDuplicate(const std::string& receivedRequest);
+			int		takingRequests(const std::string& receivedRequest);
+			std::string	pripareFileName(std::string line, bool &initialFile);
 	public:
 	/* *************************** constructors ****************************** */
 		Request();
 		~Request();
+		Request(const Request& obj);
+		Request& operator=(const Request& obj);
 
 	typedef std::invalid_argument InvalidRequest;
+	void	parseRequest(const std::string& receivedRequest, const Config& config);
 
-	/* *************************** methods ********************************* */
-		void	findUri();
-		void	boundary();
-		void	parseBody();
-		void	parseBoundary();
-		void	ContentLength();
-		void	parseChunkedBody();
-		void	parseContentType();
-		void	parseContentLength();
-		void	requestIsWellFormed();
-		void	parseTransferEncoding();
-		void	separateRequest(std::string receivedRequest);
-		void	fillHeaders(std::vector<std::string> headers);
-		void	fillRequestLine(const std::string& requestLine);
-		int		parseRequestLine(const std::string& requestLine);
-		int		checkDuplicate(const std::string& receivedRequest);
-		int		takingRequests(const std::string& receivedRequest);
-		void	parseRequest(const std::string& receivedRequest, char *configPath);
 	/* *************************** getters ************************************ */
-		int getStatus();
-		const std::string& getBody();
-		const std::map<std::string, std::string>& getHeaders();
-		const std::map<std::string, std::string>& getRequestLine();
-		const bool& getRequestIsWellFormed();
-		const bool& getBodyDone();
-		const bool& getHeadersDone();
-		const bool& getRequestLineDone();
-		const bool& getFoundUri();
+		const int& getStatus() const;
+		const std::string& getBody() const;
+		const std::map<std::string, std::string>& getHeaders() const;
+		const std::map<std::string, std::string>& getRequestLine() const;
+		const bool& getRequestIsWellFormed() const;
+		const bool& getBodyDone() const;
+		const bool& getHeadersDone() const;
+		const std::string& getHeaderByName(const std::string& name) const;
+		const bool& getRequestLineDone() const;
+		const bool& getFoundUri() const;
+
+		bool _requestIsDone;
 };

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/14 11:50:04 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/23 22:37:01 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,29 +22,44 @@ void	Request::parseContentType()
 	}
 }
 
+//check if the directory exists
+bool directoryExists(const char* path) {
+    struct stat st;
+    if (stat(path, &st) == 0)
+	{
+        if (S_ISDIR(st.st_mode)) {
+            return true; // Directory exists
+        }
+    }
+    return false; // Directory does not exist
+}
+
 //function to prepare the filename and return it
-static std::string pripareFileName(std::string line, bool &initialFile)
+std::string Request::pripareFileName(std::string line, bool &initialFile)
 {
 	std::string filename;
 	std::string extension;
-
+	std::string path;
+	ServersVector ref = _config.getServers();
+	path = ref[0].getUploadStore();
+	if (!directoryExists(path.c_str()))
+		mkdir(path.c_str(), 0777);
+	path += "/";
 	if (line.find("filename") != std::string::npos)
 	{
 		filename = line.substr(line.find("filename=") + 10,
 			line.find_last_of("\"") - line.find("filename=") - 10);
-		// std::cout << "filename: " << filename << std::endl;
 	}
 	else if (line.find("name") != std::string::npos)
 	{
 		filename = line.substr(line.find("name=") + 6,
 			line.find_last_of("\"") - line.find("name=") - 6);
-		// std::cout << "name: " << filename << std::endl;
 	}
 	initialFile = true;
 	extension = filename.substr(filename.find_last_of(".") + 1);
 	int random = std::rand() % 1000;
 	filename = filename.substr(0, filename.find_last_of("."));
-	filename = filename + "_" + Utils::intToString(random) + "." + extension;
+	filename = path + filename + "_" + Utils::intToString(random) + "." + extension;
 	return (filename);
 }
 
@@ -64,20 +79,19 @@ static void	ignoredLines(std::ifstream &file)
 void	Request::boundary()
 {
 	std::ifstream file(_boundaryName);
-	bool initialFile = false;
-	std::string filename;
-	std::string extension;
-	std::string line;
-	std::map<std::string, std::string> boundaryMap;
-	std::string boundary = _headers["content-type"].substr(31);
-	std::string boundaryEnd = "--" + boundary + "--";
-	bool isComplete = false;
-
 	if (!file.is_open())
 	{
 		_status = BadRequest;
 		throw InvalidRequest("can't open file");
 	}
+	bool initialFile = false;
+	std::string filename;
+	std::string beforeName;
+	std::string line;
+	std::string boundary = "--" + _headers["content-type"].substr(31);
+	std::string boundaryEnd = boundary + "--";
+	std::ofstream ofile;
+
 	while (std::getline(file, line))
 	{
 		if (line.find("Content-Disposition") != std::string::npos)
@@ -86,23 +100,35 @@ void	Request::boundary()
 			ignoredLines(file);
 			continue;
 		}
+		if (line.find(boundary) != std::string::npos)
+		{
+			if (ofile.is_open())
+				ofile.close();
+			initialFile = false;
+			continue;
+		}
 		if (line.find(boundaryEnd) != std::string::npos)
 		{
-			isComplete = true;
+			_isComplete = true;
 			std::remove(_boundaryName.c_str());
 		}
-		if (initialFile && !isComplete)
+		if (initialFile && !_isComplete)
 		{
-			std::ofstream file(filename, std::ios::app);
-			if (!file.is_open())
+			if (!ofile.is_open())
 			{
-				_status = BadRequest;
-				throw InvalidRequest("can't open file");
+				ofile.open(filename, std::ios::out | std::ios::app | std::ios::binary);
+				if (!ofile.is_open())
+				{
+					_status = BadRequest;
+					throw InvalidRequest("can't open file");
+				}
 			}
-			file << line << std::endl;
+			ofile.write(line.c_str(), line.size());
+			ofile.write("\n", 1);
 		}
 	}
 	file.close();
+	std::cout << "Body parsed\n";
 }
 
 void	Request::parseBoundary()
@@ -120,12 +146,12 @@ void	Request::parseBoundary()
 	}
 	if (_body.find(EndBoundary) == std::string::npos)
 	{
-		file << _body;
+		file.write(_body.c_str(), _body.size());
 		_receivecount++;
 	}
 	else
 	{
-		file << _body.substr(0, _body.find(EndBoundary) + EndBoundary.size() + 2);
+		file.write(_body.c_str(), _body.find(EndBoundary) + EndBoundary.size() + 2);
 		_body = _body.substr(_body.find(EndBoundary) + EndBoundary.size() + 2);
 		isComplete = true;
 	}
@@ -134,6 +160,5 @@ void	Request::parseBoundary()
 		file.close();
 		boundary();
 		_bodyDone = true;
-		std::cout << "Body parsed" << std::endl;
 	}
 }
