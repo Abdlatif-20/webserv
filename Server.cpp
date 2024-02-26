@@ -6,13 +6,13 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:58 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/23 00:37:10 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/25 23:51:16 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
 #include "Request.hpp"
-#include "Client.hpp"
+// #include "Client.hpp"
 
 /*
 	steps:
@@ -92,7 +92,7 @@
 
 int Utils::runServer(char **av)
 {
-	Client client;
+	// Client client;
 	Config config(av[1]);
 	ServersVector ref = config.getServers();
 	ServersVector::iterator s_iter = ref.begin();
@@ -198,7 +198,7 @@ int Utils::runServer(char **av)
 				{
 					try
 					{
-						client.parseRequest(std::string(buffer, bytesRead), config);
+						// client.parseRequest(std::string(buffer, bytesRead), config);
 					}
 					catch (const std::exception &e)
 					{

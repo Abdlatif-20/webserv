@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/25 18:05:04 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/26 02:32:16 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,8 @@ void	Request::parseBody()
 //function to parse the request line and fill it to the map and return 1 if the request line is separated
 int	Request::parseRequestLine(const std::string& requestLine)
 {
-	
+	if (!requestLine.size())
+		return 0;
 	if (requestLine.find("\r\n\r\n") == std::string::npos)
 	{
 		_requestVector = Utils::splitRequest(requestLine, CRLF);

@@ -3,37 +3,33 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/03 21:51:52 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/23 16:55:40 by aben-nei         ###   ########.fr       */
+/*   Created: 2024/02/21 12:41:43 by mel-yous          #+#    #+#             */
+/*   Updated: 2024/02/25 14:26:37 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include <iostream>
-#include <string>
-#include <vector>
-#include <map>
-#include <fstream>
-#include <sstream>
-#include <poll.h>
-#include <algorithm>
 #include "Request.hpp"
 
 class Client
 {
-	private:
-		Request request;
-		int _clientStatus;
+    private:
+        int client_fd;
+        ssize_t recvBytes;
+        Request req;
+    public:
+        Client();
+        Client(int client_fd);
+        Client(const Client& obj);
+        Client& operator=(const Client& obj);
+        ~Client();
 
-	public:
-		Client();
-		~Client();
-		void parseRequest(std::string receivedRequest, const Config& config);
-		// void parseRequest(std::string request);
-		// void parseHeaders(std::string headers);
-		// void fillHeaders(std::vector<std::string> headers);
-		
+        int getClient_fd() const;
+        ssize_t getRecvBytes() const;
+        void setRecvBytes(ssize_t r);
+        Request& getRequest();
 };

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/25 18:16:57 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/26 02:31:16 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ Request::Request()
 	_contentLength = 0;
 	_isComplete = false;
 	_headersDone = false;
+	_requestIsDone = false;
 	_requestLineDone = false;
 	requestInProgress = false;
 	_requestIsWellFormed = false;
@@ -33,6 +34,7 @@ Request::Request()
 	headers = "";
 	_requestData = "";
 	_boundaryName = "";
+	_config = Config();
 }
 
 Request::Request(const Request& obj)
@@ -153,17 +155,9 @@ void	Request::parseRequest(const std::string& receivedRequest, const Config& con
 		}
 		if (!_body.empty())
 			parseBody();
-		// std::cout <<this->getHeaderByName("content-type") << std::endl;
-		// std::cout << "-------- Body --------" << std::endl;
-		// std::cout << _body << std::endl;
-		// std::cout << "---------------------------" << std::endl;
-		return;
 	}
-	std::cout << "-------- RequestLine --------" << std::endl;
-	Utils::printMap(_requestLine);
-	std::cout << "-------- Headers --------" << std::endl;
-	Utils::printMap(_headers);
-	std::cout << "Request is well formed" << std::endl;
+	if ((_requestLineDone && _headersDone && _requestIsWellFormed) || (_requestLine["method"] == "POST" && _bodyDone))
+		_requestIsDone = true;
 }
 /*
 multipart/form-data; boundary=--------------------------564951535606361587268060

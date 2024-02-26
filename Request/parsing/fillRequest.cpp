@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/25 18:19:01 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/26 00:44:10 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,19 @@ void	Request::fillHeaders(std::vector<std::string> headers)
 //function to Check if the request Line is well formed and fill it to the map
 void	Request::fillRequestLine(const std::string& requestLine)
 {
+	if (!requestLine.size())
+	{
+		_status = BadRequest;
+		return;
+	}
 	std::vector<std::string> requestLineVector;
 	std::map<std::string, std::string> requestLineMap;
 	requestLineVector = Utils::split(requestLine, ' ');
 	if (requestLineVector.size() != 3)
+	{
 		_status = BadRequest;
+		return;
+	}
 	if (requestLineVector.front() != "GET" && requestLineVector.front() != "POST"
 		&& requestLineVector.front() != "DELETE")
 	{
@@ -57,6 +65,7 @@ void	Request::fillRequestLine(const std::string& requestLine)
 				_status = BadRequest;
 		else
 			_status = NotImplemented;
+		return;
 	}
 	if (requestLineVector[1].front() != '/')
 		_status = BadRequest;

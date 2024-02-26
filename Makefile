@@ -6,7 +6,7 @@
 #    By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/02/23 00:07:36 by aben-nei         ###   ########.fr        #
+#    Updated: 2024/02/25 23:57:25 by aben-nei         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
 SRCS = $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
 OBJS = $(patsubst %.cpp,obj/%.o,$(SRCS))
 INC = $(wildcard *.hpp) $(wildcard */*.hpp)
-COMPILER = c++ -I config -I utils -I Request
+COMPILER = c++ -I config -I utils -I Request -I core
 MKDIR_P = mkdir -p
 
 TOTAL := $(words $(SRCS))

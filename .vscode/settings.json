@@ -57,16 +57,16 @@
         "stack": "cpp",
         "stdexcept": "cpp",
         "streambuf": "cpp",
-        "string_view": "cpp",
-        "system_error": "cpp",
-        "tuple": "cpp",
-        "type_traits": "cpp",
         "typeinfo": "cpp",
         "unordered_map": "cpp",
         "utility": "cpp",
         "vector": "cpp",
         "filesystem": "cpp",
         "__tree": "cpp",
-        "map": "cpp"
-    }
+        "map": "cpp",
+        "string_view": "cpp",
+        "system_error": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp"
+}
 }

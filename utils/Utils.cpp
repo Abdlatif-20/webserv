@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/24 02:07:10 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/25 23:44:20 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,33 @@ std::string Utils::strTrim(const std::string& str, char c)
         j = str.size();
     return str.substr(i, j - i + 1);
 }
-//POST / HTTP/1.1^M$
+
+t_directive Utils::getDirectiveFromTokenName(const std::string& tokenName)
+{
+    std::string tokens[11] = 
+    {
+        "root", "index", "auto_index", "error_page", "client_max_body_size",
+        "allowed_methods", "listen", "server_name", "return", "location", "upload_store"
+    };
+    for (int i = 0; i < 11; i++)
+        if (tokenName == tokens[i])
+            return static_cast<t_directive>(i);
+    return UNKNOWN;
+}
+
+std::string Utils::getDefaultErrorPage(const std::string& status)
+{
+    std::string errors[12] =
+    {
+        "400", "403", "404", "405", "408", "411",
+        "414", "429", "500", "501", "502", "505"
+    };
+    for (size_t i = 0; i < 12; i++)
+        if (status == errors[i])
+            return "assets/www/error/" + status + ".html";
+    return "";
+}
+
 std::vector<std::string> Utils::splitRequest(const std::string& str, const char *sep)
 {
 	std::vector<std::string> result;
@@ -100,19 +126,6 @@ std::string Utils::intToString(int number)
     return oss.str();
 }
 
-t_directive Utils::getDirectiveFromTokenName(const std::string& tokenName)
-{
-    std::string tokens[11] = 
-    {
-        "root", "index", "auto_index", "error_page", "client_max_body_size",
-        "allowed_methods", "listen", "server_name", "return", "location", "upload_store"
-    };
-    for (int i = 0; i < 11; i++)
-        if (tokenName == tokens[i])
-            return static_cast<t_directive>(i);
-    return UNKNOWN;
-}
-
 std::string Utils::getTokenNameFromDirective(t_directive d)
 {
     switch (d)
@@ -143,17 +156,4 @@ std::string Utils::getTokenNameFromDirective(t_directive d)
             break;
     }
     return "unknown";
-}
-
-std::string Utils::getDefaultErrorPage(const std::string& status)
-{
-    std::string errors[12] =
-    {
-        "400", "403", "404", "405", "408", "411",
-        "414", "429", "500", "501", "502", "505"
-    };
-    for (size_t i = 0; i < 12; i++)
-        if (status == errors[i])
-            return "assets/www/error/" + status + ".html";
-    return "";
 }
