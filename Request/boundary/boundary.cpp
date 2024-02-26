@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/26 02:34:56 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/26 04:22:39 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ bool directoryExists(const char *path)
 }
 
 // function to prepare the filename and return it
-std::string Request::prepareFileName(std::string line, bool &initialFile)
+std::string Request::prepareFileName(std::string line)
 {
 	std::string filename;
 	std::string extension;
@@ -56,7 +56,7 @@ std::string Request::prepareFileName(std::string line, bool &initialFile)
 		filename = line.substr(posName + 6);
 		filename = filename.substr(0, filename.find("\""));
 	}
-	initialFile = true;
+	// initialFile = true;
 	extension = filename.substr(filename.find_last_of(".") + 1);
 	int random = std::rand() % 1000;
 	filename = filename.substr(0, filename.find_last_of("."));
@@ -64,93 +64,54 @@ std::string Request::prepareFileName(std::string line, bool &initialFile)
 	return (filename);
 }
 
-static void	ignoredLines(std::ifstream &file)
-{
-	std::string line;
-	while (std::getline(file, line))
-	{
-		if (line.find("Content-Type:") != std::string::npos)
-			continue;
-		else
-			break;
-	}
-}
-
-// function to parse the boundary and write the body to a file
-void Request::boundary()
-{
-	std::ifstream file;
-	if (!file.is_open())
-		file.open(_boundaryName, std::ios::in | std::ios::binary);
-	if (!file.is_open())
-		_status = BadRequest;
-	bool initialFile = false;
-	std::string filename;
-	std::string boundary = "--" + _headers["content-type"].substr(30);
-	std::string boundaryEnd = boundary + "--";
-	std::ofstream ofile;
-	std::string line;
-
-	while (std::getline(file, line))
-	{
-		if (line.find("Content-Disposition") != std::string::npos)
-		{
-			filename = prepareFileName(line, initialFile);
-			ignoredLines(file);
-			continue;
-		}
-		if (line.find(boundary) != std::string::npos)
-		{
-			if (ofile.is_open())
-				ofile.close();
-			initialFile = false;
-			continue;
-		}
-		if (line.find(boundaryEnd) != std::string::npos)
-		{
-			_isComplete = true;
-			std::remove(_boundaryName.c_str());
-		}
-		if (initialFile && !_isComplete)
-		{
-			if (!ofile.is_open())
-			{
-				ofile.open(filename, std::ios::out | std::ios::app | std::ios::binary);
-				if (!ofile.is_open())
-					_status = BadRequest;
-			}
-			ofile.write(line.c_str(), line.size());
-			ofile.write("\n", 1);
-		}
-	}
-	file.close();
-}
-
+// function to parse the boundary and write the actual file
 void Request::parseBoundary()
 {
+	std::ofstream file;
 	std::string randomStr = Utils::intToString(std::rand() % 1000);
-	_boundaryName = "/tmp/boundary" + randomStr + ".txt";
-	std::ofstream file(_boundaryName, std::ios::app);
-	bool isComplete = false;
-	std::string StartBoundary = "--" + _headers["content-type"].substr(31);
-	std::string EndBoundary = StartBoundary + "--";
+	std::string firstBoundary = "--" + _headers["content-type"].substr(30);
+	std::string lastBoundary = firstBoundary + "--";
+	size_t pos;
+
+	if (!_boundaryName.size())
+	{
+		_boundaryName = prepareFileName(_body);
+		pos = _body.find("\r\n\r\n");
+		if (pos != std::string::npos)
+			_body = _body.substr(pos + 4);
+		else
+			_body = "";
+	}
 	if (!file.is_open())
-		_status = BadRequest;
-	if (_body.find(EndBoundary) == std::string::npos)
 	{
-		file.write(_body.c_str(), _body.size());
-		_receivecount++;
+		file.open(_boundaryName, std::ios::app);
+		if (!file.is_open())
+			_status = BadRequest;
+		if (_body.find(lastBoundary) == std::string::npos)
+		{
+			if (_body.find(firstBoundary) != std::string::npos)
+			{
+				file << _body.substr(0, _body.find(firstBoundary) - 2);
+				_body = _body.substr(_body.find(firstBoundary) - 2);
+				file.close();
+				_boundaryName = "";
+				Request::parseBoundary();
+			}
+			else
+			{
+				pos = _body.find("\r\n\r\n");
+				if (pos != std::string::npos)
+					_body = _body.substr(pos + 4);
+				file << _body;
+			}
+			_receivecount++;
+		}
+		else
+		{
+			file << _body.substr(0, _body.find(lastBoundary) - 2);
+			file.close();
+			_bodyDone = true;
+		}
 	}
-	else
-	{
-		file.write(_body.c_str(), _body.find(EndBoundary) + EndBoundary.size());
-		_body = _body.substr(_body.find(EndBoundary) + EndBoundary.size());
-		isComplete = true;
-	}
-	if (isComplete)
-	{
-		file.close();
-		boundary();
-		_bodyDone = true;
-	}
+	_receivecount++;
 }

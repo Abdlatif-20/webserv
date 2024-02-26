@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:09:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/26 02:27:59 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/26 03:07:36 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,7 @@ void Core::startWorking()
             {
                 bzero(buffer, sizeof(buffer));
                 clients[i].setRecvBytes(recv(poll_fds[i].fd, buffer, 1023, 0));
-                clients[i].getRequest().parseRequest(buffer , config);
+                clients[i].getRequest().parseRequest(std::string(buffer, clients[i].getRecvBytes()), config);
                 // std::cout<<"status of client [" << clients[i].getClient_fd() << "] : " << clients[i].getRequest().getStatus() << std::endl;
             }
             // if ((poll_fds[i].revents & POLLOUT) && clients[i].getRequest()._requestIsDone)
