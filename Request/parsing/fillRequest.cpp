@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/26 00:44:10 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/26 06:04:22 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,33 +44,27 @@ void	Request::fillHeaders(std::vector<std::string> headers)
 void	Request::fillRequestLine(const std::string& requestLine)
 {
 	if (!requestLine.size())
-	{
-		_status = BadRequest;
-		return;
-	}
+		return(_status = BadRequest, void());
 	std::vector<std::string> requestLineVector;
 	std::map<std::string, std::string> requestLineMap;
 	requestLineVector = Utils::split(requestLine, ' ');
 	if (requestLineVector.size() != 3)
-	{
-		_status = BadRequest;
-		return;
-	}
+		return(_status = BadRequest, void());
 	if (requestLineVector.front() != "GET" && requestLineVector.front() != "POST"
 		&& requestLineVector.front() != "DELETE")
 	{
 		if (requestLineVector.front() != "HEAD" && requestLineVector.front() != "PUT"
 			&& requestLineVector.front() != "CONNECT" && requestLineVector.front() != "OPTIONS"
 				&& requestLineVector.front() != "TRACE")
-				_status = BadRequest;
+				_status = MethodNotAllowed;
 		else
 			_status = NotImplemented;
 		return;
 	}
 	if (requestLineVector[1].front() != '/')
-		_status = BadRequest;
+		return (_status = BadRequest, void());
 	if (requestLineVector[2] != "HTTP/1.1")
-		_status = BadRequest;
+		return (_status = BadRequest, void());
 	requestLineMap["method"] = requestLineVector[0];
 	requestLineMap["path"] = requestLineVector[1];
 	_requestLineDone = true;

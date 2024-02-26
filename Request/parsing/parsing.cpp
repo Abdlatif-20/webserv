@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/26 02:32:16 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/26 06:05:08 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@ void	Request::parseTransferEncoding()
 void	Request::requestIsWellFormed()
 {
 	if (_requestLine["path"].size() > 2048)
-		_status = RequestURITooLong;
+		return (_status = RequestURITooLong, void());
 	if (_requestLine["path"].find_first_not_of(ALLOWED_CHARACTERS) != std::string::npos)
-		_status = BadRequest;
+		return (_status = BadRequest, void());
 	if (_requestLine["method"] == "POST")
 	{
 		if (_headers.find("content-length") != _headers.end())
@@ -36,7 +36,7 @@ void	Request::requestIsWellFormed()
 		else if (_headers.find("transfer-encoding") != _headers.end())
 			parseTransferEncoding();
 		else
-			_status = BadRequest;
+			return (_status = BadRequest, void());
 	}
 	_requestIsWellFormed = true;
 }
@@ -128,7 +128,7 @@ int	Request::checkDuplicate(const std::string& receivedRequest)
 				|| value.find("CONNECT") != std::string::npos
 				|| value.find("OPTIONS") != std::string::npos
 				|| value.find("TRACE") != std::string::npos)
-					_status = BadRequest;
+					return (_status = BadRequest, 0);
 		}
 		if (receivedRequest.find("host") != std::string::npos)
 			_detectHost++;

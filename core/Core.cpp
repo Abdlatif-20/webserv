@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:09:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/26 03:07:36 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/26 06:13:49 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,13 +80,14 @@ void Core::startWorking()
                 bzero(buffer, sizeof(buffer));
                 clients[i].setRecvBytes(recv(poll_fds[i].fd, buffer, 1023, 0));
                 clients[i].getRequest().parseRequest(std::string(buffer, clients[i].getRecvBytes()), config);
+                clients[i].getResponse().sendResponse(clients[i]);
                 // std::cout<<"status of client [" << clients[i].getClient_fd() << "] : " << clients[i].getRequest().getStatus() << std::endl;
             }
-            // if ((poll_fds[i].revents & POLLOUT) && clients[i].getRequest()._requestIsDone)
-            // {
-            //     std::cout << "Client [" << clients[i].getClient_fd() << "] REQUEST DONE" << std::endl;
-            //     clients[i].getRequest()._requestIsDone = false;
-            // }
+            if ((poll_fds[i].revents & POLLOUT) && clients[i].getRequest()._requestIsDone)
+            {
+                std::cout << "Client [" << clients[i].getClient_fd() << "] REQUEST DONE" << std::endl;
+                clients[i].getRequest()._requestIsDone = false;
+            }
             if (poll_fds[i].fd > 0 && (poll_fds[i].revents & POLLHUP))
                 close(clients[i].getClient_fd());
         }

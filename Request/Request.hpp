@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/26 03:36:30 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/26 05:59:10 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include "Config.hpp"
 #include <fcntl.h>
 #include <sys/stat.h> // For mkdir
+
 
 
 /* 
@@ -117,6 +118,7 @@ class Request
 
 	/* *************************** getters ************************************ */
 		const int& getStatus() const;
+		void setStatus(int status);
 		const std::string& getBody() const;
 		const std::map<std::string, std::string>& getHeaders() const;
 		const std::map<std::string, std::string>& getRequestLine() const;

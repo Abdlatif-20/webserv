@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/26 02:31:16 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/26 07:00:15 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,11 @@ const int&	Request::getStatus() const
 	return (_status);
 }
 
+void	Request::setStatus(int status)
+{
+	_status = status;
+}
+
 const bool& Request::getRequestIsWellFormed() const
 {
 	return (_requestIsWellFormed);
@@ -131,9 +136,6 @@ const bool& Request::getFoundUri() const
 //main function to parse the request
 void	Request::parseRequest(const std::string& receivedRequest, const Config& config)
 {
-	// std::cout <<"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-" << std::endl;
-	// std::cout << "Request:\n" << receivedRequest << std::endl;
-	// std::cout <<"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-" << std::endl;
 	_config = config;
 	std::srand(time(0));
 	if (!_requestLineDone || !_headersDone || !_requestIsWellFormed)
@@ -156,9 +158,5 @@ void	Request::parseRequest(const std::string& receivedRequest, const Config& con
 		if (!_body.empty())
 			parseBody();
 	}
-	if ((_requestLineDone && _headersDone && _requestIsWellFormed) || (_requestLine["method"] == "POST" && _bodyDone))
-		_requestIsDone = true;
+	_requestIsDone = true;
 }
-/*
-multipart/form-data; boundary=--------------------------564951535606361587268060
-*/

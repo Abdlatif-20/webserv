@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/26 04:22:39 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/26 06:03:56 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void Request::parseBoundary()
 	{
 		file.open(_boundaryName, std::ios::app);
 		if (!file.is_open())
-			_status = BadRequest;
+			return (_status = BadRequest, void());
 		if (_body.find(lastBoundary) == std::string::npos)
 		{
 			if (_body.find(firstBoundary) != std::string::npos)
