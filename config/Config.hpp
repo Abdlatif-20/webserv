@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:08 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/23 10:47:55 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/23 14:45:54 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ class Config
         void parseServers();
         void setupDefaultServer();
         void setupDefaultLocation();
-        void printDirectives(const Context& ctx);
     public:
         Config();
         Config(const std::string& configPath);

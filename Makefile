@@ -6,16 +6,16 @@
 #    By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/02/23 10:52:15 by mel-yous         ###   ########.fr        #
+#    Updated: 2024/02/26 10:48:35 by mel-yous         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserv
 CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g #-fsanitize=address
 SRCS = $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
-OBJS = $(patsubst %.cpp,obj/%.o,$(SRCS))
+OBJS = $(SRCS:%.cpp=%.o)
 INC = $(wildcard *.hpp) $(wildcard */*.hpp)
-COMPILER = c++ -g -fsanitize=address -I config -I utils -I core
+COMPILER = c++ -g -I config -I utils -I core -I Request -I Response
 
 COLOR_GREEN = \033[0;32m
 COLOR_RED = \033[0;31m
@@ -43,7 +43,7 @@ $(NAME): $(OBJS)
 	@$(COMPILER) $(CPPFLAGS) $(OBJS) -o $(NAME)
 %.o: %.cpp $(INC)
 	@$(COMPILER) $(CPPFLAGS) -c $< -o $@
-	@printf "$(COLOR_GREEN)█████$(END_COLOR)"
+	@printf "$(COLOR_GREEN)████$(END_COLOR)"
 clean:
 	@rm -rf $(OBJS)
 fclean: clean

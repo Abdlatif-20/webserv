@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/23 10:49:33 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/23 10:51:30 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,8 @@ std::string Utils::getDefaultErrorPage(const std::string& status)
         if (status == errors[i])
             return "assets/www/error/" + status + ".html";
     return "";
-//POST / HTTP/1.1^M$
+}
+
 std::vector<std::string> Utils::splitRequest(const std::string& str, const char *sep)
 {
 	std::vector<std::string> result;
