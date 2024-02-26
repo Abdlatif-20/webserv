@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/23 10:51:30 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/26 11:19:39 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,38 +36,6 @@ t_directive Utils::getDirectiveFromTokenName(const std::string& tokenName)
         if (tokenName == tokens[i])
             return static_cast<t_directive>(i);
     return UNKNOWN;
-}
-
-std::string Utils::getTokenNameFromDirective(t_directive d)
-{
-    switch (d)
-    {
-        case ROOT:
-            return "root";
-        case INDEX:
-            return "index";
-        case AUTO_INDEX:
-            return "auto_index";
-        case ERROR_PAGE:
-            return "error_page";
-        case CLIENT_MAX_BODY_SIZE:
-            return "client_max_body_size";
-        case ALLOWED_METHODS:
-            return "allowed_methods";
-        case LISTEN:
-            return "listen";
-        case SERVER_NAME:
-            return "server_name";
-        case RETURN:
-            return "return";
-        case LOCATION:
-            return "location";
-        case UPLOAD_STORE:
-            return "upload_store";
-        default:
-            break;
-    }
-    return "unknown";
 }
 
 std::string Utils::getDefaultErrorPage(const std::string& status)
@@ -122,7 +90,7 @@ void    Utils::printMap(const std::map<std::string, std::string>& map)
 void    Utils::printVector(std::vector<std::string> vec)
 {
 	for (std::vector<std::string>::iterator it = vec.begin(); it != vec.end(); it++)
-		std::cout << "req[" << *it << "]" << std::endl;
+		std::cout << "req[" << *it << "]";
 }
 
 void    Utils::toLower(std::string& str)
@@ -156,5 +124,36 @@ std::string Utils::intToString(int number)
     
     // Convert the string stream to a string and return it
     return oss.str();
+}
 
+std::string Utils::getTokenNameFromDirective(t_directive d)
+{
+    switch (d)
+    {
+        case ROOT:
+            return "root";
+        case INDEX:
+            return "index";
+        case AUTO_INDEX:
+            return "auto_index";
+        case ERROR_PAGE:
+            return "error_page";
+        case CLIENT_MAX_BODY_SIZE:
+            return "client_max_body_size";
+        case ALLOWED_METHODS:
+            return "allowed_methods";
+        case LISTEN:
+            return "listen";
+        case SERVER_NAME:
+            return "server_name";
+        case RETURN:
+            return "return";
+        case LOCATION:
+            return "location";
+        case UPLOAD_STORE:
+            return "upload_store";
+        default:
+            break;
+    }
+    return "unknown";
 }

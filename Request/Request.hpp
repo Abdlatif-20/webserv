@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/25 14:08:21 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/26 11:17:16 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,6 @@ class Request
 		bool _headersDone;
 		bool _requestLineDone;
 		bool requestInProgress;
-		bool _requestIsWellFormed;
 		// content length
 		unsigned int	_contentLength;
 		Config _config;
@@ -103,9 +102,11 @@ class Request
 			int		parseRequestLine(const std::string& requestLine);
 			int		checkDuplicate(const std::string& receivedRequest);
 			int		takingRequests(const std::string& receivedRequest);
-			std::string	pripareFileName(std::string line, bool &initialFile);
+			std::string	prepareFileName(std::string line);
 	public:
 	/* *************************** constructors ****************************** */
+		bool _requestIsWellFormed;
+		bool _requestIsDone;
 		Request();
 		~Request();
 		Request(const Request& obj);
@@ -116,6 +117,7 @@ class Request
 
 	/* *************************** getters ************************************ */
 		const int& getStatus() const;
+		void setStatus(int status);
 		const std::string& getBody() const;
 		const std::map<std::string, std::string>& getHeaders() const;
 		const std::map<std::string, std::string>& getRequestLine() const;
@@ -125,6 +127,4 @@ class Request
 		const std::string& getHeaderByName(const std::string& name) const;
 		const bool& getRequestLineDone() const;
 		const bool& getFoundUri() const;
-
-		bool _requestIsDone;
 };

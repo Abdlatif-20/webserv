@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/12 21:23:59 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/22 17:44:24 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/26 00:27:39 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,9 @@ Server::Server(const std::string& host, const std::string& port)
     this->port = port;
     server_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
     if (server_fd == -1)
+        throw ServerErrorException(strerror(errno));
+    int opt = 1;
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
         throw ServerErrorException(strerror(errno));
     fcntl(server_fd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
     bzero(&hints, sizeof(hints));

@@ -6,13 +6,12 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:43 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/25 19:18:00 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/26 11:53:41 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
-#include <iostream>
 #include "Request.hpp"
 
 class Client

@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/25 17:49:06 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/26 11:16:45 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ Request::Request()
 	_contentLength = 0;
 	_isComplete = false;
 	_headersDone = false;
+	_requestIsDone = false;
 	_requestLineDone = false;
 	requestInProgress = false;
 	_requestIsWellFormed = false;
@@ -96,6 +97,11 @@ const int&	Request::getStatus() const
 	return (_status);
 }
 
+void	Request::setStatus(int status)
+{
+	_status = status;
+}
+
 const bool& Request::getRequestIsWellFormed() const
 {
 	return (_requestIsWellFormed);
@@ -131,9 +137,6 @@ const bool& Request::getFoundUri() const
 //main function to parse the request
 void	Request::parseRequest(const std::string& receivedRequest, const Config& config)
 {
-	// std::cout <<"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-" << std::endl;
-	// std::cout << "Request:\n" << receivedRequest << std::endl;
-	// std::cout <<"-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-" << std::endl;
 	_config = config;
 	std::srand(time(0));
 	if (!_requestLineDone || !_headersDone || !_requestIsWellFormed)
@@ -141,10 +144,7 @@ void	Request::parseRequest(const std::string& receivedRequest, const Config& con
 		if (takingRequests(receivedRequest))
 		{
 			if (_detectHost > 1)
-			{
 				_status = BadRequest;
-				throw InvalidRequest("Duplicate Host");
-			}
 			return;
 		}
 	}
@@ -158,15 +158,6 @@ void	Request::parseRequest(const std::string& receivedRequest, const Config& con
 		}
 		if (!_body.empty())
 			parseBody();
-		// std::cout << "-------- Body --------" << std::endl;
-		// std::cout << _body << std::endl;
-		// std::cout << "---------------------------" << std::endl;
-		return;
 	}
 	_requestIsDone = true;
-	// std::cout << "-------- RequestLine --------" << std::endl;
-	// Utils::printMap(_requestLine);
-	// std::cout << "-------- Headers --------" << std::endl;
-	// Utils::printMap(_headers);
-	// std::cout << "Request is well formed" << std::endl;
 }

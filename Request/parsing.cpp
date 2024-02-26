@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/23 00:22:39 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/26 11:19:21 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,25 +16,16 @@
 void	Request::parseTransferEncoding()
 {
 	if (_headers["transfer-encoding"] != "chunked")
-	{
 		_status = NotImplemented;
-		throw InvalidRequest("Not Implemented(Transfer-Encoding not supported)");
-	}
 }
 
 //function to check if the request Line is well formed And Set the status To true If all is well
 void	Request::requestIsWellFormed()
 {
 	if (_requestLine["path"].size() > 2048)
-	{
-		_status = RequestURITooLong;
-		throw InvalidRequest("Request-URI Too Long");
-	}
+		return (_status = RequestURITooLong, void());
 	if (_requestLine["path"].find_first_not_of(ALLOWED_CHARACTERS) != std::string::npos)
-	{
-		_status = BadRequest;
-		throw InvalidRequest("Bad Request(Invalid path)");
-	}
+		return (_status = BadRequest, void());
 	if (_requestLine["method"] == "POST")
 	{
 		if (_headers.find("content-length") != _headers.end())
@@ -45,10 +36,7 @@ void	Request::requestIsWellFormed()
 		else if (_headers.find("transfer-encoding") != _headers.end())
 			parseTransferEncoding();
 		else
-		{
-			_status = BadRequest;
-			throw InvalidRequest("Bad Request(Invalid body)");
-		}
+			return (_status = BadRequest, void());
 	}
 	_requestIsWellFormed = true;
 }
@@ -75,10 +63,7 @@ void	Request::findUri()
 		}
 	}
 	if (_foundUri == false)
-	{
 		_status = NotFound;
-		throw InvalidRequest("URI not found");
-	}
 }
 
 //function to separate the request line And the headers from the request
@@ -91,10 +76,7 @@ void	Request::separateRequest(std::string receivedRequest)
 		_body = receivedRequest.substr(pos + 4);
 	}
 	else
-	{
 		_status = BadRequest;
-		throw InvalidRequest("Invalid request...");
-	}
 }
 
 //function to parse the Body of the request if method is POST
@@ -112,7 +94,8 @@ void	Request::parseBody()
 //function to parse the request line and fill it to the map and return 1 if the request line is separated
 int	Request::parseRequestLine(const std::string& requestLine)
 {
-	
+	if (!requestLine.size())
+		return 0;
 	if (requestLine.find("\r\n\r\n") == std::string::npos)
 	{
 		// std::cout<<"_requestLineDoneeee: "<< _requestLineDone << std::endl;
@@ -146,10 +129,7 @@ int	Request::checkDuplicate(const std::string& receivedRequest)
 				|| value.find("CONNECT") != std::string::npos
 				|| value.find("OPTIONS") != std::string::npos
 				|| value.find("TRACE") != std::string::npos)
-				{
-					_status = BadRequest;
-					throw InvalidRequest("Duplicate request line");
-				}
+					return (_status = BadRequest, 0);
 		}
 		if (receivedRequest.find("host") != std::string::npos)
 			_detectHost++;

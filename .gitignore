@@ -1,4 +1,7 @@
+
 *.o
-.vscode
-.DS_Store
 *.pdf
+*.tldr
+*.txt
+obj/
+webserv

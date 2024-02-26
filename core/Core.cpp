@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:09:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/26 10:43:37 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/26 11:44:25 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ void Core::startWorking()
         it = servers.begin();
         while (it != servers.end())
         {
+            
             client_fd = accept(it->getServer_fd(), it->getServerInfo()->ai_addr, &it->getServerInfo()->ai_addrlen);
             if (client_fd != -1)
             {
@@ -82,7 +83,8 @@ void Core::startWorking()
                 std::cout << poll_fds[i].fd << std::endl;
                 bzero(buffer, sizeof(buffer));
                 clients[i].setRecvBytes(recv(poll_fds[i].fd, buffer, 1023, 0));
-                clients[i].getRequest().parseRequest(buffer , config);
+                clients[i].getRequest().parseRequest(std::string(buffer, clients[i].getRecvBytes()), config);
+                // std::cout<<"status of client [" << clients[i].getClient_fd() << "] : " << clients[i].getRequest().getStatus() << std::endl;
             }
             if ((poll_fds[i].revents & POLLOUT) && clients[i].getRequest()._requestIsDone)
             {
