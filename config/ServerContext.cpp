@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 10:40:09 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/21 21:02:32 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/29 11:01:47 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,27 @@ class is a getter method that returns a constant reference to the `locations` ve
 const LocationsVector& ServerContext::getLocations() const
 {
     return locations;
+}
+
+const LocationContext ServerContext::matchLocation(const std::string& prefix) const
+{
+    LocationsVector::const_iterator it = locations.cbegin();
+    while (it != locations.cend())
+    {
+        if (it->getPrefix() == prefix)
+            return *it;
+        it++;
+    }
+    it = locations.cbegin();
+    LocationContext result;
+    while (it != locations.cend())
+    {
+        if (Utils::stringStartsWith(prefix, it->getPrefix())
+            && it->getPrefix().length() > result.getPrefix().length())
+            result = *it;
+        it++;
+    }
+    return result;
 }
 
 std::string ServerContext::getListen() const
