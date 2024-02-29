@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/29 02:02:50 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/29 19:45:47 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ Request::Request()
 	requestInProgress = false;
 	_remainingChunkLength = 0;
 	_requestIsWellFormed = false;
-	
+
 	_body = "";
 	headers = "";
 	_requestData = "";

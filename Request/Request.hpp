@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/29 02:02:38 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/29 19:55:32 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 
 
 
-/* 
+/*
 
 GET / HTTP/1.1
 
@@ -38,6 +38,7 @@ Content-Length: 11
 Content-Type: text/plain
 
 Hello world
+
 */
 
 enum Errors
