@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   response.cpp                                       :+:      :+:    :+:   */
+/*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 05:13:21 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/26 06:16:31 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/29 20:18:55 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,15 @@
 
 Response::Response()
 {
-	_statusCode = 200;
-	_statusMessage = "OK";
+	statusCode = 200;
+	statusMessage = "OK";
 	_request = Request();
 }
 
 Response::Response(Request request)
 {
-	_statusCode = 200;
-	_statusMessage = "OK";
+	statusCode = 200;
+	statusMessage = "OK";
 	_request = request;
 }
 
@@ -37,8 +37,8 @@ Response& Response::operator=(const Response& obj)
 {
 	if (this != &obj)
 	{
-		_statusCode = obj._statusCode;
-		_statusMessage = obj._statusMessage;
+		statusCode = obj.statusCode;
+		statusMessage = obj.statusMessage;
 		_request = obj._request;
 	}
 	return (*this);

@@ -5,7 +5,7 @@
         "ostream": "cpp",
         "list": "cpp",
         "__bit_reference": "cpp",
-        "__config": "cpp",
+        "_config": "cpp",
         "__debug": "cpp",
         "__errc": "cpp",
         "__functional_base": "cpp",

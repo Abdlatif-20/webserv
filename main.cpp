@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/25 23:54:01 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/29 20:21:51 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,8 @@ int main(int argc, char **argv)
             configPath = argv[1];
         else if (argc > 2)
             throw "Error: invalid number of args";
-        Config _config(configPath);
-        Core _core(_config);
+        Config config(configPath);
+        Core _core(config);
         _core.startWorking();
     }
     catch(const std::exception& e)

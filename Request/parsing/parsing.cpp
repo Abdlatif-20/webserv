@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/29 02:02:27 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/29 20:37:32 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,17 +16,17 @@
 void	Request::parseTransferEncoding()
 {
 	if (_headers["transfer-encoding"] != "chunked")
-		_status = NotImplemented;
+		this->status = NotImplemented;
 }
 
 //function to check if the request Line is well formed And Set the status To true If all is well
 void	Request::requestIsWellFormed()
 {
-	if (_requestLine["path"].size() > 2048)
-		return (_status = RequestURITooLong, void());
-	if (_requestLine["path"].find_first_not_of(ALLOWED_CHARACTERS) != std::string::npos)
-		return (_status = BadRequest, void());
-	if (_requestLine["method"] == "POST")
+	if (this->requestLine["path"].size() > 2048)
+		return (this->status = RequestURITooLong, void());
+	if (this->requestLine["path"].find_first_not_of(ALLOWED_CHARACTERS) != std::string::npos)
+		return (this->status = BadRequest, void());
+	if (this->requestLine["method"] == "POST")
 	{
 		if (_headers.find("content-type") != _headers.end()
 				&& _headers.find("transfer-encoding") == _headers.end())
@@ -36,7 +36,7 @@ void	Request::requestIsWellFormed()
 		else if (_headers.find("content-length") != _headers.end())
 			parseContentLength();
 		else
-			return (_status = BadRequest, void());
+			return (this->status = BadRequest, void());
 	}
 	_requestIsWellFormed = true;
 }
@@ -44,8 +44,8 @@ void	Request::requestIsWellFormed()
 //function to find the uri in the config file and set the status to true if found
 void	Request::findUri()
 {
-	std::string uri = _requestLine["path"];
-	ServersVector ref = _config.getServers();
+	std::string uri = this->requestLine["path"];
+	ServersVector ref = this->config.getServers();
 	ServersVector::iterator s_iter = ref.begin();
 
 	for (; s_iter != ref.end(); s_iter++)
@@ -57,15 +57,15 @@ void	Request::findUri()
 			if (uri == l_iter->getPrefix())
 			{
 				std::cout << "Matched: " << l_iter->getPrefix() <<" with the config file" << std::endl;
-				_foundUri = true;
+				this->foundUri = true;
 				return;
 			}
 		}
 	}
-	if (_foundUri == false)
+	if (this->foundUri == false)
 	{
 		std::cout << uri << " not found in the config file" << std::endl;
-		_status = NotFound;
+		this->status = NotFound;
 	}
 }
 
@@ -79,25 +79,25 @@ void	Request::separateRequest(std::string receivedRequest)
 		_body = receivedRequest.substr(pos + 4);
 	}
 	else
-		_status = BadRequest;
+		this->status = BadRequest;
 }
 
 void	Request::parseUri()
 {
-	if (_requestLine["path"].find("%") != std::string::npos)
-		Utils::decodeUri(_requestLine["path"]);
+	if (this->requestLine["path"].find("%") != std::string::npos)
+		Utils::decodeUri(this->requestLine["path"]);
 }
 
 //function to parse the Body of the request if method is POST
 void	Request::parseBody()
 {
-	if (_requestLine["method"] == "POST"
+	if (this->requestLine["method"] == "POST"
 			&& _headers.find("transfer-encoding") != _headers.end())
 			parseChunkedBody();
-	else if (_requestLine["method"] == "POST"
+	else if (this->requestLine["method"] == "POST"
 		&& _headers.find("content-type") != _headers.end())
 			parseBoundary();
-	else if (_requestLine["method"] == "POST"
+	else if (this->requestLine["method"] == "POST"
 			&& _headers.find("content-length") != _headers.end())
 				ContentLength();
 }
@@ -109,15 +109,15 @@ int	Request::parseRequestLine(const std::string& requestLine)
 		return 0;
 	if (requestLine.find("\r\n\r\n") == std::string::npos)
 	{
-		_requestVector = Utils::splitRequest(requestLine, CRLF);
-		fillRequestLine(_requestVector[0]); //fill the request line
-		requestInProgress = true;
+		this->requestVector = Utils::splitRequest(requestLine, CRLF);
+		fillRequestLine(this->requestVector[0]); //fill the request line
+		this->requestInProgress = true;
 		return 1;
 	}
 	else
 	{
-		_requestVector = Utils::splitRequest(requestLine, CRLF);
-		fillRequestLine(_requestVector[0]); //fill the request line
+		this->requestVector = Utils::splitRequest(requestLine, CRLF);
+		fillRequestLine(this->requestVector[0]); //fill the request line
 	}
 	return 0;
 }
@@ -139,11 +139,11 @@ int	Request::checkDuplicate(const std::string& receivedRequest)
 				|| value.find("CONNECT") != std::string::npos
 				|| value.find("OPTIONS") != std::string::npos
 				|| value.find("TRACE") != std::string::npos)
-					return (_status = BadRequest, 0);
+					return (this->status = BadRequest, 0);
 		}
 		if (receivedRequest.find("host") != std::string::npos)
-			_detectHost++;
-		return (_requestData += receivedRequest, _receivecount++, 1);
+			detectHost++;
+		return (requestData += receivedRequest, receivecount++, 1);
 	}
 	return (0);
 }
@@ -151,28 +151,28 @@ int	Request::checkDuplicate(const std::string& receivedRequest)
 //function to take the separated request or complete request and parse it
 int	Request::takingRequests(const std::string& receivedRequest)
 {
-	if (!_requestLineDone)
+	if (!this->requestLineDone)
 	{
 		if (parseRequestLine(receivedRequest))
 			return 1;
 	}
-	if (!_headersDone)
+	if (!headersDone)
 	{
 		if (checkDuplicate(receivedRequest))
 			return 1;
 	}
-	if (_foundUri)
+	if (foundUri)
 	{
 		if (requestInProgress)
-			_requestVector = Utils::splitRequest(_requestData, CRLF);
+			requestVector = Utils::splitRequest(requestData, CRLF);
 		else
 		{
 			separateRequest(receivedRequest);
-			_requestVector = Utils::splitRequest(headers, CRLF);
+			requestVector = Utils::splitRequest(headers, CRLF);
 		}
-		fillHeaders(_requestVector); //fill the headers to the map
+		fillHeaders(requestVector); //fill the headers to the map
 		requestIsWellFormed(); //check if the request is well formed
-		_receivecount++;
+		receivecount++;
 	}
 	return 0;
 }

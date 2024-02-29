@@ -3,16 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   Core.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:09:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/26 11:44:25 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/29 21:03:05 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Core.hpp"
-
-#define fakeResponse "HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\r\nServer: Apache/2.2.14 (Win32)\r\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd"
 
 Core::Core()
 {
@@ -69,8 +67,7 @@ void Core::startWorking()
             if (client_fd != -1)
             {
                 std::cout << "Client: " << client_fd << " accepted" << std::endl;
-                Client newClient(client_fd);
-                clients.push_back(newClient);
+                clients.push_back(Client(client_fd));
                 poll_fds.push_back((pollfd){client_fd, POLLIN | POLLOUT, 0});
             }
             it++;
@@ -80,7 +77,6 @@ void Core::startWorking()
         {
             if (poll_fds[i].revents & POLLIN)
             {
-                std::cout << poll_fds[i].fd << std::endl;
                 bzero(buffer, sizeof(buffer));
                 clients[i].setRecvBytes(recv(poll_fds[i].fd, buffer, 1023, 0));
                 clients[i].getRequest().parseRequest(std::string(buffer, clients[i].getRecvBytes()), config);
@@ -88,15 +84,11 @@ void Core::startWorking()
             }
             if ((poll_fds[i].revents & POLLOUT) && clients[i].getRequest()._requestIsDone)
             {
-                send(poll_fds[i].fd, fakeResponse, 202, 0);
+                std::cout << "Client [" << clients[i].getClient_fd() << "] REQUEST DONE" << std::endl;
                 clients[i].getRequest()._requestIsDone = false;
             }
             if (poll_fds[i].fd > 0 && (poll_fds[i].revents & POLLHUP))
-            {
                 close(clients[i].getClient_fd());
-                if ((poll_fds.begin() + i) != poll_fds.end())
-                    poll_fds.erase(poll_fds.cbegin() + i);
-            }
         }
     }
 }

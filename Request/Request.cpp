@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/29 19:45:47 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/29 20:39:39 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,29 +17,29 @@
 
 Request::Request()
 {
-	_status = OK;
-	_detectHost = 0;
-	_bodyDone = false;
-	_foundUri = false;
-	_receivecount = 0;
-	_sizeBoundary = 0;
-	_contentLength = 0;
+	status = OK;
+	detectHost = 0;
+	bodyDone = false;
+	foundUri = false;
+	receivecount = 0;
+	sizeBoundary = 0;
+	contentLength = 0;
 	multipart = false;
 	_setLength = false;
-	_isComplete = false;
-	_headersDone = false;
+	isComplete = false;
+	headersDone = false;
 	_requestIsDone = false;
-	_requestLineDone = false;
+	requestLineDone = false;
 	requestInProgress = false;
-	_remainingChunkLength = 0;
+	remainingChunkLength = 0;
 	_requestIsWellFormed = false;
 
 	_body = "";
 	headers = "";
-	_requestData = "";
+	requestData = "";
 	_chunkedName = "";
-	_boundaryName = "";
-	_config = Config();
+	this->boundaryName = "";
+	config = Config();
 }
 
 Request::Request(const Request& obj)
@@ -51,31 +51,31 @@ Request& Request::operator=(const Request& obj)
 {
 	if (this != &obj)
 	{
-		_status = obj._status;
-		_detectHost = obj._detectHost;
-		_bodyDone = obj._bodyDone;
-		_foundUri = obj._foundUri;
-		_receivecount = obj._receivecount;
-		_contentLength = obj._contentLength;
-		_isComplete = obj._isComplete;
-		_headersDone = obj._headersDone;
-		_requestLineDone = obj._requestLineDone;
-		requestInProgress = obj.requestInProgress;
-		_requestIsWellFormed = obj._requestIsWellFormed;
-		_config = obj._config;
-		_headers = obj._headers;
-		_requestLine = obj._requestLine;
-		_requestVector = obj._requestVector;
-		_body = obj._body;
-		_params = obj._params;
-		headers = obj.headers;
-		_requestData = obj._requestData;
-		_boundaryName = obj._boundaryName;
-		_chunkedName = obj._chunkedName;
-		_requestIsDone = obj._requestIsDone;
-		_setLength = obj._setLength;
-		_sizeBoundary = obj._sizeBoundary;
-		_remainingChunkLength = obj._remainingChunkLength;
+		this->status = obj.status;
+		this->detectHost = obj.detectHost;
+		this->bodyDone = obj.bodyDone;
+		this->foundUri = obj.foundUri;
+		this->receivecount = obj.receivecount;
+		this->contentLength = obj.contentLength;
+		this->isComplete = obj.isComplete;
+		this->headersDone = obj.headersDone;
+		this->requestLineDone = obj.requestLineDone;
+		this->requestInProgress = obj.requestInProgress;
+		this->_requestIsWellFormed = obj._requestIsWellFormed;
+		this->config = obj.config;
+		this->headers = obj.headers;
+		this->requestLine = obj.requestLine;
+		this->requestVector = obj.requestVector;
+		this->_body = obj._body;
+		this->params = obj.params;
+		this->headers = obj.headers;
+		this->requestData = obj.requestData;
+		this->boundaryName = obj.boundaryName;
+		this->_chunkedName = obj._chunkedName;
+		this->_requestIsDone = obj._requestIsDone;
+		this->_setLength = obj._setLength;
+		this->sizeBoundary = obj.sizeBoundary;
+		this->remainingChunkLength = obj.remainingChunkLength;
 	}
 	return (*this);
 }
@@ -98,17 +98,17 @@ const std::map<std::string, std::string>&	Request::getHeaders() const
 
 const std::map<std::string, std::string>&	Request::getRequestLine() const
 {
-	return (_requestLine);
+	return (requestLine);
 }
 
 const int&	Request::getStatus() const
 {
-	return (_status);
+	return (status);
 }
 
 void	Request::setStatus(int status)
 {
-	_status = status;
+	this->status = status;
 }
 
 const bool& Request::getRequestIsWellFormed() const
@@ -118,12 +118,12 @@ const bool& Request::getRequestIsWellFormed() const
 
 const bool& Request::getBodyDone() const
 {
-	return (_bodyDone);
+	return (bodyDone);
 }
 
 const bool& Request::getHeadersDone() const
 {
-	return (_headersDone);
+	return (headersDone);
 }
 
 const std::string& Request::getHeaderByName(const std::string& name) const
@@ -133,12 +133,12 @@ const std::string& Request::getHeaderByName(const std::string& name) const
 
 const bool& Request::getRequestLineDone() const
 {
-	return (_requestLineDone);
+	return (requestLineDone);
 }
 
 const bool& Request::getFoundUri() const
 {
-	return (_foundUri);
+	return (foundUri);
 }
 
 /* *************************** methods *************************** */
@@ -146,37 +146,37 @@ const bool& Request::getFoundUri() const
 //main function to parse the request
 void	Request::parseRequest(const std::string& receivedRequest, const Config& config)
 {
-	_config = config;
+	this->config = config;
 	std::srand(time(0));
-	if (!_requestLineDone || !_headersDone || !_requestIsWellFormed)
+	if (!this->requestLineDone || !this->headersDone || !this->_requestIsWellFormed)
 	{
 		if (takingRequests(receivedRequest))
 		{
-			if (_detectHost > 1)
-				_status = BadRequest;
+			if (detectHost > 1)
+				this->status = BadRequest;
 			return;
 		}
 	}
-	if (_requestLine["method"] == "POST" && !_bodyDone && _requestIsWellFormed && _status == 200)
+	if (this->requestLine["method"] == "POST" && !this->bodyDone && this->_requestIsWellFormed && this->status == 200)
 	{
-		if (_receivecount > 1)
+		if (this->receivecount > 1)
 		{
-			if (receivedRequest.front() == CR && requestInProgress)
+			if (receivedRequest.front() == CR && this->requestInProgress)
 				return;
-			_body = receivedRequest;
+			this->_body = receivedRequest;
 		}
-	// std::cout << "status: " << _status << std::endl;
+	// std::cout << "status: " << status << std::endl;
 	// std::cout <<"_body: " << _body << std::endl;
-		if (!_body.empty())
+		if (!this->_body.empty())
 			parseBody();
 	}
-	if ((_requestLine["method"] == "GET" && _requestIsWellFormed)
-		|| (_requestLine["method"] == "POST" && _requestIsWellFormed && _bodyDone))
-		_requestIsDone = true;
+	if ((this->requestLine["method"] == "GET" && this->_requestIsWellFormed)
+		|| (this->requestLine["method"] == "POST" && this->_requestIsWellFormed && this->bodyDone))
+		this->_requestIsDone = true;
 	std::cout <<"--------------------------------------"<< std::endl;
-	// std::cout << "size boundary: " << _sizeBoundary << std::endl;
+	// std::cout << "size boundary: " << sizeBoundary << std::endl;
 	// std::cout <<"startBoundary: " << _Boundary << std::endl;
 	Utils::printMap(_headers);
 	std::cout <<"--------------------------------------"<< std::endl;
-	// Utils::printMap(_requestLine);
+	// Utils::printMap(requestLine);
 }

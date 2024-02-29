@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/29 19:55:32 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/29 20:59:38 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,40 +60,43 @@ enum Errors
 #define ALLOWED_CHARACTERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJ\
 							KLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%"
 
+typedef std::vector<std::string> Vector;
+typedef std::map<std::string, std::string> Map;
+
 class Config;
 
 class Request
 {
 	private:
 		//status
-		int _status;
-		bool _foundUri;
-		bool _bodyDone;
-		int	_detectHost;
+		int status;
+		bool foundUri;
+		bool bodyDone;
+		int	detectHost;
 		bool multipart;
 		bool _setLength;
-		bool _isComplete;
-		int	_receivecount;
-		bool _headersDone;
-		bool _requestLineDone;
+		bool isComplete;
+		int	receivecount;
+		bool headersDone;
+		bool requestLineDone;
 		bool requestInProgress;
 		bool _requestIsWellFormed;
-		unsigned int _remainingChunkLength;
+		unsigned int remainingChunkLength;
 		// content length
-		unsigned int	_contentLength;
-		unsigned int	_sizeBoundary;
-		Config _config;
+		unsigned int	contentLength;
+		unsigned int	sizeBoundary;
+		Config config;
 		//maps
-		std::map<std::string, std::string> _headers;
-		std::map<std::string, std::string> _requestLine;
-		std::map<std::string, std::string> _params;
+		Map _headers;
+		Map requestLine;
+		Map params;
 		//vector
-		std::vector<std::string>	_requestVector;
+		Vector	requestVector;
 		//strings
 		std::string _body;
 		std::string	headers;
-		std::string	_requestData;
-		std::string _boundaryName;
+		std::string	requestData;
+		std::string boundaryName;
 		std::string _chunkedName;
 		/* *************************** methods ********************************* */
 			void	findUri();
@@ -107,16 +110,21 @@ class Request
 			void	parseContentLength();
 			void	requestIsWellFormed();
 			void	parseTransferEncoding();
+			void	fillHeaders(Vector headers);
+			bool directoryExists(const char *path);
+			std::string	prepareFileName(std::string line);
+			unsigned int convertToDecimal(std::string hex);
+			std::string& isExist(Map& headers, std::string key);
 			void	separateRequest(std::string receivedRequest);
-			void	fillHeaders(std::vector<std::string> headers);
 			void	fillRequestLine(const std::string& requestLine);
 			int		parseRequestLine(const std::string& requestLine);
 			int		checkDuplicate(const std::string& receivedRequest);
 			int		takingRequests(const std::string& receivedRequest);
-			std::string	prepareFileName(std::string line);
+			void	preparLengthAndName(size_t pos, std::string& length, std::ofstream& file);
 	public:
 	/* *************************** constructors ****************************** */
-		bool _requestIsDone;
+	
+	bool _requestIsDone;
 		Request();
 		~Request();
 		Request(const Request& obj);
@@ -129,8 +137,8 @@ class Request
 		const int& getStatus() const;
 		void setStatus(int status);
 		const std::string& getBody() const;
-		const std::map<std::string, std::string>& getHeaders() const;
-		const std::map<std::string, std::string>& getRequestLine() const;
+		const Map& getHeaders() const;
+		const Map& getRequestLine() const;
 		const bool& getRequestIsWellFormed() const;
 		const bool& getBodyDone() const;
 		const bool& getHeadersDone() const;
