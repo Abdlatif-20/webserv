@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/26 06:05:08 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/29 02:02:27 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,13 +28,13 @@ void	Request::requestIsWellFormed()
 		return (_status = BadRequest, void());
 	if (_requestLine["method"] == "POST")
 	{
-		if (_headers.find("content-length") != _headers.end())
-			parseContentLength();
-		else if (_headers.find("content-type") != _headers.end()
+		if (_headers.find("content-type") != _headers.end()
 				&& _headers.find("transfer-encoding") == _headers.end())
 			parseContentType();
 		else if (_headers.find("transfer-encoding") != _headers.end())
 			parseTransferEncoding();
+		else if (_headers.find("content-length") != _headers.end())
+			parseContentLength();
 		else
 			return (_status = BadRequest, void());
 	}
@@ -56,20 +56,23 @@ void	Request::findUri()
 		{
 			if (uri == l_iter->getPrefix())
 			{
-				std::cout << "Matched: " << l_iter->getPrefix() << std::endl;
+				std::cout << "Matched: " << l_iter->getPrefix() <<" with the config file" << std::endl;
 				_foundUri = true;
 				return;
 			}
 		}
 	}
 	if (_foundUri == false)
+	{
+		std::cout << uri << " not found in the config file" << std::endl;
 		_status = NotFound;
+	}
 }
 
 //function to separate the request line And the headers from the request
 void	Request::separateRequest(std::string receivedRequest)
 {
-	size_t pos = receivedRequest.find(CRLF CRLF);
+	size_t pos = receivedRequest.find("\r\n\r\n");
 	if (pos != std::string::npos)
 	{
 		this->headers = receivedRequest.substr(0, pos + 4);
@@ -79,18 +82,26 @@ void	Request::separateRequest(std::string receivedRequest)
 		_status = BadRequest;
 }
 
+void	Request::parseUri()
+{
+	if (_requestLine["path"].find("%") != std::string::npos)
+		Utils::decodeUri(_requestLine["path"]);
+}
+
 //function to parse the Body of the request if method is POST
 void	Request::parseBody()
 {
 	if (_requestLine["method"] == "POST"
-			&& _headers.find("content-length") != _headers.end())
-			ContentLength();
-	else if (_requestLine["method"] == "POST"
 			&& _headers.find("transfer-encoding") != _headers.end())
 			parseChunkedBody();
-	else if (_requestLine["method"] == "POST")
+	else if (_requestLine["method"] == "POST"
+		&& _headers.find("content-type") != _headers.end())
 			parseBoundary();
+	else if (_requestLine["method"] == "POST"
+			&& _headers.find("content-length") != _headers.end())
+				ContentLength();
 }
+
 //function to parse the request line and fill it to the map and return 1 if the request line is separated
 int	Request::parseRequestLine(const std::string& requestLine)
 {

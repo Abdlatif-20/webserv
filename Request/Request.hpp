@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/26 05:59:10 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/29 02:02:38 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,13 @@ Hello world
 
 enum Errors
 {
+	OK = 200,
 	NotImplemented = 501,
 	BadRequest = 400,
 	RequestURITooLong = 414,
 	RequestEntityTooLarge = 413,
 	NotFound = 404,
+	LengthRequired = 411,
 	MovedPermanently = 301,
 	MethodNotAllowed = 405,
 };
@@ -64,32 +66,39 @@ class Request
 	private:
 		//status
 		int _status;
-		bool _bodyDone;
 		bool _foundUri;
+		bool _bodyDone;
 		int	_detectHost;
+		bool multipart;
+		bool _setLength;
 		bool _isComplete;
 		int	_receivecount;
 		bool _headersDone;
 		bool _requestLineDone;
 		bool requestInProgress;
+		bool _requestIsWellFormed;
+		unsigned int _remainingChunkLength;
 		// content length
 		unsigned int	_contentLength;
+		unsigned int	_sizeBoundary;
 		Config _config;
 		//maps
 		std::map<std::string, std::string> _headers;
 		std::map<std::string, std::string> _requestLine;
+		std::map<std::string, std::string> _params;
 		//vector
 		std::vector<std::string>	_requestVector;
 		//strings
 		std::string _body;
 		std::string	headers;
-		std::string _params;
 		std::string	_requestData;
 		std::string _boundaryName;
+		std::string _chunkedName;
 		/* *************************** methods ********************************* */
 			void	findUri();
-			void	boundary();
+			void	parseUri();
 			void	parseBody();
+			void	fillParams();
 			void	parseBoundary();
 			void	ContentLength();
 			void	parseChunkedBody();
@@ -106,7 +115,6 @@ class Request
 			std::string	prepareFileName(std::string line);
 	public:
 	/* *************************** constructors ****************************** */
-		bool _requestIsWellFormed;
 		bool _requestIsDone;
 		Request();
 		~Request();

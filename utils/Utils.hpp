@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/25 23:42:39 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/28 18:03:26 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,8 @@ namespace Utils
 		void		toLower(std::string& str);
 		void		printFile(std::string filename);
 		std::string intToString(int number);
+		int stringToInt(const std::string& str);
 		int     runServer(char **av);
     	std::string strTrim(const std::string& str, char c);
+		void	decodeUri(std::string& uri);
 };

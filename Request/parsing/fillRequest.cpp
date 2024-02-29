@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/26 06:04:22 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/29 02:03:51 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,8 +30,7 @@ void	Request::fillHeaders(std::vector<std::string> headers)
 			key = it->substr(0, pos);
 			if (key == "host")
 				checkHostIsFound++;
-			value = Utils::strTrim(it->substr(pos + 1), CR);
-			value = Utils::strTrim(value, ' ');
+			value = Utils::strTrim(Utils::strTrim(it->substr(pos + 1), CR), ' ');
 			_headers[key] = value;
 		}
 	}
@@ -69,5 +68,27 @@ void	Request::fillRequestLine(const std::string& requestLine)
 	requestLineMap["path"] = requestLineVector[1];
 	_requestLineDone = true;
 	_requestLine = requestLineMap;
+	fillParams();
 	findUri();
+	parseUri();
+}
+
+void	Request::fillParams()
+{
+	std::vector<std::string> sepPath;
+	std::string path = _requestLine["path"];
+	sepPath = Utils::split(path, '?');
+	_requestLine["path"] = sepPath[0];
+	if (sepPath.size() > 1)
+	{
+		std::vector<std::string> sepParams;
+		sepParams = Utils::split(sepPath[1], '&');
+		for (size_t i = 0; i < sepParams.size(); i++)
+		{
+			std::vector<std::string> sepParam;
+			sepParam = Utils::split(sepParams[i], '=');
+			if (sepParam.size() == 2)
+				_params[sepParam[0]] = sepParam[1];
+		}
+	}
 }

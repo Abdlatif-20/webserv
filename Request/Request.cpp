@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/26 07:00:15 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/29 02:02:50 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,22 +17,27 @@
 
 Request::Request()
 {
-	_status = 200;
+	_status = OK;
 	_detectHost = 0;
 	_bodyDone = false;
 	_foundUri = false;
 	_receivecount = 0;
+	_sizeBoundary = 0;
 	_contentLength = 0;
+	multipart = false;
+	_setLength = false;
 	_isComplete = false;
 	_headersDone = false;
 	_requestIsDone = false;
 	_requestLineDone = false;
 	requestInProgress = false;
+	_remainingChunkLength = 0;
 	_requestIsWellFormed = false;
+	
 	_body = "";
-	_params = "";
 	headers = "";
 	_requestData = "";
+	_chunkedName = "";
 	_boundaryName = "";
 	_config = Config();
 }
@@ -66,6 +71,11 @@ Request& Request::operator=(const Request& obj)
 		headers = obj.headers;
 		_requestData = obj._requestData;
 		_boundaryName = obj._boundaryName;
+		_chunkedName = obj._chunkedName;
+		_requestIsDone = obj._requestIsDone;
+		_setLength = obj._setLength;
+		_sizeBoundary = obj._sizeBoundary;
+		_remainingChunkLength = obj._remainingChunkLength;
 	}
 	return (*this);
 }
@@ -147,7 +157,7 @@ void	Request::parseRequest(const std::string& receivedRequest, const Config& con
 			return;
 		}
 	}
-	if (_requestLine["method"] == "POST" && !_bodyDone)
+	if (_requestLine["method"] == "POST" && !_bodyDone && _requestIsWellFormed && _status == 200)
 	{
 		if (_receivecount > 1)
 		{
@@ -155,8 +165,18 @@ void	Request::parseRequest(const std::string& receivedRequest, const Config& con
 				return;
 			_body = receivedRequest;
 		}
+	// std::cout << "status: " << _status << std::endl;
+	// std::cout <<"_body: " << _body << std::endl;
 		if (!_body.empty())
 			parseBody();
 	}
-	_requestIsDone = true;
+	if ((_requestLine["method"] == "GET" && _requestIsWellFormed)
+		|| (_requestLine["method"] == "POST" && _requestIsWellFormed && _bodyDone))
+		_requestIsDone = true;
+	std::cout <<"--------------------------------------"<< std::endl;
+	// std::cout << "size boundary: " << _sizeBoundary << std::endl;
+	// std::cout <<"startBoundary: " << _Boundary << std::endl;
+	Utils::printMap(_headers);
+	std::cout <<"--------------------------------------"<< std::endl;
+	// Utils::printMap(_requestLine);
 }
