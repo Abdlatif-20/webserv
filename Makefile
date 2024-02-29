@@ -6,7 +6,7 @@
 #    By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/02/26 21:16:29 by houmanso         ###   ########.fr        #
+#    Updated: 2024/02/29 19:06:53 by houmanso         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = webserv
 SRCS = $(wildcard *.cpp) $(wildcard */*.cpp)
 INC  = $(wildcard *.hpp) $(wildcard */*.hpp)
 OBJS = $(SRCS:.cpp=.o)
-CPPFLAGS = -Wall -Wextra -Werror -std=c++98 #-g -fsanitize=address
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g# -fsanitize=address
 CPPFLAGS += -I config -I utils -I core
 
 all: $(NAME)

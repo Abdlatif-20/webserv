@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:21:50 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/25 16:05:48 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/29 20:54:35 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,8 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/event.h>
-#include <sys/event.h>
 #include <sys/time.h>
 #include <sys/socket.h>
-#include <sys/types.h>
 #include <libc.h>
 #include <netdb.h>
 #include <climits>

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/26 17:13:07 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/27 16:17:38 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,16 +31,17 @@ Client::Client(const Client &cpy)
 	*this = cpy;
 }
 
-void	Client::recvRequest(void)
+int	Client::recvRequest(void)
 {
 	int	len;
 	char	buff[1024];
 
 	len = recv(sockId, buff, 1023, 0);
 	if (len <= -1)
-		return ;
+		return (-1);
 	buff[len] = '\0';
 	// ss << len;
+	return (len);
 }
 
 void	Client::sendResponse(void)

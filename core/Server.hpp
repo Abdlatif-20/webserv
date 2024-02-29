@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/24 16:46:23 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/29 20:43:54 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,10 @@ class Server
 		Server(const Server& cpy);
 		Server(const ServerContext& _serverCTX);
 
-		int		getSocketId(void) const;
-		void	setupServer(void);
+		void		setupServer(void);
+		std::string	getPort(void) const;
+		int			getSocketId(void) const;
+
 		Server&	operator=(const Server& cpy);
 
 		~Server(void);

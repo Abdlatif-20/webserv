@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:50:55 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/25 17:40:36 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/27 16:16:59 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ class Client
 		// Client(const Server& serverCTX);
 		Client(const Client& cpy);
 
-		void	recvRequest(void);
+		int		recvRequest(void);
 		void	sendResponse(void);
 
 		void	setSockId(int sock);

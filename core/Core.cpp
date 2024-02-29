@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/26 21:05:46 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/29 20:58:16 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,14 +36,27 @@ Core::Core(const Config &conf)
 
 void	Core::run(void)
 {
+	StringVector	ports;
+	StringVector::iterator	p;
 	std::vector<Server>::iterator	it;
 
-	std::cout << "Core: running ..." << std::endl;
 	size = servers.size();
 	for(int i = 0; i < size; i++)
 	{
-		servers[i].setupServer();
-		fcntl(servers[i].getSocketId(), F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+		p = std::find(ports.begin(), ports.end(), servers[i].getPort());
+		if (p == ports.end())
+		{
+			try
+			{
+				servers[i].setupServer();
+				ports.push_back(servers[i].getPort());
+				fcntl(servers[i].getSocketId(), F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+			}
+			catch (const std::exception& e)
+			{
+				std::cerr << e.what() << std::endl;
+			}
+		}
 	}
 	kq = kqueue();
 	if (kq == -1)
@@ -58,8 +71,7 @@ void	Core::traceEvents(void)
 	int		fd;
 	v_it	it;
 	int		hooks;
-	Client c;
-	// struct timespec	t = {5, 0};
+	Client	c;
 
 	n = 0;
 	while (1)
