@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:58 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/25 23:51:16 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/02/27 17:58:56 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@
 // 		std::cerr << "Error setting socket options\n";
 // 		return 1;
 // 	}
-// 	int port = std::stoi(av[1]);
+// 	int port = Utils::stringToInt(av[1]);
 // 	struct sockaddr_in serverAddr;// IPv4 address structure
 // 	memset(&serverAddr, 0, sizeof(serverAddr));
 // 	serverAddr.sin_family = AF_INET;		 // IPv4
@@ -108,7 +108,7 @@ int Utils::runServer(char **av)
 		std::cerr << "Error setting socket options\n";
 		return 1;
 	}
-	int port = std::stoi(s_iter->getListen().c_str());
+	int port = Utils::stringToInt(s_iter->getListen().c_str());
 	struct sockaddr_in serverAddr; // IPv4 address structure
 	memset(&serverAddr, 0, sizeof(serverAddr));
 	serverAddr.sin_family = AF_INET;           // IPv4
