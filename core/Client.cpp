@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/27 16:17:38 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/29 21:29:05 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,16 @@
 
 Client::Client(void)
 {
+	sockId = -1;
+	requestDone = false;
+	responseDone = false;
 }
 
 Client::Client(int sock)
 {
 	sockId = sock;
+	requestDone = false;
+	responseDone = false;
 }
 
 // Client::Client(const Server &serverCTX)
@@ -33,20 +38,19 @@ Client::Client(const Client &cpy)
 
 int	Client::recvRequest(void)
 {
-	int	len;
-	char	buff[1024];
-
 	len = recv(sockId, buff, 1023, 0);
+	requestDone = true;
 	if (len <= -1)
 		return (-1);
 	buff[len] = '\0';
-	// ss << len;
+	ss << len;
 	return (len);
 }
 
 void	Client::sendResponse(void)
 {
-	send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
+	if (requestDone)
+		send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
 }
 
 void	Client::setSockId(int sock)
@@ -59,6 +63,8 @@ Client	&Client::operator=(const Client &cpy)
 	if (this != &cpy)
 	{
 		sockId = cpy.sockId;
+		requestDone = false;
+		responseDone = false;
 		// serverCTX = cpy.serverCTX;
 	}
 	return (*this);

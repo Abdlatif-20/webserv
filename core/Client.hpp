@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:50:55 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/27 16:16:59 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/29 21:19:48 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,11 @@
 class Client
 {
 	private:
+		int		len;
 		int		sockId;
+		char	buff[1024];
+		bool	requestDone;
+		bool	responseDone;
 		// Server	serverCTX;
 		std::stringstream	ss;
 

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/02/29 20:58:16 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/29 21:22:45 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,9 +71,9 @@ void	Core::traceEvents(void)
 	int		fd;
 	v_it	it;
 	int		hooks;
-	Client	c;
 
 	n = 0;
+	std::cout << "Server is running ..." << std::endl;
 	while (1)
 	{
 		for (it = servers.begin(); it !=  servers.end() && n < OPEN_MAX; it++)
@@ -81,10 +81,12 @@ void	Core::traceEvents(void)
 			fd = accept(it->getSocketId(), NULL, 0);
 			if (fd != -1)
 			{
-				(clients[fd] = c).setSockId(fd);
+				clients[fd].setSockId(fd);
 				EV_SET(&checklist[n++], fd, EVFILT_READ | EVFILT_WRITE, EV_ADD | EV_DELETE, 0, 0, 0);
 			}
 		}
+		if (!n)
+			continue ;
 		hooks = kevent(kq, checklist, n, triggered, n, 0);
 		for (i = 0; i < hooks; i++)
 		{

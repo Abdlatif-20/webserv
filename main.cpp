@@ -6,38 +6,12 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/21 16:35:46 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/02/29 21:00:07 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Config.hpp"
 #include "Core.hpp"
-
-static void __unused showTokens(std::vector<Token>& tokens)
-{
-	std::vector<Token>::iterator iter = tokens.begin();
-	while (iter != tokens.end())
-	{
-		switch (iter->getType())
-		{
-			case WORD:
-				std::cout << "WORD =>\t\t\t" + iter->getContent() << std::endl;
-				break;
-			case SEMICOLON:
-				std::cout << "SEMICOLON =>\t\t" + iter->getContent() << std::endl;
-				break;
-			case OPEN_BRACKET:
-				std::cout << "OPEN_BRACKET =>\t\t" + iter->getContent() << std::endl;
-				break;
-			case CLOSED_BRACKET:
-				std::cout << "CLOSE_BRACKET =>\t" + iter->getContent() << std::endl;
-				break;
-			default:
-				break;
-		}
-		iter++;
-	}
-}
 
 int main(int argc, char **argv)
 {
@@ -48,9 +22,17 @@ int main(int argc, char **argv)
 			configPath = argv[1];
 		else if (argc > 2)
 			throw Fail("Error: invalid number of args");
-		Config	_config(configPath);
-		Core core(_config);
-		core.run();
+		try
+		{
+			Config	_config(configPath);
+			Core core(_config);
+			core.run();
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << e.what() << '\n';
+		}
+		
 	}
 	catch(const std::exception& e)
 	{
