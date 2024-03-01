@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:09:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/23 15:28:00 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/26 20:23:22 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 #include "Server.hpp"
 #include "Client.hpp"
 #include <poll.h>
+#include <deque>
 
 class Core
 {

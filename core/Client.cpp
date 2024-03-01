@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/26 11:53:47 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/26 17:20:13 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ Client& Client::operator=(const Client& obj)
     client_fd = obj.client_fd;
     recvBytes = obj.recvBytes;
     req = obj.req;
+    resp = obj.resp;
     return *this;
 }
 
