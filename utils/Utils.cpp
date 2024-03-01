@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/26 11:19:39 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/29 10:38:04 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,4 +156,9 @@ std::string Utils::getTokenNameFromDirective(t_directive d)
             break;
     }
     return "unknown";
+}
+
+bool Utils::stringStartsWith(const std::string& str, const std::string& prefix)
+{
+    return (std::strncmp(str.c_str(), prefix.c_str(), prefix.length()) == 0);
 }

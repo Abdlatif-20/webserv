@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 14:36:15 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/16 12:52:21 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/29 12:59:34 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 class ServerContext;
 class Token;
 class LocationContext;
+
+#define HTTP_VERSION "HTTP/1.1"
 
 typedef std::vector<std::string> StringVector;
 typedef std::pair<std::string, StringVector> Directive;
