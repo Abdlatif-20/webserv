@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/21 11:07:24 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/01 09:45:58 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,22 +34,6 @@ Config::Config(const std::string& configPath)
     setupDefaultServer();
     setupDefaultLocation();
     checkLogicalErrors(servers);
-    // ServersVector::iterator s_iter = servers.begin();
-    // while (s_iter != servers.end())
-    // {
-    //     std::cout << "server {" << std::endl;
-    //     printDirectives(*s_iter);
-    //     LocationsVector::const_iterator location_iter = s_iter->getLocations().cbegin();
-    //     while (location_iter != s_iter->getLocations().cend())
-    //     {
-    //         std::cout << " location " << location_iter->getPrefix() << " {" << std::endl;
-    //         printDirectives(*location_iter);
-    //         std::cout << " }" << std::endl;
-    //         location_iter++;
-    //     }
-    //     std::cout << "}" << std::endl;
-    //     s_iter++;
-    // }
 }
 
 Config::Config(const Config& obj)
@@ -209,20 +193,6 @@ void Config::setupDefaultLocation()
         if (serv_it->getLocations().empty())
             serv_it->addLocation(LocationContext("/"));
         serv_it++;
-    }
-}
-
-void Config::printDirectives(const Context &ctx)
-{
-    DirectivesMap::const_iterator directive_iter = ctx.getDirectives().cbegin();
-    while (directive_iter != ctx.getDirectives().cend())
-    {
-        StringVector::const_iterator i = directive_iter->second.cbegin();
-        std::cout << "  " << directive_iter->first;
-        while (i != directive_iter->second.cend())
-            std::cout << " " << *(i++);
-        std::cout << std::endl;
-        directive_iter++;
     }
 }
 

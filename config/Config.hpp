@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:08 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/21 11:07:39 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/01 09:46:08 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ class Config
         void parseServers();
         void setupDefaultServer();
         void setupDefaultLocation();
-        void printDirectives(const Context& ctx);
     public:
         Config();
         Config(const std::string& configPath);

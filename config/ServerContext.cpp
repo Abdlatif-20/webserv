@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 10:40:09 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/21 11:14:40 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/29 11:01:47 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,27 @@ const LocationsVector& ServerContext::getLocations() const
     return locations;
 }
 
+const LocationContext ServerContext::matchLocation(const std::string& prefix) const
+{
+    LocationsVector::const_iterator it = locations.cbegin();
+    while (it != locations.cend())
+    {
+        if (it->getPrefix() == prefix)
+            return *it;
+        it++;
+    }
+    it = locations.cbegin();
+    LocationContext result;
+    while (it != locations.cend())
+    {
+        if (Utils::stringStartsWith(prefix, it->getPrefix())
+            && it->getPrefix().length() > result.getPrefix().length())
+            result = *it;
+        it++;
+    }
+    return result;
+}
+
 std::string ServerContext::getListen() const
 {
     DirectivesMap::const_iterator it = directives.find("listen");
@@ -73,7 +94,7 @@ std::string ServerContext::getPort() const
     size_t i = str.find(':');
     if (i != std::string::npos)
         return str.substr(i + 1, str.length() - i);
-    return "8080";
+    return str;
 }
 
 /* The `StringVector ServerContext::getServerName() const` function in the `ServerContext` class is a
