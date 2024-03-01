@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/26 11:16:45 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/02/29 16:33:16 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,6 +130,16 @@ const bool& Request::getRequestLineDone() const
 const bool& Request::getFoundUri() const
 {
 	return (_foundUri);
+}
+
+const std::string& Request::getMethod() const
+{
+	return _requestLine.at("method");
+}
+
+const std::string& Request::getHost() const
+{
+	return _headers.at("host");
 }
 
 /* *************************** methods *************************** */
