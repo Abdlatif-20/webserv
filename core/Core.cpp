@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Core.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/01 11:53:05 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/01 17:35:14 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,35 +68,40 @@ void	Core::run(void)
 
 void	Core::traceEvents(void)
 {
-	int		i;
-	int		n;
-	int		fd;
-	v_it	it;
-	int		hooks;
+	int	fd;
+	int	hooks;
+	size_t	i;
+	servers_it	it;
 
-	n = 0;
+	checklist.resize(OPEN_MAX);
 	std::cout << "Server is running ..." << std::endl;
+	std::cout << checklist.size() << std::endl;
 	while (true)
 	{
-		for (it = servers.begin(); it !=  servers.end() && n < OPEN_MAX; it++)
+		for (it = servers.begin(); it !=  servers.end(); it++)
 		{
 			fd = accept(it->getSocketId(), NULL, 0);
 			if (fd != -1)
 			{
+				std::cout << "Client [" << fd << "] accepted" << std::endl;
 				clients[fd].setSockId(fd);
 				clients[fd].setConfig(config);
-				EV_SET(&checklist[n++], fd, EVFILT_READ | EVFILT_WRITE, EV_ADD | EV_DELETE, 0, 0, 0);
+				checklist.;
 			}
 		}
-		if (!n)
+		if (!checklist.size())
 			continue ;
-		hooks = kevent(kq, checklist, n, triggered, n, 0);
-		for (i = 0; i < hooks; i++)
+		hooks = poll(checklist.data(), checklist.size(), 0);
+		for (i = 0; i < checklist.size(); i++)
 		{
-			clients[triggered[i].ident].recvRequest();
-			clients[triggered[i].ident].sendResponse();
-			clients.erase(triggered[i].ident);
-			n--;
+			if (checklist[i].revents & POLLIN)
+				clients[checklist[i].fd].recvRequest();
+			if (checklist[i].revents & POLLOUT && clients[checklist[i].fd].isRequestDone())
+				clients[checklist[i].fd].sendResponse();
+			if (checklist[i].revents & POLLHUP)
+			{
+				clients.erase(checklist[i].fd);
+			}
 		}
 	}
 }

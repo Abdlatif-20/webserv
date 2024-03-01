@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/01 11:54:49 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/01 17:32:10 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ int	Client::recvRequest(void)
 		return (-1);
 	}
 	buff[len] = '\0';
+	std::cout << "buff=>" <<  buff << std::endl;
 	request.parseRequest(buff, config);
 	requestDone = true;
 	// ss << len;
@@ -53,13 +54,24 @@ int	Client::recvRequest(void)
 
 void	Client::sendResponse(void)
 {
-	if (requestDone)
-		send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
+	std::cout << "sending" << std::endl;
+	send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
+	responseDone = true;
 }
 
 void	Client::setConfig(const Config& conf)
 {
 	config = conf;
+}
+
+bool	Client::isRequestDone(void) const
+{
+	return (requestDone);
+}
+
+bool	Client::isResponseDone(void) const
+{
+	return (responseDone);
 }
 
 void	Client::setSockId(int sock)
