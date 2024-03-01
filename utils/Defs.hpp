@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 14:36:15 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/29 12:59:34 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/01 11:11:32 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ typedef std::map<std::string, StringVector>  DirectivesMap;
 typedef std::vector<ServerContext> ServersVector;
 typedef std::vector<Token> TokensVector;
 typedef std::vector<LocationContext> LocationsVector;
+typedef std::pair<std::string, std::string> HostPort;
+typedef std::invalid_argument	Fail;
 
 typedef enum e_directive
 {

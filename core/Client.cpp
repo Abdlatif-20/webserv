@@ -5,61 +5,81 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/26 17:20:13 by mel-yous         ###   ########.fr       */
+/*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
+/*   Updated: 2024/03/01 11:54:49 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
-Client::Client()
+Client::Client(void)
 {
-
+	sockId = -1;
+	requestDone = false;
+	responseDone = false;
 }
 
-Client::Client(int client_fd)
+Client::Client(int sock)
 {
-    this->client_fd = client_fd;
-    this->recvBytes = -1;
+	sockId = sock;
+	requestDone = false;
+	responseDone = false;
 }
 
-Client::Client(const Client& obj)
+// Client::Client(const Server &serverCTX)
+// {
+// 	this->serverCTX = serverCTX;
+// }
+
+Client::Client(const Client &cpy)
 {
-    *this = obj;
+	*this = cpy;
 }
 
-Client& Client::operator=(const Client& obj)
+int	Client::recvRequest(void)
 {
-    if (this == &obj)
-        return *this;
-    client_fd = obj.client_fd;
-    recvBytes = obj.recvBytes;
-    req = obj.req;
-    resp = obj.resp;
-    return *this;
+	len = recv(sockId, buff, 1023, 0);
+	if (len < 0)
+	{
+		buff[0] = '\0';
+		return (-1);
+	}
+	buff[len] = '\0';
+	request.parseRequest(buff, config);
+	requestDone = true;
+	// ss << len;
+	return (len);
 }
 
-Client::~Client()
+void	Client::sendResponse(void)
 {
-
+	if (requestDone)
+		send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
 }
 
-int Client::getClient_fd() const
+void	Client::setConfig(const Config& conf)
 {
-    return client_fd;
+	config = conf;
 }
 
-ssize_t Client::getRecvBytes() const
+void	Client::setSockId(int sock)
 {
-    return recvBytes;
+	sockId = sock;
 }
 
-void Client::setRecvBytes(ssize_t r)
+Client	&Client::operator=(const Client &cpy)
 {
-    recvBytes = r;
+	if (this != &cpy)
+	{
+		sockId = cpy.sockId;
+		requestDone = false;
+		responseDone = false;
+		// serverCTX = cpy.serverCTX;
+	}
+	return (*this);
 }
 
-Request& Client::getRequest()
+Client::~Client(void)
 {
-    return req;
+	close(sockId);
 }

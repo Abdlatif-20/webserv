@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/27 14:22:03 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/01 11:25:18 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,6 @@ class Request
 	public:
 	/* *************************** constructors ****************************** */
 		bool _requestIsWellFormed;
-		bool _requestIsDone;
 		Request();
 		~Request();
 		Request(const Request& obj);

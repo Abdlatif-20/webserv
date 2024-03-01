@@ -5,32 +5,46 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/21 12:41:43 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/26 16:58:26 by mel-yous         ###   ########.fr       */
+/*   Created: 2024/02/14 19:50:55 by houmanso          #+#    #+#             */
+/*   Updated: 2024/03/01 11:50:22 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#ifndef CLIENT_HPP
+#define CLIENT_HPP
 
+#include <iostream>
+#include "Server.hpp"
 #include "Request.hpp"
-#include "Response.hpp"
 
 class Client
 {
-    private:
-        int client_fd;
-        ssize_t recvBytes;
-        Request req;
-        Response resp;
-    public:
-        Client();
-        Client(int client_fd);
-        Client(const Client& obj);
-        Client& operator=(const Client& obj);
-        ~Client();
+	private:
+		int		len;
+		int		sockId;
+		char	buff[1024];
+		bool	requestDone;
+		bool	responseDone;
+		Config	config;
+		Request request;
+		// Server	serverCTX;
+		// std::stringstream	ss;
 
-        int getClient_fd() const;
-        ssize_t getRecvBytes() const;
-        void setRecvBytes(ssize_t r);
-        Request& getRequest();
+	public:
+		Client(void);
+		Client(int sock);
+		// Client(const Server& serverCTX);
+		Client(const Client& cpy);
+
+		int		recvRequest(void);
+		void	sendResponse(void);
+
+		void	setSockId(int sock);
+		void	setConfig(const Config& conf);
+
+		Client&	operator=(const Client& cpy);
+
+		~Client(void);
 };
+
+#endif

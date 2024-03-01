@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/29 16:33:16 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/01 11:25:56 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ Request::Request()
 	_contentLength = 0;
 	_isComplete = false;
 	_headersDone = false;
-	_requestIsDone = false;
 	_requestLineDone = false;
 	requestInProgress = false;
 	_requestIsWellFormed = false;
@@ -34,7 +33,6 @@ Request::Request()
 	headers = "";
 	_requestData = "";
 	_boundaryName = "";
-	_requestIsDone = false;
 }
 
 Request::Request(const Request& obj)
@@ -66,7 +64,6 @@ Request& Request::operator=(const Request& obj)
 		headers = obj.headers;
 		_requestData = obj._requestData;
 		_boundaryName = obj._boundaryName;
-		_requestIsDone = obj._requestIsDone;
 	}
 	return (*this);
 }
@@ -169,5 +166,4 @@ void	Request::parseRequest(const std::string& receivedRequest, const Config& con
 		if (!_body.empty())
 			parseBody();
 	}
-	_requestIsDone = true;
 }

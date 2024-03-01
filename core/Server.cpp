@@ -3,100 +3,78 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/12 21:23:59 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/26 00:27:39 by aben-nei         ###   ########.fr       */
+/*   Created: 2024/02/14 19:55:56 by houmanso          #+#    #+#             */
+/*   Updated: 2024/03/01 09:47:21 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 #include <poll.h>
 
-Server::Server()
+Server::Server(void)
 {
-
 }
 
-Server::Server(const std::string& host, const std::string& port)
+Server::Server(const ServerContext &_serverCTX)
 {
-    addrinfo hints, *result;
-    this->host = host;
-    this->port = port;
-    server_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_IP);
-    if (server_fd == -1)
-        throw ServerErrorException(strerror(errno));
-    int opt = 1;
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) == -1)
-        throw ServerErrorException(strerror(errno));
-    fcntl(server_fd, F_SETFL, O_NONBLOCK, FD_CLOEXEC);
-    bzero(&hints, sizeof(hints));
-    hints.ai_family = AF_INET;
-    hints.ai_socktype = SOCK_STREAM;
-    hints.ai_protocol = IPPROTO_IP;
-    hints.ai_flags = AI_PASSIVE;
-    if (getaddrinfo(host.c_str(), port.c_str(), &hints, &result) == -1)
-        throw ServerErrorException(strerror(errno));
-    this->serverInfo = result;
-    if (bind(server_fd, result->ai_addr, result->ai_addrlen) == -1)
-        throw ServerErrorException(strerror(errno));
-    if (listen(server_fd, 32) == -1)
-        throw ServerErrorException(strerror(errno));
+	HostPort hp;
+
+	serverCTX = _serverCTX;
+	hp = Utils::getPortAndHost(serverCTX.getListen());
+	if (!hp.first.empty())
+		serverNames.push_back(hp.first);
+	StringVector tmp = serverCTX.getServerName();
+	serverNames.insert(serverNames.end(), tmp.begin(), tmp.end());
+	host = hp.first;
+	port = hp.second;
+	sockID = -1;
+	Utils::setupAddr(&addr, std::strtol(port.c_str(), 0, 10));
 }
 
-
-Server::Server(const Server& obj)
+int	Server::getSocketId(void) const
 {
-    *this = obj;
+	return (sockID);
 }
 
-Server& Server::operator=(const Server& obj)
+void Server::setupServer(void)
 {
-    if (this == &obj)
-        return *this;
-    host = obj.host;
-    port = obj.port;
-    serverInfo = obj.serverInfo;
-    server_fd = obj.server_fd;
-    return *this;
+	sockID = socket(PF_INET, SOCK_STREAM, 0);
+	if (sockID == -1)
+		throw(Fail(strerror(errno)));
+	int a = 1;
+	setsockopt(sockID, SOL_SOCKET, SO_REUSEADDR,&a, sizeof a);
+	if (bind(sockID, (sockaddr *)&addr, sizeof addr) == -1)
+		throw(Fail(strerror(errno)));
+	if (listen(sockID, INT_MAX) == -1)
+		throw(Fail(strerror(errno)));
 }
 
-Server::~Server()
+std::string	Server::getPort(void) const
 {
-    // freeaddrinfo(serverInfo);
+	return	(port);
 }
 
-const std::string& Server::getServerHost()
+Server::Server(const Server &cpy)
 {
-    return host;
+	*this = cpy;
 }
 
-const std::string& Server::getServerPort()
+Server &Server::operator=(const Server &cpy)
 {
-    return port;
+	if (this != &cpy)
+	{
+		port = cpy.port;
+		addr = cpy.addr;
+		sockID = cpy.sockID;
+		serverCTX = cpy.serverCTX;
+	}
+	return (*this);
 }
 
-addrinfo* Server::getServerInfo()
+Server::~Server(void)
 {
-    return serverInfo;
-}
-
-int Server::getServer_fd()
-{
-    return server_fd;
-}
-
-Server::ServerErrorException::ServerErrorException(const std::string& str)
-{
-    this->str = "Server error, " + str;
-}
-
-const char* Server::ServerErrorException::what() const throw()
-{
-    return str.c_str();
-}
-
-Server::ServerErrorException::~ServerErrorException() throw()
-{
-
+	if (sockID != -1)
+		close(sockID);
 }

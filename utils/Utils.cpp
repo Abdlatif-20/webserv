@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/29 10:38:04 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/01 11:19:19 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,6 +126,33 @@ std::string Utils::intToString(int number)
     return oss.str();
 }
 
+void	Utils::setupAddr(sockaddr_in *addr, int port)
+{
+	std::memset(addr, 0, sizeof(sockaddr_in));
+	addr->sin_port = htons(port);
+	addr->sin_family = AF_INET;
+	addr->sin_addr.s_addr = INADDR_ANY;
+}
+
+HostPort	Utils::getPortAndHost(const std::string &str)
+{
+	size_t	idx;
+	std::string	host;
+	std::string	port;
+
+	idx = str.find(':');
+	if (idx != std::string::npos)
+	{
+		std::stringstream ss;
+		ss << str;
+		std::getline(ss, host, ':');
+		std::getline(ss, port, ':');
+	}
+	else
+		port = str;
+	return HostPort(host, port);
+}
+
 std::string Utils::getTokenNameFromDirective(t_directive d)
 {
     switch (d)
@@ -160,5 +187,5 @@ std::string Utils::getTokenNameFromDirective(t_directive d)
 
 bool Utils::stringStartsWith(const std::string& str, const std::string& prefix)
 {
-    return (std::strncmp(str.c_str(), prefix.c_str(), prefix.length()) == 0);
+	return (!std::strncmp(str.c_str(), prefix.c_str(), prefix.length()));
 }
