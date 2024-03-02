@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/01 11:25:18 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/02 16:41:54 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ class Request
 		bool requestInProgress;
 		// content length
 		unsigned int	_contentLength;
-		Config _config;
+		ServerContext serverCTX;
 		//maps
 		std::map<std::string, std::string> _headers;
 		std::map<std::string, std::string> _requestLine;
@@ -112,7 +112,7 @@ class Request
 		Request& operator=(const Request& obj);
 
 		typedef std::invalid_argument InvalidRequest;
-		void	parseRequest(const std::string& receivedRequest, const Config& config);
+		void	parseRequest(const std::string& receivedRequest, const ServerContext& serverCTX);
 
 	/* *************************** getters ************************************ */
 		const int& getStatus() const;

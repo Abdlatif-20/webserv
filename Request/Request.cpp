@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/01 11:25:56 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/02 16:54:23 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ Request& Request::operator=(const Request& obj)
 		_requestLineDone = obj._requestLineDone;
 		requestInProgress = obj.requestInProgress;
 		_requestIsWellFormed = obj._requestIsWellFormed;
-		_config = obj._config;
+		serverCTX = obj.serverCTX;
 		_headers = obj._headers;
 		_requestLine = obj._requestLine;
 		_requestVector = obj._requestVector;
@@ -142,9 +142,9 @@ const std::string& Request::getHost() const
 /* *************************** methods *************************** */
 
 //main function to parse the request
-void	Request::parseRequest(const std::string& receivedRequest, const Config& config)
+void	Request::parseRequest(const std::string& receivedRequest, const ServerContext& serverCTX)
 {
-	_config = config;
+	this->serverCTX = serverCTX;
 	std::srand(time(0));
 	if (!_requestLineDone || !_headersDone || !_requestIsWellFormed)
 	{
