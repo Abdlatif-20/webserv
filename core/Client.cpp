@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 15:26:53 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/02 15:43:54 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,14 +54,19 @@ void	Client::setConfig(const Config& conf)
 	config = conf;
 }
 
+bool	Client::isRequestDone(void) const
+{
+	return (requestDone);
+}
+
+bool	Client::isResponseDone(void) const
+{
+	return (responseDone);
+}
+
 void	Client::setSockId(int sock)
 {
 	sockId = sock;
-}
-
-bool	Client::requestIsDone(void) const
-{
-	return (requestDone);
 }
 
 Client	&Client::operator=(const Client &cpy)

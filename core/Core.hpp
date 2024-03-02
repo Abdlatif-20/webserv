@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Core.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:21:50 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/01 11:52:34 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/01 17:02:25 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,17 @@
 #define CORE_HPP
 
 #include <iostream>
+#include <climits>
+
+#include <libc.h>
+#include <netdb.h>
+#include <sys/time.h>
+#include <sys/poll.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/event.h>
-#include <sys/time.h>
 #include <sys/socket.h>
-#include <libc.h>
-#include <netdb.h>
-#include <climits>
-#include <netdb.h>
+
 #include "Config.hpp"
 #include "Server.hpp"
 #include "Client.hpp"
@@ -39,10 +41,10 @@ class Core
 		ServersVector	serversConf;
 		std::vector<Server>	servers;
 		std::map<int, Client>	clients;
-		struct kevent	triggered[OPEN_MAX];
-		struct kevent	checklist[OPEN_MAX];
+		// struct kevent	triggered[OPEN_MAX];
+		std::vector<struct pollfd>	checklist;
 
-		typedef std::vector<Server>::iterator	v_it;
+		typedef std::vector<Server>::iterator	servers_it;
 
 	public:
 		Core(void);

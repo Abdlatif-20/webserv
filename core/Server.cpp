@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:55:56 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 15:37:47 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/02 15:53:42 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,10 +21,11 @@ Server::Server(void)
 Server::Server(const ServerContext &_serverCTX)
 {
 	sockID = -1;
+	serverCTX = _serverCTX;
 	host = serverCTX.getHost();
 	port = serverCTX.getPort();
+	std::cout << host << " " << port << '\n';
 	serverNames = serverCTX.getServerName();
-	serverCTX = _serverCTX;
 	Utils::setupAddr(&addr, std::atoi(port.c_str()));
 }
 
@@ -71,11 +72,11 @@ Server &Server::operator=(const Server &cpy)
 	if (this != &cpy)
 	{
 		sockID = cpy.sockID;
+		serverCTX = cpy.serverCTX;
 		addr = cpy.addr;
 		host = cpy.host;
 		port = cpy.port;
 		serverNames = cpy.serverNames;
-		serverCTX = cpy.serverCTX;
 	}
 	return (*this);
 }
