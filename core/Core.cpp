@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 16:02:50 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/02 19:34:16 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,8 +83,7 @@ void	Core::traceEvents(void)
 			{
 				clients[fd].setSockId(fd);
 				clients[fd].setConfig(config);
-				checklist.push_back((pollfd){fd, POLLIN|POLLOUT, 0});
-				checklist.push_back((pollfd){fd, POLLIN | POLLOUT, 0});;
+				checklist.push_back((pollfd){fd, POLLIN | POLLOUT | POLLHUP, 0});
 			}
 		}
 		if (!checklist.size())
@@ -92,12 +91,15 @@ void	Core::traceEvents(void)
 		hooks = poll(checklist.data(), checklist.size(), 0);
 		for (i = 0; i < checklist.size(); i++)
 		{
-			if (checklist[i].revents & POLLHUP)
-				clients.erase(checklist[i].fd);
 			if (checklist[i].revents & POLLIN)
 				clients[checklist[i].fd].recvRequest();
 			if (checklist[i].revents & POLLOUT && clients[checklist[i].fd].isRequestDone())
 				clients[checklist[i].fd].sendResponse();
+			if (checklist[i].revents & POLLHUP)
+			{
+				clients.erase(checklist[i].fd);
+				// checklist.erase(checklist.begin() + i);
+			}
 		}
 	}
 }

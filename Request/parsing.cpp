@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/29 18:14:50 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/02 17:11:16 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ void	Request::findUri()
 		{
 			if (uri == l_iter->getPrefix())
 			{
-				std::cout << "Matched: " << l_iter->getPrefix() << std::endl;
+				// std::cout << "Matched: " << l_iter->getPrefix() << std::endl;
 				_foundUri = true;
 				return;
 			}
