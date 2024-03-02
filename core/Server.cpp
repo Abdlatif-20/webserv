@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:55:56 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/01 09:47:21 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/02 15:37:47 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,22 +15,17 @@
 
 Server::Server(void)
 {
+
 }
 
 Server::Server(const ServerContext &_serverCTX)
 {
-	HostPort hp;
-
-	serverCTX = _serverCTX;
-	hp = Utils::getPortAndHost(serverCTX.getListen());
-	if (!hp.first.empty())
-		serverNames.push_back(hp.first);
-	StringVector tmp = serverCTX.getServerName();
-	serverNames.insert(serverNames.end(), tmp.begin(), tmp.end());
-	host = hp.first;
-	port = hp.second;
 	sockID = -1;
-	Utils::setupAddr(&addr, std::strtol(port.c_str(), 0, 10));
+	host = serverCTX.getHost();
+	port = serverCTX.getPort();
+	serverNames = serverCTX.getServerName();
+	serverCTX = _serverCTX;
+	Utils::setupAddr(&addr, std::atoi(port.c_str()));
 }
 
 int	Server::getSocketId(void) const
@@ -40,20 +35,30 @@ int	Server::getSocketId(void) const
 
 void Server::setupServer(void)
 {
-	sockID = socket(PF_INET, SOCK_STREAM, 0);
+	sockID = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockID == -1)
 		throw(Fail(strerror(errno)));
 	int a = 1;
-	setsockopt(sockID, SOL_SOCKET, SO_REUSEADDR,&a, sizeof a);
+	setsockopt(sockID, SOL_SOCKET, SO_REUSEADDR, &a, sizeof a);
 	if (bind(sockID, (sockaddr *)&addr, sizeof addr) == -1)
 		throw(Fail(strerror(errno)));
 	if (listen(sockID, INT_MAX) == -1)
 		throw(Fail(strerror(errno)));
 }
 
-std::string	Server::getPort(void) const
+const std::string& Server::getHost(void) const
+{
+	return host;
+}
+
+const std::string& Server::getPort(void) const
 {
 	return	(port);
+}
+
+const ServerContext& Server::getServerCTX(void) const
+{
+	return serverCTX;
 }
 
 Server::Server(const Server &cpy)
@@ -65,9 +70,11 @@ Server &Server::operator=(const Server &cpy)
 {
 	if (this != &cpy)
 	{
-		port = cpy.port;
-		addr = cpy.addr;
 		sockID = cpy.sockID;
+		addr = cpy.addr;
+		host = cpy.host;
+		port = cpy.port;
+		serverNames = cpy.serverNames;
 		serverCTX = cpy.serverCTX;
 	}
 	return (*this);
