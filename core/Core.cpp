@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/01 11:53:05 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/01 15:15:44 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ void	Core::traceEvents(void)
 			{
 				clients[fd].setSockId(fd);
 				clients[fd].setConfig(config);
-				EV_SET(&checklist[n++], fd, EVFILT_READ | EVFILT_WRITE, EV_ADD | EV_DELETE, 0, 0, 0);
+				EV_SET(&checklist[n++], fd, EVFILT_READ | EVFILT_WRITE|EVFILT_VNODE, EV_ADD | EV_DELETE, 0, 0, 0);
 			}
 		}
 		if (!n)
@@ -93,10 +93,16 @@ void	Core::traceEvents(void)
 		hooks = kevent(kq, checklist, n, triggered, n, 0);
 		for (i = 0; i < hooks; i++)
 		{
-			clients[triggered[i].ident].recvRequest();
-			clients[triggered[i].ident].sendResponse();
-			clients.erase(triggered[i].ident);
-			n--;
+			if ((int)triggered[i].fflags == EVFILT_READ)
+			{
+				clients[triggered[i].ident].recvRequest();
+				if (clients[triggered[i].ident].requestIsDone())
+				{
+					clients[triggered[i].ident].sendResponse();
+					clients.erase(triggered[i].ident);
+					n--;
+				}
+			}
 		}
 	}
 }

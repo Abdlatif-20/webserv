@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:50:55 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/01 11:50:22 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/01 15:02:16 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ class Client
 
 		void	setSockId(int sock);
 		void	setConfig(const Config& conf);
+
+		bool	requestIsDone(void) const;
 
 		Client&	operator=(const Client& cpy);
 

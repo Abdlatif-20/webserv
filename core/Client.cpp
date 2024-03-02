@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/01 11:54:49 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/01 15:07:16 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,15 +38,17 @@ Client::Client(const Client &cpy)
 
 int	Client::recvRequest(void)
 {
+	bzero(buff, sizeof(buff));
 	len = recv(sockId, buff, 1023, 0);
-	if (len < 0)
-	{
-		buff[0] = '\0';
-		return (-1);
-	}
-	buff[len] = '\0';
+	// if (len < 0)
+	// {
+	// 	buff[0] = '\0';
+	// 	return (-1);
+	// }
+	// buff[len] = '\0';
+	std::cout << "buff:\n" << buff << std::endl;
 	request.parseRequest(buff, config);
-	requestDone = true;
+	// requestDone = true;
 	// ss << len;
 	return (len);
 }
@@ -65,6 +67,11 @@ void	Client::setConfig(const Config& conf)
 void	Client::setSockId(int sock)
 {
 	sockId = sock;
+}
+
+bool	Client::requestIsDone(void) const
+{
+	return (requestDone);
 }
 
 Client	&Client::operator=(const Client &cpy)
