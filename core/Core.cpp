@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/01 17:35:14 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/02 14:03:10 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,6 @@ void	Core::traceEvents(void)
 	size_t	i;
 	servers_it	it;
 
-	checklist.resize(OPEN_MAX);
 	std::cout << "Server is running ..." << std::endl;
 	std::cout << checklist.size() << std::endl;
 	while (true)
@@ -83,10 +82,9 @@ void	Core::traceEvents(void)
 			fd = accept(it->getSocketId(), NULL, 0);
 			if (fd != -1)
 			{
-				std::cout << "Client [" << fd << "] accepted" << std::endl;
 				clients[fd].setSockId(fd);
 				clients[fd].setConfig(config);
-				checklist.;
+				checklist.push_back((pollfd){fd, POLLIN|POLLOUT, 0});
 			}
 		}
 		if (!checklist.size())
@@ -94,14 +92,12 @@ void	Core::traceEvents(void)
 		hooks = poll(checklist.data(), checklist.size(), 0);
 		for (i = 0; i < checklist.size(); i++)
 		{
+			if (checklist[i].revents & POLLHUP)
+				clients.erase(checklist[i].fd);
 			if (checklist[i].revents & POLLIN)
 				clients[checklist[i].fd].recvRequest();
 			if (checklist[i].revents & POLLOUT && clients[checklist[i].fd].isRequestDone())
 				clients[checklist[i].fd].sendResponse();
-			if (checklist[i].revents & POLLHUP)
-			{
-				clients.erase(checklist[i].fd);
-			}
 		}
 	}
 }
