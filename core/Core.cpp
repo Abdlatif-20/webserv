@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 14:03:10 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/02 16:02:50 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,6 @@ void	Core::traceEvents(void)
 	servers_it	it;
 
 	std::cout << "Server is running ..." << std::endl;
-	std::cout << checklist.size() << std::endl;
 	while (true)
 	{
 		for (it = servers.begin(); it !=  servers.end(); it++)
@@ -85,6 +84,7 @@ void	Core::traceEvents(void)
 				clients[fd].setSockId(fd);
 				clients[fd].setConfig(config);
 				checklist.push_back((pollfd){fd, POLLIN|POLLOUT, 0});
+				checklist.push_back((pollfd){fd, POLLIN | POLLOUT, 0});;
 			}
 		}
 		if (!checklist.size())

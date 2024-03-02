@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/01 09:47:41 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/02 15:37:18 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,15 +31,16 @@ class Server
 		std::string	host;
 		StringVector	serverNames;
 		ServerContext	serverCTX;
-
 	public:
 		Server(void);
 		Server(const Server& cpy);
 		Server(const ServerContext& _serverCTX);
 
-		void		setupServer(void);
-		std::string	getPort(void) const;
-		int			getSocketId(void) const;
+		void setupServer(void);
+		const std::string& getHost(void) const;
+		const std::string& getPort(void) const;
+		const ServerContext& getServerCTX(void) const;
+		int getSocketId(void) const;
 
 		Server&	operator=(const Server& cpy);
 

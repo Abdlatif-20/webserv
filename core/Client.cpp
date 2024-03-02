@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 13:13:35 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/02 16:00:52 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,6 @@ Client::Client(int sock)
 	responseDone = false;
 }
 
-// Client::Client(const Server &serverCTX)
-// {
-// 	this->serverCTX = serverCTX;
-// }
-
 Client::Client(const Client &cpy)
 {
 	*this = cpy;
@@ -38,24 +33,21 @@ Client::Client(const Client &cpy)
 
 int	Client::recvRequest(void)
 {
+	std::memset(buff, 0, sizeof(buff));
 	len = recv(sockId, buff, 1023, 0);
-	if (len < 0)
-	{
-		buff[0] = '\0';
-		return (-1);
-	}
-	buff[len] = '\0';
 	request.parseRequest(buff, config);
 	requestDone = true;
-	// ss << len;
+	responseDone = true;
 	return (len);
 }
 
 void	Client::sendResponse(void)
 {
-	send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
-	requestDone = false;
-	responseDone = true;
+	if (requestDone)
+	{
+		send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
+		requestDone = false;
+	}
 }
 
 void	Client::setConfig(const Config& conf)
@@ -82,10 +74,12 @@ Client	&Client::operator=(const Client &cpy)
 {
 	if (this != &cpy)
 	{
+		len = cpy.len;
 		sockId = cpy.sockId;
-		requestDone = false;
-		responseDone = false;
-		// serverCTX = cpy.serverCTX;
+		requestDone = cpy.requestDone;
+		responseDone = cpy.responseDone;
+		config = cpy.config;
+		request = cpy.request;
 	}
 	return (*this);
 }
