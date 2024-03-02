@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/01 11:19:46 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/02 15:31:17 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,6 @@ namespace Utils
 	std::string	getTokenNameFromDirective(t_directive d);
 	std::string getDefaultErrorPage(const std::string& status);
 
-	HostPort	getPortAndHost(const std::string& str);
 	t_directive getDirectiveFromTokenName(const std::string& tokenName);
 
 	std::vector<std::string> split(const std::string& str, const char sep);
