@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 16:50:51 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/03 11:11:10 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,10 +33,11 @@ Client::Client(const Client &cpy)
 
 int	Client::recvRequest(const ServerContext& serverCTX)
 {
-	bzero(buff, sizeof(buff));
+	std::memset(buff, 0, sizeof(buff));
 	len = recv(sockId, buff, 1023, 0);
 	request.parseRequest(buff, serverCTX);
 	requestDone = true;
+	responseDone = true;
 	return (len);
 }
 
@@ -45,7 +46,7 @@ void	Client::sendResponse(void)
 	if (requestDone)
 	{
 		send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
-		responseDone = true;
+		requestDone = false;
 	}
 }
 

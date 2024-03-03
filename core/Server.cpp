@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:55:56 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 15:53:42 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/02 19:32:54 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ void Server::setupServer(void)
 		throw(Fail(strerror(errno)));
 	int a = 1;
 	setsockopt(sockID, SOL_SOCKET, SO_REUSEADDR, &a, sizeof a);
+	setsockopt(sockID, SOL_SOCKET, SO_NOSIGPIPE, &a, sizeof a);
 	if (bind(sockID, (sockaddr *)&addr, sizeof addr) == -1)
 		throw(Fail(strerror(errno)));
 	if (listen(sockID, INT_MAX) == -1)

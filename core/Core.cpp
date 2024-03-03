@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 16:53:51 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/03 11:11:38 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,10 +81,9 @@ void	Core::traceEvents(void)
 			fd = accept(it->getSocketId(), NULL, 0);
 			if (fd != -1)
 			{
-				std::cout << "Client [" << fd << "] accepted" << std::endl;
 				clients[fd].setSockId(fd);
 				clients[fd].setConfig(config);
-				checklist.push_back((pollfd){fd, POLLIN | POLLOUT, 0});;
+				checklist.push_back((pollfd){fd, POLLIN | POLLOUT | POLLHUP, 0});
 			}
 		}
 		if (!checklist.size())
@@ -99,6 +98,7 @@ void	Core::traceEvents(void)
 			if (checklist[i].revents & POLLHUP)
 			{
 				clients.erase(checklist[i].fd);
+				// checklist.erase(checklist.begin() + i);
 			}
 		}
 	}
