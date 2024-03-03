@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 15:53:48 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/02 16:53:51 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ void	Core::traceEvents(void)
 		for (i = 0; i < checklist.size(); i++)
 		{
 			if (checklist[i].revents & POLLIN)
-				clients[checklist[i].fd].recvRequest();
+				clients[checklist[i].fd].recvRequest(it->getServerCTX());
 			if (checklist[i].revents & POLLOUT && clients[checklist[i].fd].isRequestDone())
 				clients[checklist[i].fd].sendResponse();
 			if (checklist[i].revents & POLLHUP)

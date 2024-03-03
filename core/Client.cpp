@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 15:43:54 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/02 16:50:51 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,11 @@ Client::Client(const Client &cpy)
 	*this = cpy;
 }
 
-int	Client::recvRequest(void)
+int	Client::recvRequest(const ServerContext& serverCTX)
 {
 	bzero(buff, sizeof(buff));
 	len = recv(sockId, buff, 1023, 0);
-	request.parseRequest(buff, config);
+	request.parseRequest(buff, serverCTX);
 	requestDone = true;
 	return (len);
 }
