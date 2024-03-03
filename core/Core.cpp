@@ -6,12 +6,12 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 19:34:16 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/03 20:46:04 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Core.hpp"
-
+#include "Vec.hpp"
 Core::Core(void)
 {
 
@@ -98,7 +98,7 @@ void	Core::traceEvents(void)
 			if (checklist[i].revents & POLLHUP)
 			{
 				clients.erase(checklist[i].fd);
-				// checklist.erase(checklist.begin() + i);
+				checklist.erase(i);
 			}
 		}
 	}
