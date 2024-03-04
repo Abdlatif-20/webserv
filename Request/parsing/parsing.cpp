@@ -6,11 +6,21 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/29 20:37:32 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/04 05:55:22 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
+
+//function to set the path to the upload store
+void	Request::setUploadingPath()
+{
+	ServersVector ref = config.getServers();
+	this->_path = ref[0].getUploadStore();
+	this->_path += "/";
+	if (!directoryExists(this->_path.c_str()))
+		mkdir(this->_path.c_str(), 0777);
+}
 
 //function to Check if transfer encoding is chunked Or not
 void	Request::parseTransferEncoding()
@@ -92,10 +102,12 @@ void	Request::parseUri()
 void	Request::parseBody()
 {
 	if (this->requestLine["method"] == "POST"
-			&& _headers.find("transfer-encoding") != _headers.end())
+			&& _headers.find("transfer-encoding") != _headers.end()
+			&& _headers.find("content-type") == _headers.end())
 			parseChunkedBody();
 	else if (this->requestLine["method"] == "POST"
-		&& _headers.find("content-type") != _headers.end())
+		&& _headers.find("content-type") != _headers.end()
+		&& _headers.find("transfer-encoding") == _headers.end())
 			parseBoundary();
 	else if (this->requestLine["method"] == "POST"
 			&& _headers.find("content-length") != _headers.end())
@@ -160,7 +172,7 @@ int	Request::takingRequests(const std::string& receivedRequest)
 	{
 		if (checkDuplicate(receivedRequest))
 			return 1;
-	}
+	}std::cout <<"status: " << this->status << std::endl;
 	if (foundUri)
 	{
 		if (requestInProgress)

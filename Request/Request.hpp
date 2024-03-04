@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/29 20:59:38 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/04 08:08:04 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ class Request
 		//vector
 		Vector	requestVector;
 		//strings
+		std::string _path;
 		std::string _body;
 		std::string	headers;
 		std::string	requestData;
@@ -107,6 +108,7 @@ class Request
 			void	ContentLength();
 			void	parseChunkedBody();
 			void	parseContentType();
+			void	setUploadingPath();
 			void	parseContentLength();
 			void	requestIsWellFormed();
 			void	parseTransferEncoding();
@@ -124,6 +126,7 @@ class Request
 	public:
 	/* *************************** constructors ****************************** */
 	
+	bool shortRequest;
 	bool _requestIsDone;
 		Request();
 		~Request();

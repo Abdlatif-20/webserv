@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/29 20:39:39 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/04 05:58:04 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,29 +17,29 @@
 
 Request::Request()
 {
-	status = OK;
-	detectHost = 0;
-	bodyDone = false;
-	foundUri = false;
-	receivecount = 0;
-	sizeBoundary = 0;
-	contentLength = 0;
-	multipart = false;
-	_setLength = false;
-	isComplete = false;
-	headersDone = false;
-	_requestIsDone = false;
-	requestLineDone = false;
-	requestInProgress = false;
-	remainingChunkLength = 0;
-	_requestIsWellFormed = false;
-
-	_body = "";
-	headers = "";
-	requestData = "";
-	_chunkedName = "";
+	this->status = OK;
+	this->detectHost = 0;
+	this->bodyDone = false;
+	this->foundUri = false;
+	this->receivecount = 0;
+	this->sizeBoundary = 0;
+	this->contentLength = 0;
+	this->multipart = false;
+	this->_setLength = false;
+	this->isComplete = false;
+	this->headersDone = false;
+	this->_requestIsDone = false;
+	this->requestLineDone = false;
+	this->requestInProgress = false;
+	this->remainingChunkLength = 0;
+	this->_requestIsWellFormed = false;
+	this->shortRequest = false;
+	this->_path = "";
+	this->_body = "";
+	this->headers = "";
+	this->requestData = "";
 	this->boundaryName = "";
-	config = Config();
+	this->config = Config();
 }
 
 Request::Request(const Request& obj)
@@ -71,11 +71,14 @@ Request& Request::operator=(const Request& obj)
 		this->headers = obj.headers;
 		this->requestData = obj.requestData;
 		this->boundaryName = obj.boundaryName;
-		this->_chunkedName = obj._chunkedName;
 		this->_requestIsDone = obj._requestIsDone;
 		this->_setLength = obj._setLength;
 		this->sizeBoundary = obj.sizeBoundary;
 		this->remainingChunkLength = obj.remainingChunkLength;
+		this->multipart = obj.multipart;
+		this->shortRequest = obj.shortRequest;
+		this->_path = obj._path;
+		this->_chunkedName = obj._chunkedName;
 	}
 	return (*this);
 }
@@ -148,6 +151,7 @@ void	Request::parseRequest(const std::string& receivedRequest, const Config& con
 {
 	this->config = config;
 	std::srand(time(0));
+	setUploadingPath();
 	if (!this->requestLineDone || !this->headersDone || !this->_requestIsWellFormed)
 	{
 		if (takingRequests(receivedRequest))
@@ -165,18 +169,15 @@ void	Request::parseRequest(const std::string& receivedRequest, const Config& con
 				return;
 			this->_body = receivedRequest;
 		}
-	// std::cout << "status: " << status << std::endl;
-	// std::cout <<"_body: " << _body << std::endl;
 		if (!this->_body.empty())
 			parseBody();
+		if (this->_body.empty() && this->shortRequest)
+		{
+			this->receivecount++;
+			return;
+		}
 	}
 	if ((this->requestLine["method"] == "GET" && this->_requestIsWellFormed)
 		|| (this->requestLine["method"] == "POST" && this->_requestIsWellFormed && this->bodyDone))
 		this->_requestIsDone = true;
-	std::cout <<"--------------------------------------"<< std::endl;
-	// std::cout << "size boundary: " << sizeBoundary << std::endl;
-	// std::cout <<"startBoundary: " << _Boundary << std::endl;
-	Utils::printMap(_headers);
-	std::cout <<"--------------------------------------"<< std::endl;
-	// Utils::printMap(requestLine);
 }

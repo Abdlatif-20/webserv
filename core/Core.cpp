@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:09:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/29 21:03:05 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/04 05:59:53 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,31 @@ Core::~Core()
 
 }
 
+
+
+bool    Core::ifShortRequest(char *buffer, std::string &temp, std::vector<Client> &clients, int i)
+{
+    if (BUFFER_SIZE >= 1024)
+        return false;
+    if (!temp.empty() && temp.find("\r\n\r\n") == std::string::npos)
+    {
+        temp += std::string(buffer, clients[i].getRecvBytes());
+        return true;
+    }
+    else
+    {
+        clients[i].getRequest().shortRequest = true;
+        clients[i].getRequest().parseRequest(temp, config);
+    }
+    return false;
+}
+
 void Core::startWorking()
 {
     std::vector<Server>::iterator it;
     int client_fd;
-    char buffer[1024];
+    char buffer[BUFFER_SIZE];
+    std::string temp ="";
     std::vector<pollfd>::iterator pollfd_it;
 
     while (true)
@@ -78,7 +98,8 @@ void Core::startWorking()
             if (poll_fds[i].revents & POLLIN)
             {
                 bzero(buffer, sizeof(buffer));
-                clients[i].setRecvBytes(recv(poll_fds[i].fd, buffer, 1023, 0));
+                clients[i].setRecvBytes(recv(poll_fds[i].fd, buffer, sizeof(buffer) - 1, 0));
+                if (ifShortRequest(buffer, temp, clients, i)) continue;
                 clients[i].getRequest().parseRequest(std::string(buffer, clients[i].getRecvBytes()), config);
                 // std::cout<<"status of client [" << clients[i].getClient_fd() << "] : " << clients[i].getRequest().getStatus() << std::endl;
             }

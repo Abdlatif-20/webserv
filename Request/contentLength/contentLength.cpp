@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/29 20:35:46 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/04 02:52:28 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,36 +30,29 @@ void	Request::ContentLength()
 	std::string path = requestLine["path"];
 	std::string extension = "";
 	
+	if (contentLength < _body.size())
+		return (status = BadRequest, void());
 	if (!file.is_open())
 	{
 		if (path == "/")
-			file.open("body" + randomStr + ".txt", std::ios::app);
+			file.open(this->_path + "body" + randomStr + ".txt", std::ios::app);
 		else
 		{
 			path = path.substr(1);
-			size_t pos = path.find(".");
+			size_t pos = path.find_last_of(".");
 			if (pos != std::string::npos)
 				extension = path.substr(pos + 1);
 			path = path.substr(0, pos);
-			file.open(path + randomStr + "." + extension, std::ios::app);
+			file.open(this->_path + path + randomStr + "." + extension, std::ios::app);
 		}
 		if (!file.is_open())
-			status = BadRequest;
+			return (status = BadRequest, void());
 	}
 	if (bodyDone == false)
 	{
-		if (contentLength < _body.size())
-		{
-			file << _body.substr(0, contentLength);
-			_body = _body.substr(contentLength);
-			contentLength = 0;
-		}
-		else
-		{
-			file << _body;
-			contentLength -= _body.size();
-			receivecount++;
-		}
+		file << _body;
+		contentLength -= _body.size();
+		receivecount++;
 	}
 	if (contentLength == 0)
 	{

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:12:18 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/29 20:58:27 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/04 02:52:28 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,8 @@ std::string Request::prepareFileName(std::string line)
 {
 	std::string filename = "";
 	std::string extension = "";
-	std::string path = "";
 	size_t posFile = line.find("filename=");
 	size_t posName = line.find("name=");
-	ServersVector ref = config.getServers();
-	path = ref[0].getUploadStore();
-	if (!directoryExists(path.c_str()))
-		mkdir(path.c_str(), 0777);
-	path += "/";
 	if (posFile != std::string::npos)
 	{
 		filename = line.substr(posFile + 10);
@@ -68,6 +62,6 @@ std::string Request::prepareFileName(std::string line)
 	extension = filename.substr(filename.find_last_of(".") + 1);
 	int random = std::rand() % 1000;
 	filename = filename.substr(0, filename.find_last_of("."));
-	filename = path + filename + "_" + Utils::intToString(random) + "." + extension;
+	filename = this->_path + filename + "_" + Utils::intToString(random) + "." + extension;
 	return (filename);
 }
