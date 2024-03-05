@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/02 15:31:25 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/05 18:51:18 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,4 +169,21 @@ std::string Utils::getTokenNameFromDirective(t_directive d)
 bool Utils::stringStartsWith(const std::string& str, const std::string& prefix)
 {
 	return (!std::strncmp(str.c_str(), prefix.c_str(), prefix.length()));
+}
+
+std::string Utils::getCurrentTime()
+{
+    std::string strTime;
+    std::time_t t = std::time(0);
+    std::tm* now = std::localtime(&t);
+    int year, month, day, hour, min, sec;
+    year = now->tm_year + 1900;
+    month = now->tm_mon + 1;
+    day = now->tm_mday;
+    hour = now->tm_hour;
+    min = now->tm_min;
+    sec = now->tm_sec;
+    strTime = Utils::intToString(year) + "-" + Utils::intToString(month) + "-" + Utils::intToString(day);
+    strTime += " " + Utils::intToString(hour) + ":" + Utils::intToString(min) + ":" + Utils::intToString(sec);
+    return strTime;
 }
