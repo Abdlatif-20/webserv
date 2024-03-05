@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 12:09:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/04 05:59:13 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/04 22:16:05 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,5 +33,4 @@ class Core
         ~Core();
 
         void startWorking();
-        bool    ifShortRequest(char *buffer, std::string &temp, std::vector<Client> &clients, int i);
 };

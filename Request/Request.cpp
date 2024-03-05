@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/04 05:58:04 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/04 22:16:33 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ Request::Request()
 	this->requestInProgress = false;
 	this->remainingChunkLength = 0;
 	this->_requestIsWellFormed = false;
-	this->shortRequest = false;
 	this->_path = "";
 	this->_body = "";
 	this->headers = "";
@@ -76,7 +75,6 @@ Request& Request::operator=(const Request& obj)
 		this->sizeBoundary = obj.sizeBoundary;
 		this->remainingChunkLength = obj.remainingChunkLength;
 		this->multipart = obj.multipart;
-		this->shortRequest = obj.shortRequest;
 		this->_path = obj._path;
 		this->_chunkedName = obj._chunkedName;
 	}
@@ -171,11 +169,6 @@ void	Request::parseRequest(const std::string& receivedRequest, const Config& con
 		}
 		if (!this->_body.empty())
 			parseBody();
-		if (this->_body.empty() && this->shortRequest)
-		{
-			this->receivecount++;
-			return;
-		}
 	}
 	if ((this->requestLine["method"] == "GET" && this->_requestIsWellFormed)
 		|| (this->requestLine["method"] == "POST" && this->_requestIsWellFormed && this->bodyDone))

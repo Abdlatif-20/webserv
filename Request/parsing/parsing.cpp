@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/04 05:55:22 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/04 22:18:25 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,7 @@ int	Request::takingRequests(const std::string& receivedRequest)
 	{
 		if (checkDuplicate(receivedRequest))
 			return 1;
-	}std::cout <<"status: " << this->status << std::endl;
+	}
 	if (foundUri)
 	{
 		if (requestInProgress)
