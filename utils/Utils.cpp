@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/05 18:51:18 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/05 19:12:40 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,4 +186,16 @@ std::string Utils::getCurrentTime()
     strTime = Utils::intToString(year) + "-" + Utils::intToString(month) + "-" + Utils::intToString(day);
     strTime += " " + Utils::intToString(hour) + ":" + Utils::intToString(min) + ":" + Utils::intToString(sec);
     return strTime;
+}
+
+std::string Utils::readFile(const std::string& filePath)
+{
+    std::string line;
+    std::ifstream ifs(filePath);
+    std::string text;
+    if (!ifs.good())
+        throw std::runtime_error("can't open file");
+    while (std::getline(ifs, line))
+        text += line;
+    return text;
 }

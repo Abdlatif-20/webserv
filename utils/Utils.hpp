@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/05 18:48:35 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/05 19:09:01 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,4 +53,5 @@ namespace Utils
 	bool		stringStartsWith(const std::string& str, const std::string& prefix);
 
 	std::string getCurrentTime();
+	std::string readFile(const std::string& filePath);
 };
