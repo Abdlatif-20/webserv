@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 19:34:16 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/06 17:02:40 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,9 +60,6 @@ void	Core::run(void)
 			}
 		}
 	}
-	kq = kqueue();
-	if (kq == -1)
-		throw Fail(strerror(errno));
 	traceEvents();
 }
 
@@ -95,10 +92,10 @@ void	Core::traceEvents(void)
 				clients[checklist[i].fd].recvRequest();
 			if (checklist[i].revents & POLLOUT && clients[checklist[i].fd].isRequestDone())
 				clients[checklist[i].fd].sendResponse();
-			if (checklist[i].revents & POLLHUP)
+			if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].isResponseDone())
 			{
 				clients.erase(checklist[i].fd);
-				// checklist.erase(checklist.begin() + i);
+				checklist.erase(checklist.begin() + i--);
 			}
 		}
 	}
@@ -116,5 +113,4 @@ Core	&Core::operator=(const Core &cpy)
 
 Core::~Core(void)
 {
-	close(kq);
 }

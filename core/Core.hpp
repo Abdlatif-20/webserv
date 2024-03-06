@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:21:50 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/01 17:02:25 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/06 17:02:21 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,13 +35,11 @@
 class Core
 {
 	private:
-		int	kq;
 		long	size;
 		Config	config;
 		ServersVector	serversConf;
 		std::vector<Server>	servers;
 		std::map<int, Client>	clients;
-		// struct kevent	triggered[OPEN_MAX];
 		std::vector<struct pollfd>	checklist;
 
 		typedef std::vector<Server>::iterator	servers_it;
