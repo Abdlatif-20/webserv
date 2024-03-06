@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/05 19:12:40 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/06 10:22:35 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,13 @@ t_directive Utils::getDirectiveFromTokenName(const std::string& tokenName)
 
 std::string Utils::getDefaultErrorPage(const std::string& status)
 {
-    std::string errors[12] =
+    std::string errors[24] =
     {
-        "400", "403", "404", "405", "408", "411",
-        "414", "429", "500", "501", "502", "505"
+        "400", "401", "402", "403", "404", "405", "406", "407", "408",
+        "409", "410", "411", "412", "413", "414", "415", "416", "417",
+        "500", "501", "502", "503", "504", "505"
     };
-    for (size_t i = 0; i < 12; i++)
+    for (size_t i = 0; i < 24; i++)
         if (status == errors[i])
             return "assets/www/error/" + status + ".html";
     return "";
