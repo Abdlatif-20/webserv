@@ -5,32 +5,60 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/20 12:09:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/04 22:16:05 by aben-nei         ###   ########.fr       */
+/*   Created: 2024/02/15 17:21:50 by houmanso          #+#    #+#             */
+/*   Updated: 2024/03/05 02:42:00 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#ifndef CORE_HPP
+#define CORE_HPP
+
+#include <climits>
+#include <iostream>
+
+#include <libc.h>
+#include <netdb.h>
+#include <sys/time.h>
+#include <sys/poll.h>
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/socket.h>
 
 #include "Config.hpp"
 #include "Server.hpp"
 #include "Client.hpp"
-#include <poll.h>
+#include "Vec.hpp"
+
+#define JJJ "HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\r\nServer: Apache/2.2.14 (Win32)\r\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd"
+
 
 #define BUFFER_SIZE 1024
 class Core
 {
-    private:
-        Config config;
-        std::vector<Server> servers;
-        std::vector<Client> clients;
-        std::vector<pollfd> poll_fds;
-    public:
-        Core();
-        Core(const Config& config);
-        Core(const Core& obj);
-        Core& operator=(const Core& obj);
-        ~Core();
+	private:
+		int	kq;
+		long	size;
+		Config	config;
+		ServersVector	serversConf;
+		std::vector<Server>	servers;
+		std::map<int, Client>	clients;
+		// struct kevent	triggered[OPEN_MAX];
+		Vec	checklist;
 
-        void startWorking();
+		typedef std::vector<Server>::iterator	servers_it;
+
+	public:
+		Core(void);
+		Core(const Core& cpy);
+		Core(const Config& conf);
+
+		void	run(void);
+		void	traceEvents(void);
+
+		Core&	operator=(const Core& cpy);
+
+		~Core(void);
 };
+
+#endif

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/29 01:51:43 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/05 02:44:05 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,6 +129,14 @@ int Utils::stringToInt(const std::string& str)
 	return result;
 }
 
+void	Utils::setupAddr(sockaddr_in *addr, int port)
+{
+	std::memset(addr, 0, sizeof(sockaddr_in));
+	addr->sin_port = htons(port);
+	addr->sin_family = AF_INET;
+	addr->sin_addr.s_addr = INADDR_ANY;
+}
+
 std::string Utils::getTokenNameFromDirective(t_directive d)
 {
 	switch (d)
@@ -177,4 +185,9 @@ void	Utils::decodeUri(std::string& uri)
 			decoded += uri[i];
 	}
 	uri = decoded;
+}
+
+bool Utils::stringStartsWith(const std::string& str, const std::string& prefix)
+{
+	return (!std::strncmp(str.c_str(), prefix.c_str(), prefix.length()));
 }

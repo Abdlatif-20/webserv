@@ -5,53 +5,46 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/12 21:23:57 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/24 18:34:00 by mel-yous         ###   ########.fr       */
+/*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
+/*   Updated: 2024/03/02 15:37:18 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#pragma once
+#ifndef SERVER_HPP
+#define SERVER_HPP
 
-#include <sys/socket.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <string>
-#include <fcntl.h>
-#include <unistd.h>
-#include <exception>
-#include <limits>
-#include <errno.h>
 #include <iostream>
-#include <vector>
-#include <poll.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <libc.h>
+#include <netdb.h>
+#include "Utils.hpp"
+#include "ServerContext.hpp"
 
 class Server
 {
-    private:
-        std::string host;
-        std::string port;
-        addrinfo *serverInfo; //to be added to assigment operator
-        int server_fd;
-    public:
-        Server();
-        Server(const std::string& host, const std::string& port);
-        Server(const Server& obj);
-        Server& operator=(const Server& obj);
-        ~Server();
+	private:
+		int	sockID;
+		sockaddr_in	addr;
+		std::string	port;
+		std::string	host;
+		StringVector	serverNames;
+		ServerContext	serverCTX;
+	public:
+		Server(void);
+		Server(const Server& cpy);
+		Server(const ServerContext& _serverCTX);
 
-        const std::string& getServerHost();
-        const std::string& getServerPort();
-        addrinfo* getServerInfo();
-        int getServer_fd();
+		void setupServer(void);
+		const std::string& getHost(void) const;
+		const std::string& getPort(void) const;
+		const ServerContext& getServerCTX(void) const;
+		int getSocketId(void) const;
 
-        class ServerErrorException : public std::exception
-        {
-            private:
-                std::string str;
-            public:
-                ServerErrorException(const std::string& str);
-                const char* what() const throw();
-                ~ServerErrorException() throw();
-        };
+		Server&	operator=(const Server& cpy);
+
+		~Server(void);
 };
+
+#endif

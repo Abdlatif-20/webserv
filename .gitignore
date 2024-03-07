@@ -1,7 +1,12 @@
 
 *.o
 *.pdf
+*/*.pdf
+*/*.o
+*.pdf
 *.tldr
 *.txt
 obj/
+.vscode/
 webserv
+.DS_Store

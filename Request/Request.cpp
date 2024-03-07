@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/04 22:16:33 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/05 04:34:12 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,6 +140,16 @@ const bool& Request::getRequestLineDone() const
 const bool& Request::getFoundUri() const
 {
 	return (foundUri);
+}
+
+const std::string& Request::getMethod() const
+{
+	return requestLine.at("method");
+}
+
+const std::string& Request::getHost() const
+{
+	return _headers.at("host");
 }
 
 /* *************************** methods *************************** */

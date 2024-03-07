@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/04 22:16:08 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/07 01:05:50 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,8 +132,8 @@ class Request
 		Request(const Request& obj);
 		Request& operator=(const Request& obj);
 
-	typedef std::invalid_argument InvalidRequest;
-	void	parseRequest(const std::string& receivedRequest, const Config& config);
+		typedef std::invalid_argument InvalidRequest;
+		void	parseRequest(const std::string& receivedRequest, const Config& config);
 
 	/* *************************** getters ************************************ */
 		const int& getStatus() const;
@@ -147,4 +147,6 @@ class Request
 		const std::string& getHeaderByName(const std::string& name) const;
 		const bool& getRequestLineDone() const;
 		const bool& getFoundUri() const;
+		const std::string& getMethod() const;
+		const std::string& getHost() const;
 };

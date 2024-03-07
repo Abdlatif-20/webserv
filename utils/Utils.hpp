@@ -6,12 +6,18 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/29 20:08:28 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/05 02:45:02 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include <string>
+#include <iostream>
+#include <sstream>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include "Defs.hpp"
 #include "Defs.hpp"
 #include <iostream>
 #include <cstring>
@@ -25,8 +31,6 @@
 #include <map>
 #include <fstream>
 
-#define MAX_CLIENTS 10
-#define BUFFER_SIZE 1024
 namespace Utils
 {
 		std::string strTrim(const std::string& str, char c);
@@ -43,4 +47,6 @@ namespace Utils
 		int stringToInt(const std::string& str);
 		int     runServer(char **av);
 		void	decodeUri(std::string& uri);
+		bool		stringStartsWith(const std::string& str, const std::string& prefix);
+		void		setupAddr(sockaddr_in *addr, int port);
 };

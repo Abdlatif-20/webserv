@@ -3,62 +3,88 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/26 11:53:47 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/05 04:32:49 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
 
-Client::Client()
+Client::Client(void)
 {
-
+	sockId = -1;
+	requestDone = false;
+	responseDone = false;
 }
 
-Client::Client(int client_fd)
+Client::Client(int sock)
 {
-    this->client_fd = client_fd;
-    this->recvBytes = -1;
+	sockId = sock;
+	requestDone = false;
+	responseDone = false;
 }
 
-Client::Client(const Client& obj)
+Client::Client(const Client &cpy)
 {
-    *this = obj;
+	*this = cpy;
 }
 
-Client& Client::operator=(const Client& obj)
+int	Client::recvRequest(void)
 {
-    if (this == &obj)
-        return *this;
-    client_fd = obj.client_fd;
-    recvBytes = obj.recvBytes;
-    req = obj.req;
-    return *this;
+	std::memset(buff, 0, sizeof(buff));
+	len = recv(sockId, buff, 1023, 0);
+	request.parseRequest(buff, config);
+	requestDone = true;
+	responseDone = true;
+	return (len);
 }
 
-Client::~Client()
+void	Client::sendResponse(void)
 {
-
+	if (requestDone)
+	{
+		send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
+		requestDone = false;
+	}
 }
 
-int Client::getClient_fd() const
+void	Client::setConfig(const Config& conf)
 {
-    return client_fd;
+	config = conf;
 }
 
-ssize_t Client::getRecvBytes() const
+bool	Client::isRequestDone(void) const
 {
-    return recvBytes;
+	return (requestDone);
 }
 
-void Client::setRecvBytes(ssize_t r)
+bool	Client::isResponseDone(void) const
 {
-    recvBytes = r;
+	return (responseDone);
 }
 
-Request& Client::getRequest()
+void	Client::setSockId(int sock)
 {
-    return req;
+	sockId = sock;
+}
+
+Client	&Client::operator=(const Client &cpy)
+{
+	if (this != &cpy)
+	{
+		len = cpy.len;
+		sockId = cpy.sockId;
+		requestDone = cpy.requestDone;
+		responseDone = cpy.responseDone;
+		config = cpy.config;
+		request = cpy.request;
+	}
+	return (*this);
+}
+
+Client::~Client(void)
+{
+	close(sockId);
 }

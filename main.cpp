@@ -6,35 +6,38 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/29 20:21:51 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/05 02:41:38 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
 #include "Config.hpp"
-#include "Server.hpp"
 #include "Core.hpp"
 
 int main(int argc, char **argv)
 {
-    std::string configPath = "webserv.conf";
-    try
-    {
-        if (argc == 2)
-            configPath = argv[1];
-        else if (argc > 2)
-            throw "Error: invalid number of args";
-        Config config(configPath);
-        Core _core(config);
-        _core.startWorking();
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-    }
-    catch(const char* msg)
-    {
-        std::cerr << msg << std::endl;
-    }
-    return 0;
+	std::string configPath = "webserv.conf";
+	try
+	{
+		if (argc == 2)
+			configPath = argv[1];
+		else if (argc > 2)
+			throw Fail("Error: invalid number of args");
+		try
+		{
+			Config	_config(configPath);
+			Core core(_config);
+			core.run();
+		}
+		catch(const std::exception& e)
+		{
+			std::cerr << e.what() << '\n';
+		}
+		
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << "ERROR : " << e.what() << '\n';
+	}
+	return 0;
 }
