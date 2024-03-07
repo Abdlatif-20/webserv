@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/02 16:41:54 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/07 14:54:30 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ class Request
 		// content length
 		unsigned int	_contentLength;
 		ServerContext serverCTX;
+		LocationContext locationCtx;
 		//maps
 		std::map<std::string, std::string> _headers;
 		std::map<std::string, std::string> _requestLine;
@@ -128,4 +129,5 @@ class Request
 		const bool& getFoundUri() const;
 		const std::string& getMethod() const;
 		const std::string& getHost() const;
+		const LocationContext& getLocationCtx() const;
 };

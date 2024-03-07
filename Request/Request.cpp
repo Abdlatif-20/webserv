@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/02 16:54:23 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/07 15:08:12 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ Request& Request::operator=(const Request& obj)
 		headers = obj.headers;
 		_requestData = obj._requestData;
 		_boundaryName = obj._boundaryName;
+		locationCtx = obj.locationCtx;
 	}
 	return (*this);
 }
@@ -137,6 +138,11 @@ const std::string& Request::getMethod() const
 const std::string& Request::getHost() const
 {
 	return _headers.at("host");
+}
+
+const LocationContext& Request::getLocationCtx() const
+{
+	return locationCtx;
 }
 
 /* *************************** methods *************************** */
