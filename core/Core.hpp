@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Core.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:21:50 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/01 17:02:25 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/03 17:54:03 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ class Core
 		ServersVector	serversConf;
 		std::vector<Server>	servers;
 		std::map<int, Client>	clients;
-		// struct kevent	triggered[OPEN_MAX];
 		std::vector<struct pollfd>	checklist;
 
 		typedef std::vector<Server>::iterator	servers_it;

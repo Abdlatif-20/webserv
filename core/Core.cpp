@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/03 11:11:38 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/05 21:05:47 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,8 +70,8 @@ void	Core::traceEvents(void)
 {
 	int	fd;
 	int	hooks;
-	size_t	i;
 	servers_it	it;
+	std::vector<struct pollfd>::iterator checklist_iter;
 
 	std::cout << "Server is running ..." << std::endl;
 	while (true)
@@ -82,25 +82,50 @@ void	Core::traceEvents(void)
 			if (fd != -1)
 			{
 				clients[fd].setSockId(fd);
-				clients[fd].setConfig(config);
-				checklist.push_back((pollfd){fd, POLLIN | POLLOUT | POLLHUP, 0});
+				clients[fd].setServerCTX(it->getServerCTX());
+				checklist.push_back((pollfd){fd, POLLIN | POLLOUT, 0});
 			}
 		}
 		if (!checklist.size())
 			continue ;
 		hooks = poll(checklist.data(), checklist.size(), 0);
-		for (i = 0; i < checklist.size(); i++)
+		checklist_iter = checklist.begin();
+		while (checklist_iter != checklist.end())
 		{
-			if (checklist[i].revents & POLLIN)
-				clients[checklist[i].fd].recvRequest(it->getServerCTX());
-			if (checklist[i].revents & POLLOUT && clients[checklist[i].fd].isRequestDone())
-				clients[checklist[i].fd].sendResponse();
-			if (checklist[i].revents & POLLHUP)
+			if (checklist_iter->revents & POLLIN)
 			{
-				clients.erase(checklist[i].fd);
-				// checklist.erase(checklist.begin() + i);
+				clients[checklist_iter->fd].recvRequest();
 			}
+			else if (checklist_iter->revents & POLLOUT)
+			{
+				if (clients[checklist_iter->fd].isRequestDone())
+					clients[checklist_iter->fd].sendResponse();
+			}
+			if (clients[checklist_iter->fd].isResponseDone())
+			{
+				close(checklist_iter->fd);
+				clients.erase(checklist_iter->fd);
+				checklist.erase(checklist_iter);
+			}
+			if (checklist.size() > 0 && checklist_iter != checklist.end())
+				checklist_iter++;
 		}
+		// for (size_t i = 0; i < checklist.size(); i++)
+		// {
+		// 	if (checklist[i].revents & POLLIN)
+		// 		clients[checklist[i].fd].recvRequest();
+		// 	else if (checklist[i].revents & POLLOUT)
+		// 	{
+		// 		if (clients[checklist[i].fd].isRequestDone())
+		// 			clients[checklist[i].fd].sendResponse();
+		// 	}
+		// 	if (checklist[i].revents & POLLHUP)
+		// 	{
+		// 		close(checklist[i].fd);
+		// 		// clients.erase(checklist[i].fd);
+		// 		// clients.erase(checklist.begin() + i);
+		// 	}
+		// }
 	}
 }
 

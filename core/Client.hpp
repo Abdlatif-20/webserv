@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:50:55 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 16:51:03 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/05 16:39:44 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,16 +29,17 @@ class Client
 		Config	config;
 		Request request;
 		Response response;
+		ServerContext serverCTX;
 	public:
 		Client(void);
 		Client(int sock);
 		Client(const Client& cpy);
 
-		int		recvRequest(const ServerContext& serverCTX);
+		int		recvRequest(void);
 		void	sendResponse(void);
 
 		void	setSockId(int sock);
-		void	setConfig(const Config& conf);
+		void	setServerCTX(const ServerContext& serverCTX);
 
 		bool	isRequestDone(void) const;
 		bool	isResponseDone(void) const;

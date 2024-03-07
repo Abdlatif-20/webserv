@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/03 11:11:10 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/07 15:02:51 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,13 +31,13 @@ Client::Client(const Client &cpy)
 	*this = cpy;
 }
 
-int	Client::recvRequest(const ServerContext& serverCTX)
+int	Client::recvRequest(void)
 {
 	std::memset(buff, 0, sizeof(buff));
 	len = recv(sockId, buff, 1023, 0);
 	request.parseRequest(buff, serverCTX);
 	requestDone = true;
-	responseDone = true;
+	responseDone = false;
 	return (len);
 }
 
@@ -45,14 +45,20 @@ void	Client::sendResponse(void)
 {
 	if (requestDone)
 	{
-		send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
+		// send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
+		response.setServerCtx(serverCTX);
+		response.setRequest(request);
+		std::string resp = response.generateResponse();
+		send(sockId, resp.c_str(), resp.length(), 0);
+		response.setStatusCode(0);
 		requestDone = false;
+		responseDone = true;
 	}
 }
 
-void	Client::setConfig(const Config& conf)
+void	Client::setServerCTX(const ServerContext& serverCTX)
 {
-	config = conf;
+	this->serverCTX = serverCTX;
 }
 
 bool	Client::isRequestDone(void) const
@@ -80,6 +86,7 @@ Client	&Client::operator=(const Client &cpy)
 		responseDone = cpy.responseDone;
 		config = cpy.config;
 		request = cpy.request;
+		serverCTX = cpy.serverCTX;
 	}
 	return (*this);
 }
