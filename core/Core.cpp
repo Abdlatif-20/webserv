@@ -6,9 +6,10 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/07 16:48:50 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/07 17:35:44 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include "Core.hpp"
 #include "Vec.hpp"
@@ -79,7 +80,6 @@ void	Core::traceEvents(void)
 			if (fd != -1)
 			{
 				clients[fd].setSockId(fd);
-				clients[fd].setConfig(config);
 				checklist.push_back((pollfd){fd, POLLIN | POLLOUT | POLLHUP, 0});
 			}
 		}

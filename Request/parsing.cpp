@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/03 11:12:20 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/07 15:07:35 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,10 @@ void	Request::requestIsWellFormed()
 void	Request::findUri()
 {
 	std::string uri = _requestLine["path"];
-	if (serverCTX.matchLocation(uri).getPrefix() != "")
+	LocationContext _locationCtx = serverCTX.matchLocation(uri);
+	if (_locationCtx.getPrefix() != "")
 	{
+		this->locationCtx = _locationCtx;
 		_foundUri = true;
 		return;
 	}

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/02 16:54:23 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/07 18:39:21 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ Request& Request::operator=(const Request& obj)
 		headers = obj.headers;
 		_requestData = obj._requestData;
 		_boundaryName = obj._boundaryName;
+		locationCtx = obj.locationCtx;
 	}
 	return (*this);
 }
@@ -129,7 +130,24 @@ const bool& Request::getFoundUri() const
 	return (_foundUri);
 }
 
-const std::string& Request::getMethod() const
+bool	Request::isDone(void) const
+{
+	if (_status != 200)
+		return (true);
+	else if (_headersDone)
+	{
+		try
+		{
+			if (getMethod() == "POST" && !_bodyDone)
+				return (false);
+			return (true);
+		}
+		catch(const std::exception& e){}
+	}
+	return false;
+}
+
+const std::string &Request::getMethod() const
 {
 	return _requestLine.at("method");
 }
@@ -137,6 +155,11 @@ const std::string& Request::getMethod() const
 const std::string& Request::getHost() const
 {
 	return _headers.at("host");
+}
+
+const LocationContext& Request::getLocationCtx() const
+{
+	return locationCtx;
 }
 
 /* *************************** methods *************************** */

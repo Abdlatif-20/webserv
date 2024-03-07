@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/01 11:08:48 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/07 11:21:16 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ int main(int argc, char **argv)
 		try
 		{
 			Config	_config(configPath);
+			Response::initReasonPhrases();
+			Response::initMimeTypes();
 			Core core(_config);
 			core.run();
 		}

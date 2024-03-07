@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/18 13:29:55 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/06 19:42:24 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,8 +88,8 @@ std::string Context::getRoot() const
 {
     DirectivesMap::const_iterator it = directives.find("root");
     if (it != directives.end())
-        return *it->second.cbegin();
-    return "assets/www";
+        return *it->second.cbegin() + "/";
+    return "assets/www/";
 }
 
 /* The `std::string Context::getIndex() const` function in the `Context` class is a const member
@@ -206,5 +206,5 @@ std::string Context::getErrorPage(const std::string& status) const
         }
         it++;
     }
-    return Utils::getDefaultErrorPage(status);
+    return "";
 }

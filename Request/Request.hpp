@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/02 16:41:54 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/07 18:27:29 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ class Request
 		// content length
 		unsigned int	_contentLength;
 		ServerContext serverCTX;
+		LocationContext locationCtx;
 		//maps
 		std::map<std::string, std::string> _headers;
 		std::map<std::string, std::string> _requestLine;
@@ -126,6 +127,9 @@ class Request
 		const std::string& getHeaderByName(const std::string& name) const;
 		const bool& getRequestLineDone() const;
 		const bool& getFoundUri() const;
+
+		bool	isDone(void) const;
 		const std::string& getMethod() const;
 		const std::string& getHost() const;
+		const LocationContext& getLocationCtx() const;
 };
