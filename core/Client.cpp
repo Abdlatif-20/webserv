@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/03 11:11:10 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/07 11:24:27 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,11 +31,11 @@ Client::Client(const Client &cpy)
 	*this = cpy;
 }
 
-int	Client::recvRequest(const ServerContext& serverCTX)
+int	Client::recvRequest(void)
 {
 	std::memset(buff, 0, sizeof(buff));
 	len = recv(sockId, buff, 1023, 0);
-	request.parseRequest(buff, serverCTX);
+	// request.parseRequest(buff, serverCTX);
 	requestDone = true;
 	responseDone = true;
 	return (len);
