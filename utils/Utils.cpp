@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/06 10:22:35 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/07 11:20:24 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,20 +36,6 @@ t_directive Utils::getDirectiveFromTokenName(const std::string& tokenName)
         if (tokenName == tokens[i])
             return static_cast<t_directive>(i);
     return UNKNOWN;
-}
-
-std::string Utils::getDefaultErrorPage(const std::string& status)
-{
-    std::string errors[24] =
-    {
-        "400", "401", "402", "403", "404", "405", "406", "407", "408",
-        "409", "410", "411", "412", "413", "414", "415", "416", "417",
-        "500", "501", "502", "503", "504", "505"
-    };
-    for (size_t i = 0; i < 24; i++)
-        if (status == errors[i])
-            return "assets/www/error/" + status + ".html";
-    return "";
 }
 
 std::vector<std::string> Utils::splitRequest(const std::string& str, const char *sep)
@@ -192,11 +178,24 @@ std::string Utils::getCurrentTime()
 std::string Utils::readFile(const std::string& filePath)
 {
     std::string line;
+    struct stat statBuffer;
+    if (stat(filePath.c_str(), &statBuffer) == -1)
+        throw FileNotFoundException();
+    if (S_ISDIR(statBuffer.st_mode) || !(S_IRUSR & statBuffer.st_mode))
+        throw FilePermissionDenied();
     std::ifstream ifs(filePath);
     std::string text;
     if (!ifs.good())
-        throw std::runtime_error("can't open file");
+        throw FileNotFoundException();
     while (std::getline(ifs, line))
         text += line;
     return text;
+}
+
+std::string Utils::getFileExtension(const std::string& filePath)
+{
+    size_t i = filePath.find_last_of('.');
+    if (i != std::string::npos)
+        return filePath.substr(i, filePath.length());
+    return "";
 }

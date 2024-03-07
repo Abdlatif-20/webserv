@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/05 19:09:01 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/07 11:20:37 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 #include <map>
 #include <fstream>
 #include <ctime>
+#include <sys/stat.h>
 
 namespace Utils
 {
@@ -38,7 +39,6 @@ namespace Utils
 	std::string	strTrim(const std::string& str, char c);
 	std::string getTokenNameFromDirective(t_directive d);
 	std::string	getTokenNameFromDirective(t_directive d);
-	std::string getDefaultErrorPage(const std::string& status);
 
 	t_directive getDirectiveFromTokenName(const std::string& tokenName);
 
@@ -54,4 +54,14 @@ namespace Utils
 
 	std::string getCurrentTime();
 	std::string readFile(const std::string& filePath);
+	std::string getFileExtension(const std::string& filePath);
+
+	class FileNotFoundException : public std::exception
+	{
+		
+	};
+	class FilePermissionDenied : public std::exception
+	{
+		
+	};
 };
