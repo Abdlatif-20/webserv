@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 15:37:18 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/07 17:24:19 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,11 @@ class Server
 {
 	private:
 		int	sockID;
-		sockaddr_in	addr;
 		std::string	port;
 		std::string	host;
-		StringVector	serverNames;
+		struct addrinfo	*res;
 		ServerContext	serverCTX;
+		StringVector	serverNames;
 	public:
 		Server(void);
 		Server(const Server& cpy);

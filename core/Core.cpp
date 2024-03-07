@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/07 11:25:29 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/07 16:48:50 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,29 +38,29 @@ Core::Core(const Config &conf)
 
 void	Core::run(void)
 {
+	size_t			k;
 	StringVector	ports;
 	StringVector::iterator	p;
 	std::vector<Server>::iterator	it;
 
+	k = 0;
 	size = servers.size();
 	for(int i = 0; i < size; i++)
 	{
-		p = std::find(ports.begin(), ports.end(), servers[i].getPort());
-		if (p == ports.end())
+		try
 		{
-			try
-			{
-				servers[i].setupServer();
-				ports.push_back(servers[i].getPort());
-				fcntl(servers[i].getSocketId(), F_SETFL, O_NONBLOCK, FD_CLOEXEC);
-			}
-			catch (const std::exception& e)
-			{
-				std::cerr << e.what() << std::endl;
-			}
+			servers[i].setupServer();
+			ports.push_back(servers[i].getPort());
+			fcntl(servers[i].getSocketId(), F_SETFL, O_NONBLOCK, FD_CLOEXEC);
+			k++;
+		}
+		catch (const std::exception& e)
+		{
+			std::cerr << "Server creating failed : " << e.what() << std::endl;
 		}
 	}
-	traceEvents();
+	if (k)
+		traceEvents();
 }
 
 void	Core::traceEvents(void)
