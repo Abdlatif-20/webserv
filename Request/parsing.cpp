@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/02 17:11:16 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/03 11:12:20 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,25 +45,12 @@ void	Request::requestIsWellFormed()
 void	Request::findUri()
 {
 	std::string uri = _requestLine["path"];
-	ServersVector ref = _config.getServers();
-	ServersVector::iterator s_iter = ref.begin();
-
-	for (; s_iter != ref.end(); s_iter++)
+	if (serverCTX.matchLocation(uri).getPrefix() != "")
 	{
-		LocationsVector loc = s_iter->getLocations();
-		LocationsVector::iterator l_iter = loc.begin();
-		for (; l_iter != loc.end(); l_iter++)
-		{
-			if (uri == l_iter->getPrefix())
-			{
-				// std::cout << "Matched: " << l_iter->getPrefix() << std::endl;
-				_foundUri = true;
-				return;
-			}
-		}
+		_foundUri = true;
+		return;
 	}
-	if (_foundUri == false)
-		_status = NotFound;
+	_status = NotFound;
 }
 
 //function to separate the request line And the headers from the request

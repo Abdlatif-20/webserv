@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/26 11:18:59 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/02 16:54:58 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,7 @@ std::string Request::prepareFileName(std::string line)
 	std::string path;
 	size_t posFile = line.find("filename=");
 	size_t posName = line.find("name=");
-	ServersVector ref = _config.getServers();
-	path = ref[0].getUploadStore();
+	path = serverCTX.getUploadStore();
 	if (!directoryExists(path.c_str()))
 		mkdir(path.c_str(), 0777);
 	path += "/";

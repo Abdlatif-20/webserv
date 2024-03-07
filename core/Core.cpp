@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/07 10:49:54 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/07 11:20:47 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,12 +89,14 @@ void	Core::traceEvents(void)
 		for (i = 0; i < checklist.size(); i++)
 		{
 			if (checklist[i].revents & POLLIN)
-				clients[checklist[i].fd].recvRequest();
+				clients[checklist[i].fd].recvRequest(it->getServerCTX());
 			if (checklist[i].revents & POLLOUT && clients[checklist[i].fd].isRequestDone())
 				clients[checklist[i].fd].sendResponse();
 			if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].isResponseDone())
+			if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].isResponseDone())
 			{
 				clients.erase(checklist[i].fd);
+				checklist.erase(checklist.begin() + i--);
 				checklist.erase(checklist.begin() + i--);
 			}
 		}

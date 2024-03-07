@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:50:55 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 15:42:26 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/02 16:51:03 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ class Client
 		Client(int sock);
 		Client(const Client& cpy);
 
-		int		recvRequest(void);
+		int		recvRequest(const ServerContext& serverCTX);
 		void	sendResponse(void);
 
 		void	setSockId(int sock);
