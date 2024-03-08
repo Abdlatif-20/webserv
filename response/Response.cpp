@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/07 22:28:58 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/08 03:28:39 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,6 @@ std::string Response::generateResponse()
 {
     if (!statusCode)
         statusCode = request.getStatus();
-    std::cout << "status code: " << statusCode << std::endl;
     std::string errorPage;
     if (statusCode >= 400)
     {

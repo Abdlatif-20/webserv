@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/07 22:04:13 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/08 03:27:10 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,15 +62,18 @@ void Request::parseBoundary()
 		file.open(this->boundaryName, std::ios::app);
 		if (!file.is_open())
 			return (status = BadRequest, this->requestIscomplete = true, void());
+		files.push_back(this->boundaryName);
 	}
 		if (sizeBoundary <= contentLength)
 		{
-			if (_body.find(lastBoundary) == std::string::npos)
+			size_t posLastBoundary = _body.find(lastBoundary);
+			size_t posFirstBoundary = _body.find(firstBoundary);
+			if (posLastBoundary == std::string::npos)
 			{
-				if (_body.find(firstBoundary) != std::string::npos)
+				if (posFirstBoundary != std::string::npos)
 				{
-					file << _body.substr(0, _body.find(firstBoundary) - 2);
-					_body = _body.substr(_body.find(firstBoundary) - 2);
+					file << _body.substr(0, posFirstBoundary - 2);
+					_body = _body.substr(posFirstBoundary - 2);
 					file.close();
 					this->boundaryName = "";
 					multipart = true;
@@ -87,12 +90,12 @@ void Request::parseBoundary()
 			}
 			else
 			{
-				file << _body.substr(0, _body.find(lastBoundary) - 2);
+				file << _body.substr(0, posLastBoundary - 2);
 				file.close();
 				if (sizeBoundary != contentLength)
 				{
 					sizeBoundary = 0;
-					std::remove(this->boundaryName.c_str());
+					removeFiles(files);
 					return (status = BadRequest, this->requestIscomplete = true, void());
 				}
 				bodyDone = true;
@@ -103,7 +106,7 @@ void Request::parseBoundary()
 		else
 		{
 			sizeBoundary = 0;
-			std::remove(this->boundaryName.c_str());
+			removeFiles(files);
 			return (status = BadRequest, this->requestIscomplete = true, void());
 		}
 	

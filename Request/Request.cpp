@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 00:15:07 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/08 03:22:42 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ Request::Request()
 	this->headers = "";
 	this->requestData = "";
 	this->boundaryName = "";
+	this->_chunkedName = "";
 }
 
 Request::Request(const Request& obj)
@@ -193,9 +194,5 @@ void	Request::parseRequest(const std::string& receivedRequest, const ServerConte
 		}
 		if (!this->_body.empty())
 			parseBody();
-	}
-	else if (this->requestLine["method"] != "POST" && this->requestLineDone && this->headersDone && this->_requestIsWellFormed)
-	{
-		this->requestIscomplete = true;
 	}
 }

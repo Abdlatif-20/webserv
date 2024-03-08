@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:40:48 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 02:01:31 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/08 02:46:46 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,6 @@ void	Request::preparLengthAndName(size_t pos, std::string& length, std::ofstream
 	if (!_setLength && (pos = _body.find("\r\n")) != std::string::npos)
 	{
 		length = _body.substr(0, pos);
-		// if (length.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
-		// 	return (remainingChunkLength = length.size(), void());
 		remainingChunkLength = convertToDecimal(length);
 		_body = _body.substr(pos + 2);
 		_setLength = true;

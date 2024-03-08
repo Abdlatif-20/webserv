@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/07 22:21:47 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/08 03:11:07 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ void	Request::separateRequest(std::string receivedRequest)
 	if (pos != std::string::npos)
 	{
 		this->headers = receivedRequest.substr(0, pos + 4);
-		_body = receivedRequest.substr(pos + 4);
+		this->_body = receivedRequest.substr(pos + 4);
 	}
 	else
 	{
