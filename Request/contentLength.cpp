@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   contentLength.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 00:05:13 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/08 12:39:37 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,12 @@
 //function to parse the content length
 void	Request::parseContentLength()
 {
-	// int ClientMaxBody = serverCTX.getClientMaxBodySize();
 	if (_headers["content-length"].find_first_not_of("0123456789") != std::string::npos)
 	{
 		status = BadRequest;
 		requestIscomplete = true;
 	}
-	if (Utils::stringToInt(_headers["content-length"]) > MAX_BODY_SIZE)
+	if (Utils::stringToInt(_headers["content-length"]) > locationCtx.getClientMaxBodySize())
 	{
 		status = RequestEntityTooLarge;
 		requestIscomplete = true;

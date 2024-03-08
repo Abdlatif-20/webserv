@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 03:22:42 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/08 11:05:44 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ Request& Request::operator=(const Request& obj)
 		this->headers = obj.headers;
 		this->headers = obj.headers;
 		this->bodyDone = obj.bodyDone;
-		locationCtx = obj.locationCtx;
+		this->locationCtx = obj.locationCtx;
 		this->foundUri = obj.foundUri;
 		this->multipart = obj.multipart;
 		this->_setLength = obj._setLength;
@@ -183,6 +183,10 @@ void	Request::parseRequest(const std::string& receivedRequest, const ServerConte
 			}
 			return;
 		}
+	}
+	if (this->requestLine["method"] != "POST" && this->_requestIsWellFormed && this->headersDone && this->requestLineDone)
+	{
+		this->requestIscomplete = true;
 	}
 	if (this->requestLine["method"] == "POST" && !this->bodyDone && this->_requestIsWellFormed && this->status == 200)
 	{

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fillRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/07 22:18:55 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/08 10:19:52 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void	Request::fillRequestLine(const std::string& requestLine)
 	this->requestLineDone = true;
 	this->requestLine = requestLineMap;	
 	fillParams();
-	// findUri();
+	findUri();
 	parseUri();
 }
 

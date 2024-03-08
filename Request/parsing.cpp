@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 03:11:07 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/08 08:52:56 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,8 +165,8 @@ int	Request::takingRequests(const std::string& receivedRequest)
 		if (checkDuplicate(receivedRequest))
 			return 1;
 	}
-	// if (foundUri)
-	// {
+	if (foundUri)
+	{
 		if (requestInProgress)
 			requestVector = Utils::splitRequest(requestData, CRLF);
 		else
@@ -177,6 +177,6 @@ int	Request::takingRequests(const std::string& receivedRequest)
 		fillHeaders(requestVector); //fill the headers to the map
 		requestIsWellFormed(); //check if the request is well formed
 		receivecount++;
-	// }
+	}
 	return 0;
 }
