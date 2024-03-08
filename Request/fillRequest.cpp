@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/05 02:42:30 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/07 22:18:55 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,11 @@ void	Request::fillHeaders(Vector headers)
 		}
 	}
 	if (checkHostIsFound != 1)
+	{
 		this->status = BadRequest;
+		requestIscomplete = true;
+		return;
+	}
 	this->headersDone = true;
 }
 
@@ -43,33 +47,37 @@ void	Request::fillHeaders(Vector headers)
 void	Request::fillRequestLine(const std::string& requestLine)
 {
 	if (!requestLine.size())
-		return(this->status = BadRequest, void());
+		return(this->status = BadRequest, requestIscomplete = true, void());
 	Vector requestLineVector;
 	Map requestLineMap;
 	requestLineVector = Utils::split(requestLine, ' ');
 	if (requestLineVector.size() != 3)
-		return(this->status = BadRequest, void());
+		return(this->status = BadRequest, requestIscomplete = true, void());
 	if (requestLineVector.front() != "GET" && requestLineVector.front() != "POST"
 		&& requestLineVector.front() != "DELETE")
 	{
 		if (requestLineVector.front() != "HEAD" && requestLineVector.front() != "PUT"
 			&& requestLineVector.front() != "CONNECT" && requestLineVector.front() != "OPTIONS"
 				&& requestLineVector.front() != "TRACE")
-				this->status = MethodNotAllowed;
+				{
+					this->status = MethodNotAllowed;
+					requestIscomplete = true;
+				}
 		else
+		{
 			this->status = NotImplemented;
+			requestIscomplete = true;
+		}
 		return;
 	}
-	if (requestLineVector[1].front() != '/')
-		return (this->status = BadRequest, void());
-	if (requestLineVector[2] != "HTTP/1.1")
-		return (this->status = BadRequest, void());
+	if (requestLineVector[1].front() != '/' || requestLineVector[2] != "HTTP/1.1")
+		return (this->status = BadRequest, requestIscomplete = true, void());
 	requestLineMap["method"] = requestLineVector[0];
 	requestLineMap["path"] = requestLineVector[1];
 	this->requestLineDone = true;
-	this->requestLine = requestLineMap;
+	this->requestLine = requestLineMap;	
 	fillParams();
-	findUri();
+	// findUri();
 	parseUri();
 }
 
@@ -77,6 +85,8 @@ void	Request::fillParams()
 {
 	Vector sepPath;
 	std::string path = this->requestLine["path"];
+	if (path.find('?') == std::string::npos)
+		return;
 	sepPath = Utils::split(path, '?');
 	this->requestLine["path"] = sepPath[0];
 	if (sepPath.size() > 1)

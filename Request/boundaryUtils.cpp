@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:12:18 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/04 02:52:28 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/07 23:11:18 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ std::string Request::prepareFileName(std::string line)
 		if (posFile != std::string::npos)
 			filename = filename.substr(0, filename.find("\""));
 		else
-			return (status = BadRequest, "");
+			return (status = BadRequest, requestIscomplete = true, "");
 	}
 	else if (posName != std::string::npos)
 	{
@@ -55,11 +55,11 @@ std::string Request::prepareFileName(std::string line)
 		if (posFile != std::string::npos)
 			filename = filename.substr(0, filename.find("\""));
 		else
-			return (status = BadRequest, "");
+			return (status = BadRequest, requestIscomplete = true, "");
 	}
 	if (filename.empty())
 		return (filename);
-	extension = filename.substr(filename.find_last_of(".") + 1);
+	extension = Utils::getFileExtension(filename);
 	int random = std::rand() % 1000;
 	filename = filename.substr(0, filename.find_last_of("."));
 	filename = this->_path + filename + "_" + Utils::intToString(random) + "." + extension;

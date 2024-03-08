@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/05 02:45:02 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/07 20:27:34 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@
 #include <sstream>
 #include <map>
 #include <fstream>
+#include <ctime>
+#include <sys/stat.h>
 
 namespace Utils
 {
@@ -49,4 +51,16 @@ namespace Utils
 		void	decodeUri(std::string& uri);
 		bool		stringStartsWith(const std::string& str, const std::string& prefix);
 		void		setupAddr(sockaddr_in *addr, int port);
+		std::string getCurrentTime();
+		std::string readFile(const std::string& filePath);
+		std::string getFileExtension(const std::string& filePath);
+
+		class FileNotFoundException : public std::exception
+		{
+			
+		};
+		class FilePermissionDenied : public std::exception
+		{
+			
+		};
 };

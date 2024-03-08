@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/04 02:52:28 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/08 00:05:13 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,17 @@
 //function to parse the content length
 void	Request::parseContentLength()
 {
+	// int ClientMaxBody = serverCTX.getClientMaxBodySize();
 	if (_headers["content-length"].find_first_not_of("0123456789") != std::string::npos)
+	{
 		status = BadRequest;
+		requestIscomplete = true;
+	}
 	if (Utils::stringToInt(_headers["content-length"]) > MAX_BODY_SIZE)
+	{
 		status = RequestEntityTooLarge;
+		requestIscomplete = true;
+	}
 	contentLength = Utils::stringToInt(_headers["content-length"]);
 }
 
@@ -31,7 +38,7 @@ void	Request::ContentLength()
 	std::string extension = "";
 	
 	if (contentLength < _body.size())
-		return (status = BadRequest, void());
+		return (status = BadRequest, requestIscomplete = true, void());
 	if (!file.is_open())
 	{
 		if (path == "/")
@@ -46,7 +53,7 @@ void	Request::ContentLength()
 			file.open(this->_path + path + randomStr + "." + extension, std::ios::app);
 		}
 		if (!file.is_open())
-			return (status = BadRequest, void());
+			return (status = BadRequest, requestIscomplete = true, void());
 	}
 	if (bodyDone == false)
 	{

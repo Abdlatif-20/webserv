@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/07 01:05:50 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/08 02:01:27 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,14 +44,14 @@ Hello world
 enum Errors
 {
 	OK = 200,
-	NotImplemented = 501,
-	BadRequest = 400,
-	RequestURITooLong = 414,
-	RequestEntityTooLarge = 413,
 	NotFound = 404,
+	BadRequest = 400,
 	LengthRequired = 411,
 	MovedPermanently = 301,
 	MethodNotAllowed = 405,
+	NotImplemented = 501,
+	RequestURITooLong = 414,
+	RequestEntityTooLarge = 413,
 };
 
 #define CR '\r'
@@ -85,13 +85,15 @@ class Request
 		// content length
 		unsigned int	contentLength;
 		unsigned int	sizeBoundary;
-		Config config;
+		ServerContext serverCTX;
+		LocationContext locationCtx;
 		//maps
 		Map _headers;
 		Map requestLine;
 		Map params;
 		//vector
 		Vector	requestVector;
+		Vector	files;
 		//strings
 		std::string _path;
 		std::string _body;
@@ -123,17 +125,17 @@ class Request
 			int		checkDuplicate(const std::string& receivedRequest);
 			int		takingRequests(const std::string& receivedRequest);
 			void	preparLengthAndName(size_t pos, std::string& length, std::ofstream& file);
+			bool requestIscomplete;
 	public:
 	/* *************************** constructors ****************************** */
 	
-	bool _requestIsDone;
 		Request();
 		~Request();
 		Request(const Request& obj);
 		Request& operator=(const Request& obj);
 
 		typedef std::invalid_argument InvalidRequest;
-		void	parseRequest(const std::string& receivedRequest, const Config& config);
+		void	parseRequest(const std::string& receivedRequest, const ServerContext& serverCTX);
 
 	/* *************************** getters ************************************ */
 		const int& getStatus() const;
@@ -147,6 +149,9 @@ class Request
 		const std::string& getHeaderByName(const std::string& name) const;
 		const bool& getRequestLineDone() const;
 		const bool& getFoundUri() const;
+
+		bool	isDone(void) const;
 		const std::string& getMethod() const;
 		const std::string& getHost() const;
+		const LocationContext& getLocationCtx() const;
 };

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/05 02:44:05 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/07 20:26:36 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,4 +190,46 @@ void	Utils::decodeUri(std::string& uri)
 bool Utils::stringStartsWith(const std::string& str, const std::string& prefix)
 {
 	return (!std::strncmp(str.c_str(), prefix.c_str(), prefix.length()));
+}
+
+std::string Utils::getCurrentTime()
+{
+    std::string strTime;
+    std::time_t t = std::time(0);
+    std::tm* now = std::localtime(&t);
+    int year, month, day, hour, min, sec;
+    year = now->tm_year + 1900;
+    month = now->tm_mon + 1;
+    day = now->tm_mday;
+    hour = now->tm_hour;
+    min = now->tm_min;
+    sec = now->tm_sec;
+    strTime = Utils::intToString(year) + "-" + Utils::intToString(month) + "-" + Utils::intToString(day);
+    strTime += " " + Utils::intToString(hour) + ":" + Utils::intToString(min) + ":" + Utils::intToString(sec);
+    return strTime;
+}
+
+std::string Utils::readFile(const std::string& filePath)
+{
+    std::string line;
+    struct stat statBuffer;
+    if (stat(filePath.c_str(), &statBuffer) == -1)
+        throw FileNotFoundException();
+    if (S_ISDIR(statBuffer.st_mode) || !(S_IRUSR & statBuffer.st_mode))
+        throw FilePermissionDenied();
+    std::ifstream ifs(filePath);
+    std::string text;
+    if (!ifs.good())
+        throw FileNotFoundException();
+    while (std::getline(ifs, line))
+        text += line;
+    return text;
+}
+
+std::string Utils::getFileExtension(const std::string& filePath)
+{
+    size_t i = filePath.find_last_of('.');
+    if (i != std::string::npos)
+        return filePath.substr(i, filePath.length());
+    return "";
 }

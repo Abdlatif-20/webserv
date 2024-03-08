@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/05 04:38:31 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/07 22:21:47 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,7 @@
 //function to set the path to the upload store
 void	Request::setUploadingPath()
 {
-	ServersVector ref = config.getServers();
-	this->_path = ref[0].getUploadStore();
+	this->_path = serverCTX.getUploadStore();
 	this->_path += "/";
 	if (!directoryExists(this->_path.c_str()))
 		mkdir(this->_path.c_str(), 0777);
@@ -26,16 +25,19 @@ void	Request::setUploadingPath()
 void	Request::parseTransferEncoding()
 {
 	if (_headers["transfer-encoding"] != "chunked")
+	{
 		this->status = NotImplemented;
+		requestIscomplete = true;
+	}
 }
 
 //function to check if the request Line is well formed And Set the status To true If all is well
 void	Request::requestIsWellFormed()
 {
 	if (this->requestLine["path"].size() > 2048)
-		return (this->status = RequestURITooLong, void());
+		return (this->status = RequestURITooLong, requestIscomplete = true, void());
 	if (this->requestLine["path"].find_first_not_of(ALLOWED_CHARACTERS) != std::string::npos)
-		return (this->status = BadRequest, void());
+		return (this->status = BadRequest, requestIscomplete = true, void());
 	if (this->requestLine["method"] == "POST")
 	{
 		if (_headers.find("content-type") != _headers.end()
@@ -46,7 +48,7 @@ void	Request::requestIsWellFormed()
 		else if (_headers.find("content-length") != _headers.end())
 			parseContentLength();
 		else
-			return (this->status = BadRequest, void());
+			return (this->status = BadRequest, requestIscomplete = true, void());
 	}
 	_requestIsWellFormed = true;
 }
@@ -54,29 +56,16 @@ void	Request::requestIsWellFormed()
 //function to find the uri in the config file and set the status to true if found
 void	Request::findUri()
 {
-	std::string uri = this->requestLine["path"];
-	ServersVector ref = this->config.getServers();
-	ServersVector::iterator s_iter = ref.begin();
-
-	for (; s_iter != ref.end(); s_iter++)
+	std::string uri = requestLine["path"];
+	LocationContext _locationCtx = serverCTX.matchLocation(uri);
+	if (_locationCtx.getPrefix() != "")
 	{
-		LocationsVector loc = s_iter->getLocations();
-		LocationsVector::iterator l_iter = loc.begin();
-		for (; l_iter != loc.end(); l_iter++)
-		{
-			if (uri == l_iter->getPrefix())
-			{
-				std::cout << "Matched: " << l_iter->getPrefix() <<" with the config file" << std::endl;
-				this->foundUri = true;
-				return;
-			}
-		}
+		this->locationCtx = _locationCtx;
+		foundUri = true;
+		return;
 	}
-	if (this->foundUri == false)
-	{
-		std::cout << uri << " not found in the config file" << std::endl;
-		this->status = NotFound;
-	}
+	status = NotFound;
+	requestIscomplete = true;
 }
 
 //function to separate the request line And the headers from the request
@@ -89,7 +78,10 @@ void	Request::separateRequest(std::string receivedRequest)
 		_body = receivedRequest.substr(pos + 4);
 	}
 	else
+	{
 		this->status = BadRequest;
+		requestIscomplete = true;
+	}
 }
 
 void	Request::parseUri()
@@ -151,7 +143,7 @@ int	Request::checkDuplicate(const std::string& receivedRequest)
 				|| value.find("CONNECT") != std::string::npos
 				|| value.find("OPTIONS") != std::string::npos
 				|| value.find("TRACE") != std::string::npos)
-					return (this->status = BadRequest, 0);
+					return (this->status = BadRequest, requestIscomplete = true, 0);
 		}
 		if (receivedRequest.find("host") != std::string::npos)
 			detectHost++;
@@ -173,8 +165,8 @@ int	Request::takingRequests(const std::string& receivedRequest)
 		if (checkDuplicate(receivedRequest))
 			return 1;
 	}
-	if (foundUri)
-	{
+	// if (foundUri)
+	// {
 		if (requestInProgress)
 			requestVector = Utils::splitRequest(requestData, CRLF);
 		else
@@ -185,6 +177,6 @@ int	Request::takingRequests(const std::string& receivedRequest)
 		fillHeaders(requestVector); //fill the headers to the map
 		requestIsWellFormed(); //check if the request is well formed
 		receivecount++;
-	}
+	// }
 	return 0;
 }

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:21:50 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/05 02:42:00 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/07 20:24:48 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,14 +37,12 @@
 class Core
 {
 	private:
-		int	kq;
 		long	size;
 		Config	config;
 		ServersVector	serversConf;
 		std::vector<Server>	servers;
 		std::map<int, Client>	clients;
-		// struct kevent	triggered[OPEN_MAX];
-		Vec	checklist;
+		std::vector<struct pollfd>	checklist;
 
 		typedef std::vector<Server>::iterator	servers_it;
 

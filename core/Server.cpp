@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:55:56 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/02 19:32:54 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/07 17:29:25 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,23 @@ Server::Server(void)
 
 Server::Server(const ServerContext &_serverCTX)
 {
+	struct addrinfo	hints;
+	int ret;
+
 	sockID = -1;
 	serverCTX = _serverCTX;
 	host = serverCTX.getHost();
 	port = serverCTX.getPort();
-	std::cout << host << " " << port << '\n';
+	res = NULL;
+	std::memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_PASSIVE;
+	if ((ret = getaddrinfo(host.c_str(), port.c_str(), &hints, &res)) < 0)
+		throw (Fail(gai_strerror(ret)));
+	std::cout << "setuping " << host << ":" << port << " ...\n";
 	serverNames = serverCTX.getServerName();
-	Utils::setupAddr(&addr, std::atoi(port.c_str()));
+	serverNames.push_back(host);
 }
 
 int	Server::getSocketId(void) const
@@ -36,14 +46,23 @@ int	Server::getSocketId(void) const
 
 void Server::setupServer(void)
 {
-	sockID = socket(AF_INET, SOCK_STREAM, 0);
-	if (sockID == -1)
-		throw(Fail(strerror(errno)));
 	int a = 1;
-	setsockopt(sockID, SOL_SOCKET, SO_REUSEADDR, &a, sizeof a);
-	setsockopt(sockID, SOL_SOCKET, SO_NOSIGPIPE, &a, sizeof a);
-	if (bind(sockID, (sockaddr *)&addr, sizeof addr) == -1)
-		throw(Fail(strerror(errno)));
+	for (; res != NULL; res = res->ai_next)
+	{
+		sockID = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
+		if (sockID == -1)
+			continue ;
+		if (setsockopt(sockID, SOL_SOCKET, SO_REUSEADDR, &a, sizeof a) < 0
+			|| setsockopt(sockID, SOL_SOCKET, SO_NOSIGPIPE, &a, sizeof a) < 0
+			|| bind(sockID, res->ai_addr, res->ai_addrlen) < 0)
+		{
+			close(sockID);
+			continue ;
+		}
+		break;
+	}
+	if (!res)
+		throw(Fail("Failed to bind with any address"));
 	if (listen(sockID, INT_MAX) == -1)
 		throw(Fail(strerror(errno)));
 }
@@ -72,11 +91,11 @@ Server &Server::operator=(const Server &cpy)
 {
 	if (this != &cpy)
 	{
-		sockID = cpy.sockID;
-		serverCTX = cpy.serverCTX;
-		addr = cpy.addr;
+		res = cpy.res;
 		host = cpy.host;
 		port = cpy.port;
+		sockID = cpy.sockID;
+		serverCTX = cpy.serverCTX;
 		serverNames = cpy.serverNames;
 	}
 	return (*this);

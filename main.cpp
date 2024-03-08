@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/05 02:41:38 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/07 20:23:58 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ int main(int argc, char **argv)
 		try
 		{
 			Config	_config(configPath);
+			Response::initReasonPhrases();
+			Response::initMimeTypes();
 			Core core(_config);
 			core.run();
 		}

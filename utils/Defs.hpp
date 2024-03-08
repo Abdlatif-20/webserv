@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 14:36:15 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/01 11:11:32 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/07 11:15:43 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,8 @@ class Token;
 class LocationContext;
 
 #define HTTP_VERSION "HTTP/1.1"
+#define SERVER "WebServer 1.0"
+#define UNKNOWN_MIMETYPE "application/octet-stream"
 
 typedef std::vector<std::string> StringVector;
 typedef std::pair<std::string, StringVector> Directive;
@@ -29,7 +31,6 @@ typedef std::map<std::string, StringVector>  DirectivesMap;
 typedef std::vector<ServerContext> ServersVector;
 typedef std::vector<Token> TokensVector;
 typedef std::vector<LocationContext> LocationsVector;
-typedef std::pair<std::string, std::string> HostPort;
 typedef std::invalid_argument	Fail;
 
 typedef enum e_directive

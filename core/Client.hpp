@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:50:55 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/05 02:45:33 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/07 20:24:33 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,16 @@ class Client
 {
 	private:
 		ssize_t	len;
+
 		int		sockId;
 		char	buff[1024];
 		bool	requestDone;
 		bool	responseDone;
+
 		Config	config;
 		Request request;
 		Response response;
+		ServerContext serverCTX;
 	public:
 		Client(void);
 		Client(int sock);
@@ -38,7 +41,7 @@ class Client
 		void	sendResponse(void);
 
 		void	setSockId(int sock);
-		void	setConfig(const Config& conf);
+		void	setServerCTX(const ServerContext& serverCTX);
 
 		bool	isRequestDone(void) const;
 		bool	isResponseDone(void) const;

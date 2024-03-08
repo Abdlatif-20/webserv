@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/05 02:42:08 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/07 22:04:13 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,23 @@
 void Request::parseContentType()
 {
 	if (_headers["content-type"].find("boundary") == std::string::npos)
+	{
 		status = BadRequest;
+		requestIscomplete = true;
+	}
 	else if (isExist(_headers, "content-length") == "")
+	{
 		status = LengthRequired;
+		requestIscomplete = true;
+	}
 	contentLength = Utils::stringToInt(_headers["content-length"]);
 }
 
+void	removeFiles(Vector files)
+{
+	for (size_t i = 0; i < files.size(); i++)
+		std::remove(files[i].c_str());
+}
 
 // function to parse the boundary and write the actual file
 void Request::parseBoundary()
@@ -38,7 +49,7 @@ void Request::parseBoundary()
 	{
 		this->boundaryName = prepareFileName(_body);
 		if (this->boundaryName == "")
-			return(status = BadRequest, void());
+			return(status = BadRequest, this->requestIscomplete = true, void());
 		pos = _body.find("\r\n\r\n");
 		if (pos != std::string::npos)
 			_body = _body.substr(pos + 4);
@@ -50,7 +61,8 @@ void Request::parseBoundary()
 	{
 		file.open(this->boundaryName, std::ios::app);
 		if (!file.is_open())
-			return (status = BadRequest, void());
+			return (status = BadRequest, this->requestIscomplete = true, void());
+	}
 		if (sizeBoundary <= contentLength)
 		{
 			if (_body.find(lastBoundary) == std::string::npos)
@@ -81,9 +93,10 @@ void Request::parseBoundary()
 				{
 					sizeBoundary = 0;
 					std::remove(this->boundaryName.c_str());
-					return (status = BadRequest, void());
+					return (status = BadRequest, this->requestIscomplete = true, void());
 				}
 				bodyDone = true;
+				this->requestIscomplete = true;
 				sizeBoundary = 0;
 			}
 		}
@@ -91,9 +104,8 @@ void Request::parseBoundary()
 		{
 			sizeBoundary = 0;
 			std::remove(this->boundaryName.c_str());
-			return (status = BadRequest, void());
+			return (status = BadRequest, this->requestIscomplete = true, void());
 		}
-	}
 	
 	receivecount++;
 }
