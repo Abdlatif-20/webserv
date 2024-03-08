@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/05 02:41:45 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/08 12:21:39 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,14 @@ void Config::parseLocation(TokensVector::iterator& tok_iter, ServerContext& serv
             d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
             parseDirective(tok_iter, locationCtx);
             tok_iter++;
+        }
+        DirectivesMap::const_iterator it = serverCtx.getDirectives().cbegin();
+        while (it != serverCtx.getDirectives().cend())
+        {
+            if (it->first != "listen" && it->first != "server_name"
+                && locationCtx.getDirectives().count(it->first) == 0)
+                locationCtx.addDirective(*it);
+            it++;
         }
         serverCtx.addLocation(locationCtx);
     }
