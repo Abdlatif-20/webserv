@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/07 18:39:21 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/08 03:22:42 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,22 +17,28 @@
 
 Request::Request()
 {
-	_status = 200;
-	_detectHost = 0;
-	_bodyDone = false;
-	_foundUri = false;
-	_receivecount = 0;
-	_contentLength = 0;
-	_isComplete = false;
-	_headersDone = false;
-	_requestLineDone = false;
-	requestInProgress = false;
-	_requestIsWellFormed = false;
-	_body = "";
-	_params = "";
-	headers = "";
-	_requestData = "";
-	_boundaryName = "";
+	this->status = OK;
+	this->detectHost = 0;
+	this->bodyDone = false;
+	this->foundUri = false;
+	this->receivecount = 0;
+	this->sizeBoundary = 0;
+	this->contentLength = 0;
+	this->multipart = false;
+	this->_setLength = false;
+	this->isComplete = false;
+	this->headersDone = false;
+	this->requestIscomplete = false;
+	this->requestLineDone = false;
+	this->requestInProgress = false;
+	this->remainingChunkLength = 0;
+	this->_requestIsWellFormed = false;
+	this->_path = "";
+	this->_body = "";
+	this->headers = "";
+	this->requestData = "";
+	this->boundaryName = "";
+	this->_chunkedName = "";
 }
 
 Request::Request(const Request& obj)
@@ -44,27 +50,33 @@ Request& Request::operator=(const Request& obj)
 {
 	if (this != &obj)
 	{
-		_status = obj._status;
-		_detectHost = obj._detectHost;
-		_bodyDone = obj._bodyDone;
-		_foundUri = obj._foundUri;
-		_receivecount = obj._receivecount;
-		_contentLength = obj._contentLength;
-		_isComplete = obj._isComplete;
-		_headersDone = obj._headersDone;
-		_requestLineDone = obj._requestLineDone;
-		requestInProgress = obj.requestInProgress;
-		_requestIsWellFormed = obj._requestIsWellFormed;
-		serverCTX = obj.serverCTX;
-		_headers = obj._headers;
-		_requestLine = obj._requestLine;
-		_requestVector = obj._requestVector;
-		_body = obj._body;
-		_params = obj._params;
-		headers = obj.headers;
-		_requestData = obj._requestData;
-		_boundaryName = obj._boundaryName;
+		this->_body = obj._body;
+		this->_path = obj._path;
+		this->status = obj.status;
+		this->params = obj.params;
+		this->headers = obj.headers;
+		this->headers = obj.headers;
+		this->bodyDone = obj.bodyDone;
 		locationCtx = obj.locationCtx;
+		this->foundUri = obj.foundUri;
+		this->multipart = obj.multipart;
+		this->_setLength = obj._setLength;
+		this->isComplete = obj.isComplete;
+		this->detectHost = obj.detectHost;
+		this->requestLine = obj.requestLine;
+		this->headersDone = obj.headersDone;
+		this->requestData = obj.requestData;
+		this->receivecount = obj.receivecount;
+		this->_chunkedName = obj._chunkedName;
+		this->sizeBoundary = obj.sizeBoundary;
+		this->boundaryName = obj.boundaryName;
+		this->contentLength = obj.contentLength;
+		this->requestVector = obj.requestVector;
+		this->requestLineDone = obj.requestLineDone;
+		this->requestIscomplete = obj.requestIscomplete;
+		this->requestInProgress = obj.requestInProgress;
+		this->_requestIsWellFormed = obj._requestIsWellFormed;
+		this->remainingChunkLength = obj.remainingChunkLength;
 	}
 	return (*this);
 }
@@ -87,17 +99,17 @@ const std::map<std::string, std::string>&	Request::getHeaders() const
 
 const std::map<std::string, std::string>&	Request::getRequestLine() const
 {
-	return (_requestLine);
+	return (requestLine);
 }
 
 const int&	Request::getStatus() const
 {
-	return (_status);
+	return (status);
 }
 
 void	Request::setStatus(int status)
 {
-	_status = status;
+	this->status = status;
 }
 
 const bool& Request::getRequestIsWellFormed() const
@@ -107,12 +119,12 @@ const bool& Request::getRequestIsWellFormed() const
 
 const bool& Request::getBodyDone() const
 {
-	return (_bodyDone);
+	return (bodyDone);
 }
 
 const bool& Request::getHeadersDone() const
 {
-	return (_headersDone);
+	return (headersDone);
 }
 
 const std::string& Request::getHeaderByName(const std::string& name) const
@@ -122,34 +134,22 @@ const std::string& Request::getHeaderByName(const std::string& name) const
 
 const bool& Request::getRequestLineDone() const
 {
-	return (_requestLineDone);
+	return (requestLineDone);
 }
 
 const bool& Request::getFoundUri() const
 {
-	return (_foundUri);
+	return (foundUri);
 }
 
 bool	Request::isDone(void) const
 {
-	if (_status != 200)
-		return (true);
-	else if (_headersDone)
-	{
-		try
-		{
-			if (getMethod() == "POST" && !_bodyDone)
-				return (false);
-			return (true);
-		}
-		catch(const std::exception& e){}
-	}
-	return false;
+	return (requestIscomplete);
 }
 
 const std::string &Request::getMethod() const
 {
-	return _requestLine.at("method");
+	return requestLine.at("method");
 }
 
 const std::string& Request::getHost() const
@@ -167,26 +167,32 @@ const LocationContext& Request::getLocationCtx() const
 //main function to parse the request
 void	Request::parseRequest(const std::string& receivedRequest, const ServerContext& serverCTX)
 {
+	if (receivedRequest.empty())
+		return;
 	this->serverCTX = serverCTX;
 	std::srand(time(0));
-	if (!_requestLineDone || !_headersDone || !_requestIsWellFormed)
+	setUploadingPath();
+	if (!this->requestLineDone || !this->headersDone || !this->_requestIsWellFormed)
 	{
 		if (takingRequests(receivedRequest))
 		{
-			if (_detectHost > 1)
-				_status = BadRequest;
+			if (detectHost > 1)
+			{
+				this->status = BadRequest;
+				requestIscomplete = true;
+			}
 			return;
 		}
 	}
-	if (_requestLine["method"] == "POST" && !_bodyDone)
+	if (this->requestLine["method"] == "POST" && !this->bodyDone && this->_requestIsWellFormed && this->status == 200)
 	{
-		if (_receivecount > 1)
+		if (this->receivecount > 1)
 		{
-			if (receivedRequest.front() == CR && requestInProgress)
+			if (receivedRequest.front() == CR && this->requestInProgress)
 				return;
-			_body = receivedRequest;
+			this->_body = receivedRequest;
 		}
-		if (!_body.empty())
+		if (!this->_body.empty())
 			parseBody();
 	}
 }

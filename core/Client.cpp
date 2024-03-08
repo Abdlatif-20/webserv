@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/14 19:51:06 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/07 18:25:17 by houmanso         ###   ########.fr       */
+/*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
+/*   Updated: 2024/03/08 03:20:56 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	Client::recvRequest(void)
 {
 	std::memset(buff, 0, sizeof(buff));
 	len = recv(sockId, buff, 1023, 0);
-	request.parseRequest(buff, serverCTX);
+	request.parseRequest(std::string(buff, len), serverCTX);
 	requestDone = request.isDone();
 	responseDone = false;
 	return (len);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/07 18:27:29 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/08 03:18:13 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,8 @@
 #include <sys/stat.h> // For mkdir
 
 
-/* 
+
+/*
 
 GET / HTTP/1.1
 
@@ -37,17 +38,20 @@ Content-Length: 11
 Content-Type: text/plain
 
 Hello world
+
 */
 
 enum Errors
 {
-	NotImplemented = 501,
-	BadRequest = 400,
-	RequestURITooLong = 414,
-	RequestEntityTooLarge = 413,
+	OK = 200,
 	NotFound = 404,
+	BadRequest = 400,
+	LengthRequired = 411,
 	MovedPermanently = 301,
 	MethodNotAllowed = 405,
+	NotImplemented = 501,
+	RequestURITooLong = 414,
+	RequestEntityTooLarge = 413,
 };
 
 #define CR '\r'
@@ -56,57 +60,75 @@ enum Errors
 #define ALLOWED_CHARACTERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJ\
 							KLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%"
 
+typedef std::vector<std::string> Vector;
+typedef std::map<std::string, std::string> Map;
+
 class Config;
 
 class Request
 {
 	private:
 		//status
-		int _status;
-		bool _bodyDone;
-		bool _foundUri;
-		int	_detectHost;
-		bool _isComplete;
-		int	_receivecount;
-		bool _headersDone;
-		bool _requestLineDone;
+		int status;
+		bool foundUri;
+		bool bodyDone;
+		int	detectHost;
+		bool multipart;
+		bool _setLength;
+		bool isComplete;
+		int	receivecount;
+		bool headersDone;
+		bool requestLineDone;
 		bool requestInProgress;
+		bool _requestIsWellFormed;
+		unsigned int remainingChunkLength;
 		// content length
-		unsigned int	_contentLength;
+		unsigned int	contentLength;
+		unsigned int	sizeBoundary;
 		ServerContext serverCTX;
 		LocationContext locationCtx;
 		//maps
-		std::map<std::string, std::string> _headers;
-		std::map<std::string, std::string> _requestLine;
+		Map _headers;
+		Map requestLine;
+		Map params;
 		//vector
-		std::vector<std::string>	_requestVector;
+		Vector	requestVector;
+		Vector	files;
 		//strings
+		std::string _path;
 		std::string _body;
 		std::string	headers;
-		std::string _params;
-		std::string	_requestData;
-		std::string _boundaryName;
+		std::string	requestData;
+		std::string boundaryName;
+		std::string _chunkedName;
 		/* *************************** methods ********************************* */
 			void	findUri();
-			void	boundary();
+			void	parseUri();
 			void	parseBody();
+			void	fillParams();
 			void	parseBoundary();
 			void	ContentLength();
 			void	parseChunkedBody();
 			void	parseContentType();
+			void	setUploadingPath();
 			void	parseContentLength();
 			void	requestIsWellFormed();
 			void	parseTransferEncoding();
+			void	fillHeaders(Vector headers);
+			bool directoryExists(const char *path);
+			std::string	prepareFileName(std::string line);
+			unsigned int convertToDecimal(std::string hex);
+			std::string& isExist(Map& headers, std::string key);
 			void	separateRequest(std::string receivedRequest);
-			void	fillHeaders(std::vector<std::string> headers);
 			void	fillRequestLine(const std::string& requestLine);
 			int		parseRequestLine(const std::string& requestLine);
 			int		checkDuplicate(const std::string& receivedRequest);
 			int		takingRequests(const std::string& receivedRequest);
-			std::string	prepareFileName(std::string line);
+			void	preparLengthAndName(size_t pos, std::string& length, std::ofstream& file);
+			bool requestIscomplete;
 	public:
 	/* *************************** constructors ****************************** */
-		bool _requestIsWellFormed;
+	
 		Request();
 		~Request();
 		Request(const Request& obj);
@@ -119,8 +141,8 @@ class Request
 		const int& getStatus() const;
 		void setStatus(int status);
 		const std::string& getBody() const;
-		const std::map<std::string, std::string>& getHeaders() const;
-		const std::map<std::string, std::string>& getRequestLine() const;
+		const Map& getHeaders() const;
+		const Map& getRequestLine() const;
 		const bool& getRequestIsWellFormed() const;
 		const bool& getBodyDone() const;
 		const bool& getHeadersDone() const;

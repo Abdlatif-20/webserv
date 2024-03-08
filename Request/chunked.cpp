@@ -3,49 +3,46 @@
 /*                                                        :::      ::::::::   */
 /*   chunked.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 16:42:03 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/02/26 12:38:53 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/08 03:17:34 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-//function to parse the chunked body
-
-unsigned int convertToDecimal(std::string hex)
-{
-	unsigned int decimalNumber;
-
-    std::stringstream ss;
-    ss << std::hex << hex;
-    ss >> decimalNumber;
-	return decimalNumber;
-}
-
 void	Request::parseChunkedBody()
 {
-	std::cout << "parsing chunked body" << std::endl;
 	std::string length;
-	int random = std::rand() % 1000;
-	std::string filename = "chunked_" + Utils::intToString(random) + ".txt";
+	static std::ofstream file;
+	size_t pos = 0;
 
-	length = _body.substr(0, _body.find(CRLF));
-	_body.erase(0, _body.find(CRLF) + 2);
-	while (length != "0")
+	if (this->_chunkedName.empty() || !_setLength)
+		preparLengthAndName(pos, length, file);
+	if (!remainingChunkLength)
+		return(bodyDone = true, file.close(), requestIscomplete = true, void());
+	else if (remainingChunkLength)
 	{
-		unsigned int len = convertToDecimal(length);
-		std::ofstream file(filename, std::ios::app);
-		file << _body.substr(0, len);
-		_body.erase(0, len + 2);
-		length = _body.substr(0, _body.find(CRLF));
-		_body.erase(0, _body.find(CRLF) + 2);
-		if (!_body.size())
+		if (_body.size() < remainingChunkLength
+			&& _body.find("\r\n") == std::string::npos)
 		{
-			_receivecount++;
-			return ;
+			file.write(_body.c_str(), _body.size());
+			remainingChunkLength -= _body.size();
+		}
+		else
+		{
+			std::string beflength = "";
+			pos = _body.find("\r\n");
+			if (pos != std::string::npos)
+			{
+				beflength = _body.substr(0, pos);
+				file.write(_body.c_str(), pos);
+				_body = _body.substr(pos + 2);
+				_setLength = false;
+				Request::parseChunkedBody();
+			}
 		}
 	}
-	_bodyDone = true;
+	receivecount++;
 }

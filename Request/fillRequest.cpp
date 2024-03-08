@@ -3,22 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   fillRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/01 11:44:15 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/07 22:18:55 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
 //function to fill the headers to the map
-void	Request::fillHeaders(std::vector<std::string> headers)
+void	Request::fillHeaders(Vector headers)
 {
 	int checkHostIsFound = 0;
-	std::vector<std::string>::iterator it;
+	Vector::iterator it;
 	it = headers.begin();
-	requestInProgress == false ? it++ : it;
+	this->requestInProgress == false ? it++ : it;
 	for (; it != headers.end(); it++)
 	{
 		Utils::toLower(*it);
@@ -30,44 +30,75 @@ void	Request::fillHeaders(std::vector<std::string> headers)
 			key = it->substr(0, pos);
 			if (key == "host")
 				checkHostIsFound++;
-			value = Utils::strTrim(it->substr(pos + 1), CR);
-			value = Utils::strTrim(value, ' ');
-			_headers[key] = value;
+			value = Utils::strTrim(Utils::strTrim(it->substr(pos + 1), CR), ' ');
+			this->_headers[key] = value;
 		}
 	}
 	if (checkHostIsFound != 1)
-		_status = BadRequest;
-	_headersDone = true;
+	{
+		this->status = BadRequest;
+		requestIscomplete = true;
+		return;
+	}
+	this->headersDone = true;
 }
 
 //function to Check if the request Line is well formed and fill it to the map
 void	Request::fillRequestLine(const std::string& requestLine)
 {
 	if (!requestLine.size())
-		return(_status = BadRequest, void());
-	std::vector<std::string> requestLineVector;
-	std::map<std::string, std::string> requestLineMap;
+		return(this->status = BadRequest, requestIscomplete = true, void());
+	Vector requestLineVector;
+	Map requestLineMap;
 	requestLineVector = Utils::split(requestLine, ' ');
 	if (requestLineVector.size() != 3)
-		return(_status = BadRequest, void());
+		return(this->status = BadRequest, requestIscomplete = true, void());
 	if (requestLineVector.front() != "GET" && requestLineVector.front() != "POST"
 		&& requestLineVector.front() != "DELETE")
 	{
 		if (requestLineVector.front() != "HEAD" && requestLineVector.front() != "PUT"
 			&& requestLineVector.front() != "CONNECT" && requestLineVector.front() != "OPTIONS"
 				&& requestLineVector.front() != "TRACE")
-				_status = MethodNotAllowed;
+				{
+					this->status = MethodNotAllowed;
+					requestIscomplete = true;
+				}
 		else
-			_status = NotImplemented;
+		{
+			this->status = NotImplemented;
+			requestIscomplete = true;
+		}
 		return;
 	}
-	if (requestLineVector[1].front() != '/')
-		return (_status = BadRequest, void());
-	if (requestLineVector[2] != "HTTP/1.1")
-		return (_status = BadRequest, void());
+	if (requestLineVector[1].front() != '/' || requestLineVector[2] != "HTTP/1.1")
+		return (this->status = BadRequest, requestIscomplete = true, void());
 	requestLineMap["method"] = requestLineVector[0];
 	requestLineMap["path"] = requestLineVector[1];
-	_requestLineDone = true;
-	_requestLine = requestLineMap;
-	findUri();
+	this->requestLineDone = true;
+	this->requestLine = requestLineMap;	
+	fillParams();
+	// findUri();
+	parseUri();
+}
+
+void	Request::fillParams()
+{
+	Vector sepPath;
+	std::string path = this->requestLine["path"];
+	if (path.find('?') == std::string::npos)
+		return;
+	sepPath = Utils::split(path, '?');
+	this->requestLine["path"] = sepPath[0];
+	if (sepPath.size() > 1)
+	{
+		Vector sepParams;
+		sepParams = Utils::split(sepPath[1], '&');
+		for (size_t i = 0; i < sepParams.size(); i++)
+		{
+			Vector sepParam;
+			sepParam = Utils::split(sepParams[i], '=');
+			if (sepParam.size() == 2)
+				this->params[sepParam[0]] = sepParam[1];
+		}
+	}
 }
