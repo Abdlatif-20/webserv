@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/06 19:28:20 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/08 16:24:38 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ class Context
         Context();
         Context(const Context& obj);
         Context& operator=(const Context& obj);
-        ~Context();
+        virtual ~Context();
 
         void addDirective(Directive _directive);
         void appendDirective(Directive _directive);
