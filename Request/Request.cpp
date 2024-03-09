@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/09 16:12:31 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 19:37:42 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -217,6 +217,7 @@ void	Request::parseRequest(const std::string& receivedRequest, const ServerConte
 			return;
 		}
 	}
+	// std::cout << "requestLineDone: " << requestLineDone << " headersDone: " << headersDone << " requestIsWellFormed: " << _requestIsWellFormed << std::endl;
 	if (this->requestLine["method"] != "POST" && this->_requestIsWellFormed
 		&& this->headersDone && this->requestLineDone)
 		this->requestIscomplete = true;
