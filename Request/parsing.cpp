@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/09 16:13:46 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 19:43:16 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,8 +146,10 @@ int	Request::parseRequestLine(const std::string& requestLine)
 //check if the request line or host is duplicated
 int	Request::checkDuplicate(const std::string& receivedRequest)
 {
-	if (receivedRequest != CRLF && requestInProgress)
+	if (requestInProgress)
 	{
+		if (receivedRequest == CRLF && !requestLineInProgress)
+			return 0;
 		size_t pos = receivedRequest.find(" ");
 		if (pos != std::string::npos)
 		{
@@ -164,6 +166,10 @@ int	Request::checkDuplicate(const std::string& receivedRequest)
 		}
 		if (receivedRequest.find("host") != std::string::npos)
 			detectHost++;
+		if (receivedRequest.find("\r\n") == std::string::npos)
+			return (requestData += receivedRequest, receivecount++, requestLineInProgress = true, 1);
+		if (requestLineInProgress)
+			return (requestData += receivedRequest, requestLineInProgress = false, 1);
 		return (requestData += receivedRequest, receivecount++, 1);
 	}
 	return (0);

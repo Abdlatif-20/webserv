@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/09 18:08:18 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:34:16 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ void	Client::sendResponse(void)
 	if (requestDone)
 	{
 		// send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
+		std::cout << request.getStatus() << std::endl;
 		response.setServerCtx(serverCTX);
 		response.setRequest(request);
 		std::string resp = response.generateResponse();

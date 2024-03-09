@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/09 16:27:54 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:38:19 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,6 +223,7 @@ void	Request::parseRequest(const std::string& receivedRequest, const ServerConte
 			return;
 		}
 	}
+	std::cout << "requestLineDone: " << requestLineDone << " headersDone: " << headersDone << " requestIsWellFormed: " << _requestIsWellFormed << std::endl;
 	if (this->requestLine["method"] != "POST" && this->_requestIsWellFormed
 		&& this->headersDone && this->requestLineDone)
 		this->requestIscomplete = true;
