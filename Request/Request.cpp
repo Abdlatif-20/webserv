@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 03:22:42 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 14:37:41 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,6 +163,37 @@ const LocationContext& Request::getLocationCtx() const
 }
 
 /* *************************** methods *************************** */
+
+void	Request::resetRequest()
+{
+	this->status = OK;
+	this->detectHost = 0;
+	this->bodyDone = false;
+	this->foundUri = false;
+	this->receivecount = 0;
+	this->sizeBoundary = 0;
+	this->contentLength = 0;
+	this->multipart = false;
+	this->_setLength = false;
+	this->isComplete = false;
+	this->headersDone = false;
+	this->requestIscomplete = false;
+	this->requestLineDone = false;
+	this->requestInProgress = false;
+	this->remainingChunkLength = 0;
+	this->_requestIsWellFormed = false;
+	this->_path = "";
+	this->_body = "";
+	this->headers = "";
+	this->requestData = "";
+	this->boundaryName = "";
+	this->_chunkedName = "";
+	this->requestLine.clear();
+	this->params.clear();
+	this->headers.clear();
+	this->requestVector.clear();
+
+}
 
 //main function to parse the request
 void	Request::parseRequest(const std::string& receivedRequest, const ServerContext& serverCTX)

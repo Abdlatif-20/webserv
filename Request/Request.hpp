@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 03:18:13 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 14:37:14 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ enum Errors
 
 typedef std::vector<std::string> Vector;
 typedef std::map<std::string, std::string> Map;
+typedef std::invalid_argument InvalidRequest;
 
 class Config;
 
@@ -134,8 +135,10 @@ class Request
 		Request(const Request& obj);
 		Request& operator=(const Request& obj);
 
-		typedef std::invalid_argument InvalidRequest;
+	/* *************************** methods ****************************** */
+
 		void	parseRequest(const std::string& receivedRequest, const ServerContext& serverCTX);
+		void	resetRequest();
 
 	/* *************************** getters ************************************ */
 		const int& getStatus() const;
