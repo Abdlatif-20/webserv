@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/09 12:19:03 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/09 18:08:18 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,10 @@ int	Client::recvRequest(void)
 {
 	std::memset(buff, 0, sizeof(buff));
 	len = recv(sockId, buff, 1023, 0);
-	request.parseRequest(std::string(buff, len), serverCTX);
+	if (len)
+		request.parseRequest(std::string(buff, len), serverCTX);
+	else
+		request.parseRequest("\r\n", serverCTX);
 	requestDone = request.isDone();
 	responseDone = false;
 	std::cout << len << " => " << buff << std::endl;

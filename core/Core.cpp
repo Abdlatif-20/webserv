@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/09 16:21:15 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/09 17:52:49 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ void	Core::traceEvents(void)
 				checklist.push_back((pollfd){fd, POLLIN | POLLOUT | POLLHUP, 0});
 				std::cout << it->getHostPort() << std::endl;
 			}
-			if (it != servers.end() && *it == *(it + 1))
+			if (it + 1 != servers.end() && *it == *(it + 1))
 				it++;
 		}
 		if (!checklist.size())
