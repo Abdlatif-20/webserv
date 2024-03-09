@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/08 03:28:39 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/08 11:01:08 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ std::string Response::generateResponse()
     }
     else if (statusCode == 200)
     {
-        std::cout << request.getLocationCtx().getIndex() << std::endl;
+        // std::cout << request.getLocationCtx().getIndex() << std::endl;
     }
     return toString();
 }
@@ -143,8 +143,8 @@ std::string Response::generateResponse()
 
 std::string Response::toString()
 {
-    std::string httpVersion = HTTP_VERSION;
-    std::string responseText = httpVersion + " " + Utils::intToString(statusCode) + " " + reasonPhrases[statusCode] + CRLF;
+    // std::string httpVersion = HTTP_VERSION;
+    std::string responseText = HTTP_VERSION" " + Utils::intToString(statusCode) + " " + reasonPhrases[statusCode] + CRLF;
     std::map<std::string, std::string>::const_iterator it = headers.cbegin();
     while (it != headers.cend())
         responseText += it->first + ": " + (it++)->second + CRLF;

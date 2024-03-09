@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Core.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:21:50 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/08 03:19:45 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 16:20:56 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@
 #include "Config.hpp"
 #include "Server.hpp"
 #include "Client.hpp"
-#include "Vec.hpp"
 
 #define JJJ "HTTP/1.1 200 OK\r\nDate: Mon, 27 Jul 2009 12:28:53 GMT\r\nServer: Apache/2.2.14 (Win32)\r\nLast-Modified: Wed, 22 Jul 2009 19:15:56 GMT\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd"
 
@@ -53,6 +52,7 @@ class Core
 		void	run(void);
 		void	traceEvents(void);
 
+		// bool	countainHost(const server& server);
 		Core&	operator=(const Core& cpy);
 
 		~Core(void);

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 10:44:59 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/09 10:01:25 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,6 +145,11 @@ const bool& Request::getFoundUri() const
 bool	Request::isDone(void) const
 {
 	return (requestIscomplete);
+}
+
+bool	Request::hostIsDetected(void) const
+{
+	return (detectHost);
 }
 
 const std::string &Request::getMethod() const

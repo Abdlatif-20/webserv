@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/08 03:20:56 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 12:19:03 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ int	Client::recvRequest(void)
 	request.parseRequest(std::string(buff, len), serverCTX);
 	requestDone = request.isDone();
 	responseDone = false;
+	std::cout << len << " => " << buff << std::endl;
 	return (len);
 }
 
@@ -61,7 +62,12 @@ void	Client::setServerCTX(const ServerContext& serverCTX)
 	this->serverCTX = serverCTX;
 }
 
-bool	Client::isRequestDone(void) const
+bool	Client::hostIsDetected(void) const
+{
+	return (request.hostIsDetected());
+}
+
+bool Client::isRequestDone(void) const
 {
 	return (requestDone);
 }

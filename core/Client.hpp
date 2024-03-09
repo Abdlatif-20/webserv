@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:50:55 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/08 03:20:54 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 10:00:40 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ class Client
 		void	setSockId(int sock);
 		void	setServerCTX(const ServerContext& serverCTX);
 
+		bool	hostIsDetected(void) const;
 		bool	isRequestDone(void) const;
 		bool	isResponseDone(void) const;
 

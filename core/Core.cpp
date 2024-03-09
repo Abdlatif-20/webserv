@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Core.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/07 22:04:57 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 16:21:15 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "Core.hpp"
-#include "Vec.hpp"
+
 Core::Core(void)
 {
 
@@ -31,37 +31,43 @@ Core::Core(const Config &conf)
 	serversConf = conf.getServers();
 	it = serversConf.begin();
 	while (it != serversConf.end())
-	{
-		servers.push_back(Server(*it));
-		it++;
-	}
+		servers.push_back(Server(*it++));
+	std::sort(servers.begin(), servers.end());
+	for (size_t i = 0; i < servers.size(); i++)
+		std::cout << servers[i].getHostPort() << std::endl;
+	std::cout << "================================================" << std::endl;
 }
 
 void	Core::run(void)
 {
-	size_t			k;
+	size_t			binded;
 	StringVector	ports;
 	StringVector::iterator	p;
 	std::vector<Server>::iterator	it;
 
-	k = 0;
+	binded = 0;
 	size = servers.size();
 	for(int i = 0; i < size; i++)
 	{
+		p = std::find(ports.begin(), ports.end(), servers[i].getHostPort());
+		if (p != ports.end())
+			continue ;
 		try
 		{
 			servers[i].setupServer();
-			ports.push_back(servers[i].getPort());
 			fcntl(servers[i].getSocketId(), F_SETFL, O_NONBLOCK, FD_CLOEXEC);
-			k++;
+			ports.push_back(servers[i].getHost() + ":" + servers[i].getPort());
+			binded++;
 		}
 		catch (const std::exception& e)
 		{
-			std::cerr << "Server creating failed : " << e.what() << std::endl;
+			std::cerr << servers[i].getHostPort() << " : " << e.what() << std::endl;
 		}
 	}
-	if (k)
+	if (binded > 0)
 		traceEvents();
+	else
+		std::cout << "info: no servers to bind !" << std::endl;
 }
 
 void	Core::traceEvents(void)
@@ -80,8 +86,12 @@ void	Core::traceEvents(void)
 			if (fd != -1)
 			{
 				clients[fd].setSockId(fd);
+				clients[fd].setServerCTX(it->getServerCTX());
 				checklist.push_back((pollfd){fd, POLLIN | POLLOUT | POLLHUP, 0});
+				std::cout << it->getHostPort() << std::endl;
 			}
+			if (it != servers.end() && *it == *(it + 1))
+				it++;
 		}
 		if (!checklist.size())
 			continue ;
@@ -89,7 +99,13 @@ void	Core::traceEvents(void)
 		for (i = 0; i < checklist.size(); i++)
 		{
 			if (checklist[i].revents & POLLIN)
+			{
 				clients[checklist[i].fd].recvRequest();
+				if (clients[checklist[i].fd].hostIsDetected())
+				{
+					
+				}
+			}
 			if (checklist[i].revents & POLLOUT && clients[checklist[i].fd].isRequestDone())
 				clients[checklist[i].fd].sendResponse();
 			if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].isResponseDone())
@@ -101,7 +117,12 @@ void	Core::traceEvents(void)
 	}
 }
 
-Core	&Core::operator=(const Core &cpy)
+// bool Core::countainHost(const server &server)
+// {
+// 	return ;
+// }
+
+Core &Core::operator=(const Core &cpy)
 {
 	if (this != &cpy)
 	{

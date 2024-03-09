@@ -6,7 +6,7 @@
 #    By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/03/08 10:42:40 by houmanso         ###   ########.fr        #
+#    Updated: 2024/03/09 16:22:40 by houmanso         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,9 +14,8 @@ NAME = webserv
 CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
 SRCS = $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
 OBJS = $(patsubst %.cpp,obj/%.o,$(SRCS))
-INC = $(wildcard *.hpp) $(wildcard */*.hpp)
-COMPILER = c++ -I config -I utils -I request -I core -I response
-MKDIR_P = mkdir -p
+INC  = $(wildcard *.hpp) $(wildcard */*.hpp)
+ALLFLAGS = $(CPPFLAGS) -I config -I utils -I request -I core -I response
 
 TOTAL := $(words $(SRCS))
 CURRENT = 0
@@ -27,23 +26,20 @@ CYAN = \033[0;36m
 YELLOW = \033[0;33m
 NC = \033[0m
 
-all: obj $(NAME)
+all: $(NAME)
 
 $(NAME): $(OBJS)
-	@$(COMPILER) $(CPPFLAGS) $(OBJS) -o $(NAME)
+	@c++ $(ALLFLAGS) $(OBJS) -o $(NAME)
 	@clear
 	@echo "\033[1m\033[35mWebserv is ready to use\033[0m"
 	@echo "\033[1m\033[32mRun ./webserv webserv.conf\033[0m"
 
 obj/%.o: %.cpp $(INC)
-	@$(MKDIR_P) $(dir $@)
-	@$(COMPILER) $(CPPFLAGS) -c $< -o $@
+	@mkdir -p $(dir $@)
+	@c++ $(ALLFLAGS) -c $< -o $@
 	@clear
 	@$(eval CURRENT=$(shell echo "$$(($(CURRENT)+1))"))
-	@echo "$(CYAN)Compiling$(NC) $<... $$(($(CURRENT)*100/$(TOTAL)))%$(NC)\r"
-
-obj:
-	@$(MKDIR_P) obj
+	@echo "$(CYAN)Compiling$(NC) $< ... $$(($(CURRENT)*100/$(TOTAL)))%$(NC)\r"
 
 clean:
 	@rm -rf obj

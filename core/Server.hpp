@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/07 17:24:19 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/09 11:23:06 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ class Server
 		int	sockID;
 		std::string	port;
 		std::string	host;
+		std::string	host_port;
 		struct addrinfo	*res;
 		ServerContext	serverCTX;
 		StringVector	serverNames;
@@ -36,13 +37,22 @@ class Server
 		Server(const Server& cpy);
 		Server(const ServerContext& _serverCTX);
 
-		void setupServer(void);
-		const std::string& getHost(void) const;
-		const std::string& getPort(void) const;
-		const ServerContext& getServerCTX(void) const;
-		int getSocketId(void) const;
+		void	setupServer(void);
+
+		int		getSocketId(void) const;
+
+		const std::string&	getHost(void) const;
+		const std::string&	getPort(void) const;
+		const std::string&	getHostPort(void) const;
+
+		const ServerContext&	getServerCTX(void) const;
 
 		Server&	operator=(const Server& cpy);
+		bool	operator<(const Server& cpy) const;
+		bool	operator>(const Server& cpy) const;
+		bool	operator>=(const Server& cpy) const;
+		bool	operator<=(const Server& cpy) const;
+		bool	operator==(const Server& cpy) const;
 
 		~Server(void);
 };
