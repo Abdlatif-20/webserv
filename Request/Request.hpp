@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/09 09:58:36 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/09 16:28:21 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ enum Errors
 
 typedef std::vector<std::string> Vector;
 typedef std::map<std::string, std::string> Map;
+typedef std::invalid_argument InvalidRequest;
 
 class Config;
 
@@ -80,6 +81,7 @@ class Request
 		bool headersDone;
 		bool requestLineDone;
 		bool requestInProgress;
+		bool requestLineInProgress;
 		bool _requestIsWellFormed;
 		unsigned int remainingChunkLength;
 		// content length
@@ -99,6 +101,7 @@ class Request
 		std::string _body;
 		std::string	headers;
 		std::string	requestData;
+		std::string	requestLineData;
 		std::string boundaryName;
 		std::string _chunkedName;
 		/* *************************** methods ********************************* */
@@ -134,8 +137,10 @@ class Request
 		Request(const Request& obj);
 		Request& operator=(const Request& obj);
 
-		typedef std::invalid_argument InvalidRequest;
+	/* *************************** methods ****************************** */
+
 		void	parseRequest(const std::string& receivedRequest, const ServerContext& serverCTX);
+		void	resetRequest();
 
 	/* *************************** getters ************************************ */
 		const int& getStatus() const;

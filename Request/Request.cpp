@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/09 10:01:25 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/09 16:27:54 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,17 +28,19 @@ Request::Request()
 	this->_setLength = false;
 	this->isComplete = false;
 	this->headersDone = false;
-	this->requestIscomplete = false;
 	this->requestLineDone = false;
+	this->requestIscomplete = false;
 	this->requestInProgress = false;
 	this->remainingChunkLength = 0;
 	this->_requestIsWellFormed = false;
+	this->requestLineInProgress = false;
 	this->_path = "";
 	this->_body = "";
 	this->headers = "";
 	this->requestData = "";
 	this->boundaryName = "";
 	this->_chunkedName = "";
+	this->requestLineData = "";
 }
 
 Request::Request(const Request& obj)
@@ -169,6 +171,38 @@ const LocationContext& Request::getLocationCtx() const
 
 /* *************************** methods *************************** */
 
+void	Request::resetRequest()
+{
+	this->status = OK;
+	this->detectHost = 0;
+	this->bodyDone = false;
+	this->foundUri = false;
+	this->receivecount = 0;
+	this->sizeBoundary = 0;
+	this->contentLength = 0;
+	this->multipart = false;
+	this->_setLength = false;
+	this->isComplete = false;
+	this->headersDone = false;
+	this->requestIscomplete = false;
+	this->requestLineDone = false;
+	this->requestInProgress = false;
+	this->remainingChunkLength = 0;
+	this->_requestIsWellFormed = false;
+	this->requestLineInProgress = false;
+	this->_path = "";
+	this->_body = "";
+	this->headers = "";
+	this->requestData = "";
+	this->boundaryName = "";
+	this->_chunkedName = "";
+	this->requestLine.clear();
+	this->params.clear();
+	this->headers.clear();
+	this->requestData.clear();
+	this->requestVector.clear();
+}
+
 //main function to parse the request
 void	Request::parseRequest(const std::string& receivedRequest, const ServerContext& serverCTX)
 {
@@ -189,9 +223,9 @@ void	Request::parseRequest(const std::string& receivedRequest, const ServerConte
 			return;
 		}
 	}
-	if (this->requestLine["method"] != "POST" && this->requestLineDone
-		&& this->headersDone && this->_requestIsWellFormed)
-		requestIscomplete = true;
+	if (this->requestLine["method"] != "POST" && this->_requestIsWellFormed
+		&& this->headersDone && this->requestLineDone)
+		this->requestIscomplete = true;
 	if (this->requestLine["method"] == "POST" && !this->bodyDone && this->_requestIsWellFormed && this->status == 200)
 	{
 		if (this->receivecount > 1)
