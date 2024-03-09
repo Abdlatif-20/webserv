@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 03:11:07 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 16:13:46 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,9 +113,26 @@ int	Request::parseRequestLine(const std::string& requestLine)
 		return 0;
 	if (requestLine.find("\r\n\r\n") == std::string::npos)
 	{
-		this->requestVector = Utils::splitRequest(requestLine, CRLF);
-		fillRequestLine(this->requestVector[0]); //fill the request line
-		this->requestInProgress = true;
+		if (requestLine.find("\r\n") == std::string::npos)
+		{
+			requestLineInProgress = true;
+			requestLineData += requestLine;
+			return 1;
+		}
+		if (requestLineInProgress)
+		{
+			requestLineData += requestLine;
+			this->requestVector = Utils::splitRequest(requestLineData, CRLF);
+			fillRequestLine(this->requestVector[0]); //fill the request line
+			this->requestInProgress = true;
+			requestLineInProgress = false;
+		}
+		else
+		{
+			this->requestVector = Utils::splitRequest(requestLine, CRLF);
+			fillRequestLine(this->requestVector[0]); //fill the request line
+			this->requestInProgress = true;
+		}
 		return 1;
 	}
 	else

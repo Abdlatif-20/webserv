@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/09 14:37:14 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 16:01:23 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,7 @@ class Request
 		bool headersDone;
 		bool requestLineDone;
 		bool requestInProgress;
+		bool requestLineInProgress;
 		bool _requestIsWellFormed;
 		unsigned int remainingChunkLength;
 		// content length
@@ -100,6 +101,7 @@ class Request
 		std::string _body;
 		std::string	headers;
 		std::string	requestData;
+		std::string	requestLineData;
 		std::string boundaryName;
 		std::string _chunkedName;
 		/* *************************** methods ********************************* */
