@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/10 10:55:23 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/10 20:50:20 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 // function to parse the content type
 void Request::parseContentType()
 {
-	if (_headers["content-type"].find("boundary") == std::string::npos)
+	if (_headers["content-type"].find("boundary") == String::npos)
 		return (this->status = BadRequest, requestIscomplete = true, void());
 	if (isExist(_headers, "content-length") == "")
 		return (this->status = LengthRequired, requestIscomplete = true, void());
@@ -32,9 +32,9 @@ void	removeFiles(Vector files)
 void Request::parseBoundary()
 {
 	std::ofstream file;
-	std::string randomStr = Utils::intToString(std::rand() % 1000);
-	std::string firstBoundary = "--" + _headers["content-type"].substr(30);
-	std::string lastBoundary = firstBoundary + "--";
+	String randomStr = Utils::intToString(std::rand() % 1000);
+	String firstBoundary = "--" + _headers["content-type"].substr(30);
+	String lastBoundary = firstBoundary + "--";
 	size_t pos;
 
 	if (!this->multipart)
@@ -45,7 +45,7 @@ void Request::parseBoundary()
 		if (this->boundaryName == "")
 			return(this->status = BadRequest, this->requestIscomplete = true, void());
 		pos = this->_body.find("\r\n\r\n");
-		if (pos != std::string::npos)
+		if (pos != String::npos)
 			this->_body = this->_body.substr(pos + 4);
 		else
 			this->_body = "";
@@ -62,9 +62,9 @@ void Request::parseBoundary()
 		{
 			size_t posLastBoundary = this->_body.find(lastBoundary);
 			size_t posFirstBoundary = this->_body.find(firstBoundary);
-			if (posLastBoundary == std::string::npos)
+			if (posLastBoundary == String::npos)
 			{
-				if (posFirstBoundary != std::string::npos)
+				if (posFirstBoundary != String::npos)
 				{
 					file << this->_body.substr(0, posFirstBoundary - 2);
 					this->_body = this->_body.substr(posFirstBoundary - 2);
@@ -76,7 +76,7 @@ void Request::parseBoundary()
 				else
 				{
 					pos = this->_body.find("\r\n\r\n");
-					if (pos != std::string::npos)
+					if (pos != String::npos)
 						this->_body = this->_body.substr(pos + 4);
 					file << this->_body;
 				}

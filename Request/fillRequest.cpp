@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/10 10:43:21 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/10 20:49:05 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,15 +22,17 @@ void	Request::fillHeaders(Vector headers)
 	for (; it != headers.end(); it++)
 	{
 		Utils::toLower(*it);
-		std::string key;
-		std::string value;
+		String key;
+		String value;
 		size_t pos =  it->find(':');
-		if (pos != std::string::npos)
+		if (pos != String::npos)
 		{
 			key = it->substr(0, pos);
 			if (key == "host")
 				checkHostIsFound++;
 			value = Utils::strTrim(Utils::strTrim(it->substr(pos + 1), CR), ' ');
+			if (key == "host" && value.empty())
+				return(this->status = BadRequest, requestIscomplete = true, void());
 			this->_headers[key] = value;
 		}
 	}
@@ -44,7 +46,7 @@ void	Request::fillHeaders(Vector headers)
 }
 
 //function to Check if the request Line is well formed and fill it to the map
-void	Request::fillRequestLine(const std::string& requestLine)
+void	Request::fillRequestLine(const String& requestLine)
 {
 	if (!requestLine.size())
 		return(this->status = BadRequest, requestIscomplete = true, void());
@@ -76,8 +78,8 @@ void	Request::fillRequestLine(const std::string& requestLine)
 void	Request::fillParams()
 {
 	Vector sepPath;
-	std::string path = this->requestLine["path"];
-	if (path.find('?') == std::string::npos)
+	String path = this->requestLine["path"];
+	if (path.find('?') == String::npos)
 		return;
 	sepPath = Utils::split(path, '?');
 	this->requestLine["path"] = sepPath[0];

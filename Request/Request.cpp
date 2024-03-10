@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/10 10:48:56 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/10 20:48:13 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,17 +89,17 @@ Request::~Request()
 
 /* *************************** getters *************************** */
 
-const std::string&	Request::getBody() const
+const String&	Request::getBody() const
 {
 	return (_body);
 }
 
-const std::map<std::string, std::string>&	Request::getHeaders() const
+const std::map<String, String>&	Request::getHeaders() const
 {
 	return (_headers);
 }
 
-const std::map<std::string, std::string>&	Request::getRequestLine() const
+const std::map<String, String>&	Request::getRequestLine() const
 {
 	return (requestLine);
 }
@@ -129,7 +129,7 @@ const bool& Request::getHeadersDone() const
 	return (headersDone);
 }
 
-const std::string& Request::getHeaderByName(const std::string& name) const
+const String& Request::getHeaderByName(const String& name) const
 {
 	return (_headers.at(name));
 }
@@ -154,12 +154,12 @@ bool	Request::hostIsDetected(void) const
 	return (detectHost);
 }
 
-const std::string &Request::getMethod() const
+const String &Request::getMethod() const
 {
 	return requestLine.at("method");
 }
 
-const std::string& Request::getHost() const
+const String& Request::getHost() const
 {
 	return _headers.at("host");
 }
@@ -204,7 +204,7 @@ void	Request::resetRequest()
 }
 
 //main function to parse the request
-void	Request::parseRequest(const std::string& receivedRequest, const ServerContext& serverCTX)
+void	Request::parseRequest(const String& receivedRequest, const ServerContext& serverCTX)
 {
 	if (receivedRequest.empty())
 		return;

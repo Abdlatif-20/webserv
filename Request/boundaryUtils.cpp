@@ -6,14 +6,14 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:12:18 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 03:31:54 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/10 20:50:12 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
 // function to check if the key exists in the map
-std::string& Request::isExist(Map& headers, std::string key)
+String& Request::isExist(Map& headers, String key)
 {
 	if (headers.find(key) != headers.end())
 		return headers[key];
@@ -33,26 +33,26 @@ bool Request::directoryExists(const char *path)
 }
 
 // function to prepare the filename and return it
-std::string Request::prepareFileName(std::string line)
+String Request::prepareFileName(String line)
 {
-	std::string filename = "";
-	std::string extension = "";
+	String filename = "";
+	String extension = "";
 	size_t posFile = line.find("filename=");
 	size_t posName = line.find("name=");
-	if (posFile != std::string::npos)
+	if (posFile != String::npos)
 	{
 		filename = line.substr(posFile + 10);
 		posFile = filename.find("\"");
-		if (posFile != std::string::npos)
+		if (posFile != String::npos)
 			filename = filename.substr(0, filename.find("\""));
 		else
 			return (status = BadRequest, requestIscomplete = true, "");
 	}
-	else if (posName != std::string::npos)
+	else if (posName != String::npos)
 	{
 		filename = line.substr(posName + 6);
 		posFile = filename.find("\"");
-		if (posFile != std::string::npos)
+		if (posFile != String::npos)
 			filename = filename.substr(0, filename.find("\""));
 		else
 			return (status = BadRequest, requestIscomplete = true, "");

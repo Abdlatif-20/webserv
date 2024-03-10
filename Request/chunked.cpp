@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 16:42:03 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 03:17:34 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/10 20:49:59 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	Request::parseChunkedBody()
 {
-	std::string length;
+	String length;
 	static std::ofstream file;
 	size_t pos = 0;
 
@@ -25,16 +25,16 @@ void	Request::parseChunkedBody()
 	else if (remainingChunkLength)
 	{
 		if (_body.size() < remainingChunkLength
-			&& _body.find("\r\n") == std::string::npos)
+			&& _body.find("\r\n") == String::npos)
 		{
 			file.write(_body.c_str(), _body.size());
 			remainingChunkLength -= _body.size();
 		}
 		else
 		{
-			std::string beflength = "";
+			String beflength = "";
 			pos = _body.find("\r\n");
-			if (pos != std::string::npos)
+			if (pos != String::npos)
 			{
 				beflength = _body.substr(0, pos);
 				file.write(_body.c_str(), pos);
