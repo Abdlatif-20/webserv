@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/09 16:01:23 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 16:28:21 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,7 @@ class Request
 		const bool& getFoundUri() const;
 
 		bool	isDone(void) const;
+		bool	hostIsDetected(void) const;
 		const std::string& getMethod() const;
 		const std::string& getHost() const;
 		const LocationContext& getLocationCtx() const;

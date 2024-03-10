@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/09 19:37:42 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:38:19 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,6 +149,11 @@ bool	Request::isDone(void) const
 	return (requestIscomplete);
 }
 
+bool	Request::hostIsDetected(void) const
+{
+	return (detectHost);
+}
+
 const std::string &Request::getMethod() const
 {
 	return requestLine.at("method");
@@ -184,6 +189,7 @@ void	Request::resetRequest()
 	this->requestInProgress = false;
 	this->remainingChunkLength = 0;
 	this->_requestIsWellFormed = false;
+	this->requestLineInProgress = false;
 	this->_path = "";
 	this->_body = "";
 	this->headers = "";
@@ -193,8 +199,8 @@ void	Request::resetRequest()
 	this->requestLine.clear();
 	this->params.clear();
 	this->headers.clear();
+	this->requestData.clear();
 	this->requestVector.clear();
-
 }
 
 //main function to parse the request
@@ -217,7 +223,7 @@ void	Request::parseRequest(const std::string& receivedRequest, const ServerConte
 			return;
 		}
 	}
-	// std::cout << "requestLineDone: " << requestLineDone << " headersDone: " << headersDone << " requestIsWellFormed: " << _requestIsWellFormed << std::endl;
+	std::cout << "requestLineDone: " << requestLineDone << " headersDone: " << headersDone << " requestIsWellFormed: " << _requestIsWellFormed << std::endl;
 	if (this->requestLine["method"] != "POST" && this->_requestIsWellFormed
 		&& this->headersDone && this->requestLineDone)
 		this->requestIscomplete = true;

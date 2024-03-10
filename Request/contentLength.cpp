@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   contentLength.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 00:05:13 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 20:35:38 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	Request::ContentLength()
 	std::string path = requestLine["path"];
 	std::string extension = "";
 	
-	if (contentLength < _body.size())
+	if (contentLength != _body.size())
 		return (status = BadRequest, requestIscomplete = true, void());
 	if (!file.is_open())
 	{
@@ -65,5 +65,6 @@ void	Request::ContentLength()
 	{
 		file.close();
 		bodyDone = true;
+		requestIscomplete = true;
 	}
 }
