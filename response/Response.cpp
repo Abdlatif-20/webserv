@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/08 03:28:39 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/10 19:09:13 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ std::map<std::string, std::string> Response::mimeTypes;
 Response::Response()
 {
     statusCode = 0;
+    request = NULL;
+    context = NULL;
 }
 
 Response::Response(const Response &obj)
@@ -29,11 +31,9 @@ Response& Response::operator=(const Response& obj)
 {
     if (this == &obj)
         return *this;
-    this->serverCtx = obj.serverCtx;
-    this->request = obj.request;
-    this->statusCode = obj.statusCode;
-    this->headers = obj.headers;
-    this->body = obj.body;
+    request = obj.request;
+    statusCode = obj.statusCode;
+    context = obj.context;
     return *this;
 }
 
@@ -42,114 +42,9 @@ Response::~Response()
 
 }
 
-void Response::setServerCtx(const ServerContext& serverCtx)
-{
-    this->serverCtx = serverCtx;
-}
-
-void Response::setRequest(const Request& request)
+void Response::setRequest(Request* request)
 {
     this->request = request;
-}
-
-void Response::setStatusCode(int statusCode)
-{
-    this->statusCode = statusCode;
-}
-
-void Response::addHeader(const std::string& key, const std::string& value)
-{
-    headers[key] = value;
-}
-
-void Response::setBody(const std::string& body)
-{
-    this->body = body;
-}
-
-const ServerContext &Response::getServerCtx() const
-{
-    return serverCtx;
-}
-
-const Request &Response::getRequest() const
-{
-    return request;
-}
-
-int Response::getStatusCode() const
-{
-    return statusCode;
-}
-
-const std::map<std::string, std::string>& Response::getHeaders() const
-{
-    return headers;
-}
-
-const std::string &Response::getBody() const
-{
-    return body;
-}
-
-std::string Response::getMimeType(const std::string& extension)
-{
-    std::map<std::string, std::string>::const_iterator it = mimeTypes.find(extension);
-    if (it == mimeTypes.cend())
-        return UNKNOWN_MIMETYPE;
-    return it->second;
-}
-
-std::string Response::generateResponse()
-{
-    if (!statusCode)
-        statusCode = request.getStatus();
-    std::string errorPage;
-    if (statusCode >= 400)
-    {
-        headers["Date"] = Utils::getCurrentTime();
-        headers["Server"] = "WebServer 1.0";
-        headers["Connection"] = "Closed";
-        try
-        {
-            errorPage = serverCtx.getErrorPage(Utils::intToString(statusCode));
-            errorPage.empty() ? throw Utils::FileNotFoundException() : errorPage = serverCtx.getRoot() + errorPage;
-            body = Utils::readFile(errorPage);
-            headers["Content-Type"] = getMimeType(Utils::getFileExtension(errorPage));
-            headers["Content-Length"] = body.length();
-            return toString();
-        }
-        catch (const Utils::FileNotFoundException& e)
-        {
-            if (statusCode != 404)
-                return (statusCode = 404, generateResponse());
-        }
-        catch (const Utils::FilePermissionDenied& e)
-        {
-            if (statusCode != 403)
-                return (statusCode = 403, generateResponse());
-        }
-        body = generateHtmlErrorPage();
-        headers["Content-Type"] = "text/html";
-        headers["Content-Length"] = body.length();
-    }
-    else if (statusCode == 200)
-    {
-        std::cout << request.getLocationCtx().getIndex() << std::endl;
-    }
-    return toString();
-}
-
-
-std::string Response::toString()
-{
-    std::string httpVersion = HTTP_VERSION;
-    std::string responseText = httpVersion + " " + Utils::intToString(statusCode) + " " + reasonPhrases[statusCode] + CRLF;
-    std::map<std::string, std::string>::const_iterator it = headers.cbegin();
-    while (it != headers.cend())
-        responseText += it->first + ": " + (it++)->second + CRLF;
-    responseText += CRLF"abcd";
-    return responseText;
 }
 
 std::string Response::generateHtmlErrorPage()

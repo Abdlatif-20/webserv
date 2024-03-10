@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:50:55 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/08 03:20:54 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 12:09:33 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ class Client
 		bool	requestDone;
 		bool	responseDone;
 
-		Config	config;
 		Request request;
 		Response response;
 		ServerContext serverCTX;
@@ -37,7 +36,7 @@ class Client
 		Client(int sock);
 		Client(const Client& cpy);
 
-		int		recvRequest(void);
+		ssize_t	recvRequest(void);
 		void	sendResponse(void);
 
 		void	setSockId(int sock);

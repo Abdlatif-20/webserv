@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 03:18:13 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/09 13:13:50 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,24 +77,24 @@ class Request
 		bool _setLength;
 		bool isComplete;
 		int	receivecount;
+		Context *context;
 		bool headersDone;
 		bool requestLineDone;
 		bool requestInProgress;
 		bool _requestIsWellFormed;
+		LocationContext locationCtx;
 		unsigned int remainingChunkLength;
-		// content length
+
 		unsigned int	contentLength;
 		unsigned int	sizeBoundary;
-		ServerContext serverCTX;
-		LocationContext locationCtx;
-		//maps
+
 		Map _headers;
 		Map requestLine;
 		Map params;
-		//vector
+
 		Vector	requestVector;
 		Vector	files;
-		//strings
+
 		std::string _path;
 		std::string _body;
 		std::string	headers;
@@ -135,7 +135,7 @@ class Request
 		Request& operator=(const Request& obj);
 
 		typedef std::invalid_argument InvalidRequest;
-		void	parseRequest(const std::string& receivedRequest, const ServerContext& serverCTX);
+		void	parseRequest(const std::string& receivedRequest, Context* serverCTX);
 
 	/* *************************** getters ************************************ */
 		const int& getStatus() const;
@@ -153,5 +153,6 @@ class Request
 		bool	isDone(void) const;
 		const std::string& getMethod() const;
 		const std::string& getHost() const;
-		const LocationContext& getLocationCtx() const;
+		Context* getContext() const;
+		const std::string& getRequestPath() const;
 };

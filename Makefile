@@ -3,54 +3,34 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+         #
+#    By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/03/08 04:01:15 by aben-nei         ###   ########.fr        #
+#    Updated: 2024/03/08 10:37:49 by mel-yous         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserv
-CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
-SRCS = $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
-OBJS = $(patsubst %.cpp,obj/%.o,$(SRCS))
-INC = $(wildcard *.hpp) $(wildcard */*.hpp)
-COMPILER = c++ -I config -I utils -I Request -I core -I Response
-MKDIR_P = mkdir -p
+SRCS = $(wildcard *.cpp) $(wildcard */*.cpp)
+INC  = $(wildcard *.hpp) $(wildcard */*.hpp)
+OBJS = $(SRCS:.cpp=.o)
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g# -fsanitize=address
+CPPFLAGS += -I config -I utils -I core -I request -I response
 
-TOTAL := $(words $(SRCS))
-CURRENT = 0
-
-# ANSI color codes
-GREEN = \033[0;32m
-CYAN = \033[0;36m
-YELLOW = \033[0;33m
-NC = \033[0m
-
-all: obj $(NAME)
+all: $(NAME)
 
 $(NAME): $(OBJS)
-	@$(COMPILER) $(CPPFLAGS) $(OBJS) -o $(NAME)
-	@clear
-	@echo "\033[1m\033[35mWebserv is ready to use\033[0m"
-	@echo "\033[1m\033[32mRun ./webserv webserv.conf\033[0m"
+	c++ $(CPPFLAGS) $(OBJS) -o $(NAME)
 
-obj/%.o: %.cpp $(INC)
-	@$(MKDIR_P) $(dir $@)
-	@$(COMPILER) $(CPPFLAGS) -c $< -o $@
-	@clear
-	@$(eval CURRENT=$(shell echo "$$(($(CURRENT)+1))"))
-	@echo "$(CYAN)Compiling$(NC) $<... $$(($(CURRENT)*100/$(TOTAL)))%$(NC)\r"
-
-obj:
-	@$(MKDIR_P) obj
+%.o: %.cpp $(INC)
+	c++ $(CPPFLAGS) -c $< -o $@
 
 clean:
-	@rm -rf obj
-	@echo "$(YELLOW)Cleaning object files...$(NC)"
+	rm -rf $(OBJS)
 
 fclean: clean
-	@rm -f $(NAME)
-	@echo "$(YELLOW)Cleaning executable...$(NC)"
+	rm -rf $(NAME)
 
-re: clean all
+re: clean fclean all
+
+.PHONY: clean server utils config

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:55:56 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/07 17:29:25 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/08 10:40:24 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,12 @@ Server::Server(const ServerContext &_serverCTX)
 	port = serverCTX.getPort();
 	res = NULL;
 	std::memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_UNSPEC;
+	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 	if ((ret = getaddrinfo(host.c_str(), port.c_str(), &hints, &res)) < 0)
 		throw (Fail(gai_strerror(ret)));
-	std::cout << "setuping " << host << ":" << port << " ...\n";
+	std::cout << "Setup Server " << host << ":" << port << " ...\n";
 	serverNames = serverCTX.getServerName();
 	serverNames.push_back(host);
 }

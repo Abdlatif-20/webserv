@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/08 16:24:38 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/10 14:59:42 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,10 +38,11 @@ class Context
         const DirectivesMap& getDirectives() const;
         const std::vector<StringVector>& getErrorPages() const;
         std::string getRoot() const;
-        std::string getIndex() const;
+        std::string getIndex(const std::string& requestPath) const;
         bool getAutoIndex() const;
         int getClientMaxBodySize() const;
         StringVector getAllowedMethods() const;
         std::string getUploadStore() const;
         std::string getErrorPage(const std::string& status) const;
+        StringVector getHttpRedirection() const;
 };

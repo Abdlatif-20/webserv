@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 10:19:52 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/08 18:01:48 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,11 +58,11 @@ void	Request::fillRequestLine(const std::string& requestLine)
 	{
 		if (requestLineVector.front() != "HEAD" && requestLineVector.front() != "PUT"
 			&& requestLineVector.front() != "CONNECT" && requestLineVector.front() != "OPTIONS"
-				&& requestLineVector.front() != "TRACE")
-				{
-					this->status = MethodNotAllowed;
-					requestIscomplete = true;
-				}
+			&& requestLineVector.front() != "TRACE")
+		{
+			this->status = MethodNotAllowed;
+			requestIscomplete = true;
+		}
 		else
 		{
 			this->status = NotImplemented;

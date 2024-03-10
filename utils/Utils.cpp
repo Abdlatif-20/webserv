@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/07 20:26:36 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/10 10:22:44 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -232,4 +232,11 @@ std::string Utils::getFileExtension(const std::string& filePath)
     if (i != std::string::npos)
         return filePath.substr(i, filePath.length());
     return "";
+}
+
+std::string Utils::longlongToString(long long number)
+{
+	std::stringstream ss;
+	ss << number;
+	return ss.str();
 }

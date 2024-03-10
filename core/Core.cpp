@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Core.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/07 22:04:57 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/10 12:47:33 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ void	Core::traceEvents(void)
 			if (fd != -1)
 			{
 				clients[fd].setSockId(fd);
+				clients[fd].setServerCTX(it->getServerCTX()); //Just to work on RESPONSE
 				checklist.push_back((pollfd){fd, POLLIN | POLLOUT | POLLHUP, 0});
 			}
 		}
@@ -90,7 +91,7 @@ void	Core::traceEvents(void)
 		{
 			if (checklist[i].revents & POLLIN)
 				clients[checklist[i].fd].recvRequest();
-			if (checklist[i].revents & POLLOUT && clients[checklist[i].fd].isRequestDone())
+			else if ((checklist[i].revents & POLLOUT) && clients[checklist[i].fd].isRequestDone())
 				clients[checklist[i].fd].sendResponse();
 			if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].isResponseDone())
 			{
