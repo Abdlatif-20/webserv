@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/09 20:34:16 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/10 18:21:53 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ Client::Client(void)
 	sockId = -1;
 	requestDone = false;
 	responseDone = false;
+	serverSelected = false;
 }
 
 Client::Client(int sock)
@@ -24,6 +25,7 @@ Client::Client(int sock)
 	sockId = sock;
 	requestDone = false;
 	responseDone = false;
+	serverSelected = false;
 }
 
 Client::Client(const Client &cpy)
@@ -35,13 +37,16 @@ int	Client::recvRequest(void)
 {
 	std::memset(buff, 0, sizeof(buff));
 	len = recv(sockId, buff, 1023, 0);
-	if (len)
+	if (len > 0)
+	{
 		request.parseRequest(std::string(buff, len), serverCTX);
+		requestDone = request.isDone();
+		if (!serverSelected)
+			selectServerCTX();
+	}
 	else
-		request.parseRequest("\r\n", serverCTX);
-	requestDone = request.isDone();
+		requestDone = true;;
 	responseDone = false;
-	std::cout << len << " => " << buff << std::endl;
 	return (len);
 }
 
@@ -49,11 +54,10 @@ void	Client::sendResponse(void)
 {
 	if (requestDone)
 	{
-		// send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
-		std::cout << request.getStatus() << std::endl;
+		serverSelected = false;
 		response.setServerCtx(serverCTX);
 		response.setRequest(request);
-		std::string resp = response.generateResponse();
+		resp = response.generateResponse();
 		send(sockId, resp.c_str(), resp.length(), 0);
 		response.setStatusCode(0);
 		requestDone = false;
@@ -68,7 +72,7 @@ void	Client::setServerCTX(const ServerContext& serverCTX)
 
 bool	Client::hostIsDetected(void) const
 {
-	return (request.hostIsDetected());
+	return (serverSelected);
 }
 
 bool Client::isRequestDone(void) const
@@ -81,6 +85,65 @@ bool	Client::isResponseDone(void) const
 	return (responseDone);
 }
 
+void Client::selectServerCTX(void)
+{
+	
+	std::string	host;
+	servers_it	it(serv_begin);
+	StringVector::iterator	name;
+
+	try
+	{
+		host = request.getHost();
+	}
+	catch(...){
+		return ;
+	}
+	while (it != serv_end)
+	{
+		StringVector hosts(it->getServerNames());
+		name = std::find(hosts.begin(), hosts.end(), host);
+		if (name != hosts.end())
+		{
+			serverCTX = it->getServerCTX();
+			std::cout << "host => " << serverCTX.getServerName()[0] << std::endl;
+			serverSelected = true;
+			break;
+		}
+		it++;
+	}
+}
+
+void Client::setServersEnd(servers_it it)
+{
+	serv_end = it;
+}
+
+void Client::setServersBegin(servers_it it)
+{
+	serv_begin = it;
+}
+
+const servers_it Client::serversEnd(void) const
+{
+	return (serv_end);
+}
+
+const servers_it Client::serversBegin(void) const
+{
+	return (serv_begin);
+}
+
+const Request &Client::getRequest(void) const
+{
+	return (request);
+}
+
+const Response &Client::getResponse(void) const
+{
+	return (response);
+}
+
 void	Client::setSockId(int sock)
 {
 	sockId = sock;
@@ -90,13 +153,15 @@ Client	&Client::operator=(const Client &cpy)
 {
 	if (this != &cpy)
 	{
-		len = cpy.len;
 		sockId = cpy.sockId;
+		request = cpy.request;
+		response = cpy.response;
+		serv_end = cpy.serv_end;
+		serverCTX = cpy.serverCTX;
+		serv_begin = cpy.serv_begin;
 		requestDone = cpy.requestDone;
 		responseDone = cpy.responseDone;
-		config = cpy.config;
-		request = cpy.request;
-		serverCTX = cpy.serverCTX;
+		serverSelected = cpy.serverSelected;
 	}
 	return (*this);
 }

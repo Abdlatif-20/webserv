@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:21:50 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/09 16:20:56 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/10 13:36:41 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,6 @@ class Core
 		std::vector<Server>	servers;
 		std::map<int, Client>	clients;
 		std::vector<struct pollfd>	checklist;
-
-		typedef std::vector<Server>::iterator	servers_it;
 
 	public:
 		Core(void);

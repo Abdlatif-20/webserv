@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Defs.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 14:36:15 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/07 11:15:43 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/10 13:41:21 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@
 
 class ServerContext;
 class Token;
+class Server;
 class LocationContext;
 
 #define HTTP_VERSION "HTTP/1.1"
@@ -32,6 +33,7 @@ typedef std::vector<ServerContext> ServersVector;
 typedef std::vector<Token> TokensVector;
 typedef std::vector<LocationContext> LocationsVector;
 typedef std::invalid_argument	Fail;
+typedef std::vector<Server>::iterator	servers_it;
 
 typedef enum e_directive
 {
