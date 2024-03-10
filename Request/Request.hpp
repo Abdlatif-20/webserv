@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/10 10:58:04 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/10 14:44:59 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,14 +53,6 @@ enum Errors
 	RequestURITooLong = 414,
 	RequestEntityTooLarge = 413,
 };
-
-enum Status
-{
-	REQUEST_LINE = 0,
-	HEADERS = 0,
-	BODY = 0,
-};
-
 
 #define CR '\r'
 #define CRLF "\r\n"
@@ -125,6 +117,7 @@ class Request
 			void	parseContentLength();
 			void	requestIsWellFormed();
 			void	parseTransferEncoding();
+			void	isMethodAllowedInLocation();
 			void	fillHeaders(Vector headers);
 			bool directoryExists(const char *path);
 			std::string	prepareFileName(std::string line);

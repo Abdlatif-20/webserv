@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/10 10:50:01 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/10 14:52:32 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,14 @@ void	Request::parseTransferEncoding()
 {
 	if (_headers["transfer-encoding"] != "chunked")
 		return (this->status = NotImplemented, requestIscomplete = true, void());
+}
+
+void	Request::isMethodAllowedInLocation()
+{
+	Vector allowedMethods = locationCtx.getAllowedMethods();
+	if (std::find(allowedMethods.begin(), allowedMethods.end(), requestLine["method"]) == allowedMethods.end())
+		return (std::cout << "Method not allowed in location" << std::endl, this->status = MethodNotAllowed, requestIscomplete = true, void());
+	std::cout << "Method is allowed in location" << std::endl;
 }
 
 //function to check if the request Line is well formed And Set the status To true If all is well
@@ -48,6 +56,7 @@ void	Request::requestIsWellFormed()
 			return (this->status = BadRequest, requestIscomplete = true, void());
 	}
 	_requestIsWellFormed = true;
+	isMethodAllowedInLocation();
 }
 
 //function to find the uri in the config file and set the status to true if found
