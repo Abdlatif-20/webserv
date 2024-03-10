@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/09 16:28:21 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/10 10:58:04 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,14 @@ enum Errors
 	RequestURITooLong = 414,
 	RequestEntityTooLarge = 413,
 };
+
+enum Status
+{
+	REQUEST_LINE = 0,
+	HEADERS = 0,
+	BODY = 0,
+};
+
 
 #define CR '\r'
 #define CRLF "\r\n"

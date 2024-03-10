@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/09 19:43:16 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/10 10:50:01 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,7 @@ void	Request::setUploadingPath()
 void	Request::parseTransferEncoding()
 {
 	if (_headers["transfer-encoding"] != "chunked")
-	{
-		this->status = NotImplemented;
-		requestIscomplete = true;
-	}
+		return (this->status = NotImplemented, requestIscomplete = true, void());
 }
 
 //function to check if the request Line is well formed And Set the status To true If all is well
@@ -61,6 +58,7 @@ void	Request::findUri()
 	if (_locationCtx.getPrefix() != "")
 	{
 		this->locationCtx = _locationCtx;
+		std::cout <<"Matched location: " << _locationCtx.getPrefix() << std::endl;
 		foundUri = true;
 		return;
 	}
@@ -114,33 +112,23 @@ int	Request::parseRequestLine(const std::string& requestLine)
 	if (requestLine.find("\r\n\r\n") == std::string::npos)
 	{
 		if (requestLine.find("\r\n") == std::string::npos)
-		{
-			requestLineInProgress = true;
-			requestLineData += requestLine;
-			return 1;
-		}
+			return (requestLineInProgress = true, requestLineData += requestLine, 1);
 		if (requestLineInProgress)
 		{
 			requestLineData += requestLine;
 			this->requestVector = Utils::splitRequest(requestLineData, CRLF);
-			fillRequestLine(this->requestVector[0]); //fill the request line
 			this->requestInProgress = true;
 			requestLineInProgress = false;
 		}
 		else
 		{
 			this->requestVector = Utils::splitRequest(requestLine, CRLF);
-			fillRequestLine(this->requestVector[0]); //fill the request line
 			this->requestInProgress = true;
 		}
-		return 1;
+		return (fillRequestLine(this->requestVector[0]), 1);
 	}
-	else
-	{
-		this->requestVector = Utils::splitRequest(requestLine, CRLF);
-		fillRequestLine(this->requestVector[0]); //fill the request line
-	}
-	return 0;
+	return (this->requestVector = Utils::splitRequest(requestLine,
+			CRLF), fillRequestLine(this->requestVector[0]),0);
 }
 
 //check if the request line or host is duplicated
@@ -188,8 +176,8 @@ int	Request::takingRequests(const std::string& receivedRequest)
 		if (checkDuplicate(receivedRequest))
 			return 1;
 	}
-	// if (foundUri)
-	// {
+	if (foundUri)
+	{
 		if (requestInProgress)
 			requestVector = Utils::splitRequest(requestData, CRLF);
 		else
@@ -200,6 +188,6 @@ int	Request::takingRequests(const std::string& receivedRequest)
 		fillHeaders(requestVector); //fill the headers to the map
 		requestIsWellFormed(); //check if the request is well formed
 		receivecount++;
-	// }
+	}
 	return 0;
 }

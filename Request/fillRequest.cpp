@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/07 22:18:55 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/10 10:43:21 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,16 +59,8 @@ void	Request::fillRequestLine(const std::string& requestLine)
 		if (requestLineVector.front() != "HEAD" && requestLineVector.front() != "PUT"
 			&& requestLineVector.front() != "CONNECT" && requestLineVector.front() != "OPTIONS"
 				&& requestLineVector.front() != "TRACE")
-				{
-					this->status = MethodNotAllowed;
-					requestIscomplete = true;
-				}
-		else
-		{
-			this->status = NotImplemented;
-			requestIscomplete = true;
-		}
-		return;
+				return(this->status = MethodNotAllowed, requestIscomplete = true, void());
+		return(this->status = NotImplemented, requestIscomplete = true, void());
 	}
 	if (requestLineVector[1].front() != '/' || requestLineVector[2] != "HTTP/1.1")
 		return (this->status = BadRequest, requestIscomplete = true, void());
@@ -77,7 +69,7 @@ void	Request::fillRequestLine(const std::string& requestLine)
 	this->requestLineDone = true;
 	this->requestLine = requestLineMap;	
 	fillParams();
-	// findUri();
+	findUri();
 	parseUri();
 }
 
