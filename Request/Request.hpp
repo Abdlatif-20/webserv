@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/10 22:05:20 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/11 15:33:26 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,10 +131,10 @@ class Request
 
 	/* *************************** getters ************************************ */
 		bool					isDone(void) const;
-		const String& 			getHost(void) const;
+		const String 			getHost(void) const;
 		const String&			getBody(void) const;
 		void					setStatus(int status);
-		const String& 			getMethod(void) const;
+		const String 			getMethod(void) const;
 		const int&				getStatus(void) const;
 		const Map& 				getHeaders(void) const;
 		const bool& 			getBodyDone(void) const;
@@ -145,6 +145,8 @@ class Request
 		bool					hostIsDetected(void) const;
 		const bool& 			getRequestLineDone(void) const;
 		const bool& 			getRequestIsWellFormed(void) const;
-		const String& 			getHeaderByName(const String& name) const;
+		const String 			getHeaderByName(const String& name) const;
 
 };
+
+//Connection: keep-alive

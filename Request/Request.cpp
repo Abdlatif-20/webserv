@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/10 20:48:13 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/11 15:40:38 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,8 +129,18 @@ const bool& Request::getHeadersDone() const
 	return (headersDone);
 }
 
-const String& Request::getHeaderByName(const String& name) const
+const String Request::getHeaderByName(const String& name) const
 {
+	try
+	{
+		_headers.at(name);
+	}
+	catch(const std::exception& e)
+	{
+		if (name == "Connection")
+			return ("Keep-Alive");
+		return ("");
+	}
 	return (_headers.at(name));
 }
 
@@ -154,13 +164,27 @@ bool	Request::hostIsDetected(void) const
 	return (detectHost);
 }
 
-const String &Request::getMethod() const
+const String Request::getMethod() const
 {
+	try{
+		requestLine.at("method");
+	}
+	catch(const std::exception& e)
+	{
+		return ("");
+	}
 	return requestLine.at("method");
 }
 
-const String& Request::getHost() const
+const String Request::getHost() const
 {
+	try{
+		_headers.at("host");
+	}
+	catch(const std::exception& e)
+	{
+		return ("");
+	}
 	return _headers.at("host");
 }
 
@@ -210,7 +234,6 @@ void	Request::parseRequest(const String& receivedRequest, const ServerContext& s
 		return;
 	this->serverCTX = serverCTX;
 	std::srand(time(0));
-	setUploadingPath();
 	if (!this->requestLineDone || !this->headersDone || !this->_requestIsWellFormed)
 	{
 		if (takingRequests(receivedRequest))
@@ -228,6 +251,7 @@ void	Request::parseRequest(const String& receivedRequest, const ServerContext& s
 		this->requestIscomplete = true;
 	if (this->requestLine["method"] == "POST" && !this->bodyDone && this->_requestIsWellFormed && this->status == 200)
 	{
+		setUploadingPath();
 		if (this->receivecount > 1)
 		{
 			if (receivedRequest.front() == CR && this->requestInProgress)
