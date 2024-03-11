@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 14:36:15 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/07 11:15:43 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/11 11:16:11 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ class LocationContext;
 #define HTTP_VERSION "HTTP/1.1"
 #define SERVER "WebServer 1.0"
 #define UNKNOWN_MIMETYPE "application/octet-stream"
+#define SPACE " "
 
 typedef std::vector<std::string> StringVector;
 typedef std::pair<std::string, StringVector> Directive;
