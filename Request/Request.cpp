@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/11 15:40:38 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/11 16:17:42 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,14 +131,15 @@ const bool& Request::getHeadersDone() const
 
 const String Request::getHeaderByName(const String& name) const
 {
+	Utils::toLower((String&)name);
 	try
 	{
 		_headers.at(name);
 	}
 	catch(const std::exception& e)
 	{
-		if (name == "Connection")
-			return ("Keep-Alive");
+		if (name == "connection")
+			return ("keep-alive");
 		return ("");
 	}
 	return (_headers.at(name));
