@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/11 09:29:31 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/11 09:30:33 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,13 +195,11 @@ bool Utils::stringStartsWith(const std::string& str, const std::string& prefix)
 std::string Utils::getCurrentTime()
 {
 	time_t rawTime;
-	struct tm * timeInfo;
+	struct tm * tmInfo;
 	char buffer[128];
-
-	time (&rawTime);
-	timeInfo = localtime(&rawTime);
-
-	strftime(buffer, 80, "%a, %d %b %Y %H:%M:%S %Z", timeInfo);
+	time(&rawTime);
+	tmInfo = localtime(&rawTime);
+	strftime(buffer, 80, "%a, %d %b %Y %H:%M:%S %Z", tmInfo);
 	return buffer;
 }
 
