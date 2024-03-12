@@ -6,12 +6,14 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/10 18:10:55 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/12 14:45:44 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "Core.hpp"
+
+std::vector<Server>	Core::servers;
 
 Core::Core(void)
 {
@@ -88,15 +90,16 @@ void	Core::traceEvents(void)
 				clients[fd].setSockId(fd);
 				clients[fd].setServerCTX(it->getServerCTX());
 				checklist.push_back((pollfd){fd, POLLIN | POLLOUT | POLLHUP, 0});
-				std::cout << it->getHostPort() << std::endl;
-				clients[fd].setServersBegin(it);
+				clients[fd].setServersBegin(it - servers.begin());
 				while (it + 1 != servers.end() && *it == *(it + 1))
 					it++;
-				clients[fd].setServersEnd(it + 1);
+				clients[fd].setServersEnd(it - servers.begin() + 1);
 			}
 			else
+			{
 				while (it + 1 != servers.end() && *it == *(it + 1))
 					it++;
+			}
 		}
 		if (!checklist.size())
 			continue ;
@@ -125,7 +128,11 @@ Core &Core::operator=(const Core &cpy)
 {
 	if (this != &cpy)
 	{
+		size = cpy.size;
+		config = cpy.config;
+		clients = cpy.clients;
 		servers = cpy.servers;
+		checklist = cpy.checklist;
 		serversConf = cpy.serversConf;
 	}
 	return (*this);

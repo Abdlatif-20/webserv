@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/10 18:21:53 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/12 14:46:04 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,11 +87,12 @@ bool	Client::isResponseDone(void) const
 
 void Client::selectServerCTX(void)
 {
-	
 	std::string	host;
-	servers_it	it(serv_begin);
+	servers_it it, end;
 	StringVector::iterator	name;
 
+	end = Core::servers.begin() + serv_end;
+	it  = Core::servers.begin() + serv_begin;
 	try
 	{
 		host = request.getHost();
@@ -99,14 +100,13 @@ void Client::selectServerCTX(void)
 	catch(...){
 		return ;
 	}
-	while (it != serv_end)
+	while (it != end)
 	{
 		StringVector hosts(it->getServerNames());
 		name = std::find(hosts.begin(), hosts.end(), host);
 		if (name != hosts.end())
 		{
 			serverCTX = it->getServerCTX();
-			std::cout << "host => " << serverCTX.getServerName()[0] << std::endl;
 			serverSelected = true;
 			break;
 		}
@@ -114,22 +114,22 @@ void Client::selectServerCTX(void)
 	}
 }
 
-void Client::setServersEnd(servers_it it)
+void Client::setServersEnd(size_t it)
 {
 	serv_end = it;
 }
 
-void Client::setServersBegin(servers_it it)
+void Client::setServersBegin(size_t it)
 {
 	serv_begin = it;
 }
 
-const servers_it Client::serversEnd(void) const
+size_t Client::serversEnd(void) const
 {
 	return (serv_end);
 }
 
-const servers_it Client::serversBegin(void) const
+size_t Client::serversBegin(void) const
 {
 	return (serv_begin);
 }

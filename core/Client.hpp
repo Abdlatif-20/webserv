@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:50:55 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/10 18:17:24 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/12 15:19:29 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,12 @@
 #define CLIENT_HPP
 
 #include <iostream>
+#include "Core.hpp"
 #include "Server.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
+
+class Core;
 
 class Client
 {
@@ -30,10 +33,10 @@ class Client
 		bool	serverSelected;
 
 		Request	request;
+		size_t	serv_end;
 		std::string	resp;
+		size_t	serv_begin;
 		Response	response;
-		servers_it	serv_end;
-		servers_it	serv_begin;
 		ServerContext	serverCTX;
 
 	public:
@@ -52,14 +55,14 @@ class Client
 		bool	hostIsDetected(void) const;
 
 		void	selectServerCTX(void);
-		void	setServersEnd(servers_it it);
-		void	setServersBegin(servers_it it);
+		void	setServersEnd(size_t it);
+		void	setServersBegin(size_t it);
 
 		const Request&	getRequest(void) const;
 		const Response&	getResponse(void) const;
 
-		const servers_it	serversEnd(void) const;
-		const servers_it	serversBegin(void) const;
+		size_t	serversEnd(void) const;
+		size_t	serversBegin(void) const;
 
 		Client&	operator=(const Client& cpy);
 
