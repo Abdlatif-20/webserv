@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/12 17:15:09 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/12 17:40:26 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,7 @@ class Request
 		void	parseRequest(const std::string& receivedRequest, Context* serverCTX);
 
 	/* *************************** getters ************************************ */
+		Context*				getContext() const;
 		bool					isDone(void) const;
 		const String 			getHost(void) const;
 		const String&			getBody(void) const;
@@ -145,7 +146,5 @@ class Request
 		const bool& 			getRequestIsWellFormed(void) const;
 		const String 			getHeaderByName(const String& name) const;
 
-		bool	isDone(void) const;
-		Context* getContext() const;
 		const std::string& getRequestPath() const;
 };
