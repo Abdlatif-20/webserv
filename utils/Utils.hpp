@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/10 10:22:09 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/12 11:21:21 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,15 @@ namespace Utils
     	std::string getTokenNameFromDirective(t_directive d);
     	std::string getDefaultErrorPage(const std::string& status);
 		int stringToInt(const std::string& str);
-		int     runServer(char **av);
 		void	decodeUri(std::string& uri);
 		bool		stringStartsWith(const std::string& str, const std::string& prefix);
-		void		setupAddr(sockaddr_in *addr, int port);
+		bool stringEndsWith(const std::string& str, const std::string& suffix);
 		std::string getCurrentTime();
-		std::string readFile(const std::string& filePath);
+		bool checkIfPathExists(const std::string& path);
+		bool isDirectory(const std::string& path);
+		bool isReadableFile(const std::string& path);
 		std::string getFileExtension(const std::string& filePath);
+		long long getFileSize(const std::string& filePath);
 		std::string longlongToString(long long number);
 
 		class FileNotFoundException : public std::exception

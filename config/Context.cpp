@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/10 15:00:01 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/12 15:54:58 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,27 +94,29 @@ std::string Context::getRoot() const
 
 /* The `std::string Context::getIndex() const` function in the `Context` class is a const member
 function that retrieves the index file path specified in the configuration for the server.*/
-std::string Context::getIndex(const std::string& requestPath) const
+std::string Context::getIndex(const std::string& path) const
 {
     DirectivesMap::const_iterator it = directives.find("index");
-    std::string root = getRoot();
     std::string indexPath = "";
     std::ifstream ifs;
+    StringVector::const_iterator vec_iter;
 
     if (it != directives.cend())
     {
-        StringVector::const_iterator vec_iter = it->second.cbegin();
+        vec_iter = it->second.cbegin();
         while (vec_iter != it->second.cend())
         {
-            indexPath = root + requestPath + (*vec_iter);
+            indexPath = path + (*vec_iter);
             ifs.open(indexPath);
             if (ifs.good())
-                return (ifs.close(), indexPath);
+                return (ifs.close(), *vec_iter);
             ifs.close();
             vec_iter++;
         }
     }
-    return indexPath;
+    else
+        return "";
+    return *vec_iter;
 }
 
 /* The `bool Context::getAutoIndex() const` function in the `Context` class is a const member function

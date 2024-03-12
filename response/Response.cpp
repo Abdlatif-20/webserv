@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/10 19:09:13 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/12 17:57:41 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,14 @@ std::map<std::string, std::string> Response::mimeTypes;
 
 Response::Response()
 {
-    statusCode = 0;
     request = NULL;
     context = NULL;
+    statusCode = 0;
+    responseDone = false;
+    headersSent = false;
+    std::memset(buffer, 0, sizeof(buffer));
+    fd = INT_MIN;
+    responseDone = false;
 }
 
 Response::Response(const Response &obj)
@@ -32,8 +37,16 @@ Response& Response::operator=(const Response& obj)
     if (this == &obj)
         return *this;
     request = obj.request;
-    statusCode = obj.statusCode;
     context = obj.context;
+    statusCode = obj.statusCode;
+    responseDone = obj.responseDone;
+    headers = obj.headers;
+    responseMethod = obj.responseMethod;
+    headersSent = obj.headersSent;
+    bodyPath = obj.bodyPath;
+    std::memcpy(buffer, obj.buffer, sizeof(obj.buffer));
+    fd = obj.fd;
+    responseDone = obj.responseDone;
     return *this;
 }
 
@@ -47,11 +60,173 @@ void Response::setRequest(Request* request)
     this->request = request;
 }
 
+void Response::setContext(Context* context)
+{
+    this->context = context;
+}
+
+void Response::setMethod(int method)
+{
+    responseMethod = static_cast<Method>(method);
+}
+
+void Response::setHeadersSent(bool flag)
+{
+    headersSent = flag;
+}
+
+std::string Response::getMimeType(const std::string& extension)
+{
+    std::map<std::string, std::string>::iterator it = mimeTypes.find(extension);
+    if (it == mimeTypes.end())
+        return UNKNOWN_MIMETYPE;
+    return it->second;
+}
+
+const std::string& Response::getBody() const
+{
+    return body;
+}
+
+const std::string& Response::getHeaders() const
+{
+    return headers;
+}
+
+bool Response::getHeadersSent() const
+{
+    return headersSent;
+}
+
+bool Response::responseIsDone() const
+{
+    return responseDone;
+}
+
 std::string Response::generateHtmlErrorPage()
 {
     return "<!DOCTYPE html><html><body><h1 style='text-align: center;'>Error "
         + Utils::intToString(statusCode) + " - "
         + reasonPhrases[statusCode] + "</body></html>";
+}
+
+void Response::generateResponseError()
+{
+    const std::string& errorPage = context->getErrorPage(Utils::intToString(statusCode));
+    std::cout << Utils::intToString(statusCode) << std::endl;
+    if (errorPage.empty())
+        body = generateHtmlErrorPage();
+    else
+    {
+        std::string path = context->getRoot() + errorPage;
+        if (Utils::isDirectory(path) || !Utils::isReadableFile(path))
+        {
+            return;
+        }
+        bodyPath = path;
+    }
+}
+
+void Response::prepareHeaders()
+{
+    if (headersSent)
+        return;
+    headers += std::string(HTTP_VERSION) + SPACE + Utils::intToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
+    headers += "Connection: " + request->getHeaderByName("connection") + CRLF;
+    headers += "Server: " + std::string(SERVER) + CRLF;
+    headers += "Date: " + Utils::getCurrentTime() + CRLF;
+    headers += "Content-Length: " + Utils::longlongToString(Utils::getFileSize(bodyPath)) + CRLF;
+    headers += std::string("Accept-Ranges: bytes") + CRLF;
+    headers += "Content-Type: ";
+    bodyPath.empty() ? headers += "text/html" : headers += getMimeType(Utils::getFileExtension(bodyPath));
+    headers += CRLF;
+    headers += CRLF;
+}
+
+void Response::prepareGETBody()
+{
+    if (bodyPath.empty())
+    {
+        
+    }
+    if (fd == INT_MIN)
+        fd = open(bodyPath.c_str(), O_RDONLY);
+    if (fd == -1)
+    {
+        /* ERROR WHILE OPENING FILE TO BE HANDLED LATER */
+    }
+    body.clear();
+    ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
+    if (readedBytes == -1)
+    {
+        /* Read fail */
+    }
+    if (readedBytes == 0)
+    {
+        responseDone = true;
+        return;
+    }
+    body.append(buffer, readedBytes);
+}
+
+void Response::prepareGET()
+{
+    LocationContext* locationCtx = dynamic_cast<LocationContext*>(context);
+    std::string requestedResource = locationCtx->getRoot() + request->getRequestPath();
+    if (!Utils::checkIfPathExists(requestedResource))
+    {
+        statusCode = NotFound;
+        generateResponseError();
+        return;
+    }
+    if (Utils::isDirectory(requestedResource))
+        requestedResource += "/";
+    if (Utils::stringEndsWith(requestedResource, "/"))
+    {
+        std::string index = locationCtx->getIndex(requestedResource);
+        if (index.empty())
+        {
+            if (locationCtx->getAutoIndex())
+            {
+                /* AUTO_INDEX CODE HERE ! */
+            }
+            else
+            {
+                statusCode = FORBIDDEN;
+                generateResponseError();
+            }
+        }
+        else
+        {
+            bodyPath = requestedResource + index;
+            if (Utils::isDirectory(bodyPath) || !Utils::isReadableFile(bodyPath))
+            {
+                statusCode = FORBIDDEN;
+                generateResponseError();
+                return;
+            }
+            statusCode = OK;
+        }
+    }
+}
+
+void Response::prepareResponse()
+{
+    switch (responseMethod)
+    {
+        case GET:
+            prepareGET();
+            prepareGETBody();
+            prepareHeaders();
+            break;
+        case POST:
+        
+            break;
+        case DELETE:
+            break;
+        default:
+            break;
+    }
 }
 
 void Response::initReasonPhrases()
