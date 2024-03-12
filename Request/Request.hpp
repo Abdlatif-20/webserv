@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/11 16:17:57 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/12 13:05:52 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,10 +29,10 @@ enum Errors
 	OK = 200,
 	NotFound = 404,
 	BadRequest = 400,
+	NotImplemented = 501,
 	LengthRequired = 411,
 	MovedPermanently = 301,
 	MethodNotAllowed = 405,
-	NotImplemented = 501,
 	RequestURITooLong = 414,
 	RequestEntityTooLarge = 413,
 };

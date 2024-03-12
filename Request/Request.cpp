@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/11 16:17:42 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/12 13:23:22 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,9 +247,6 @@ void	Request::parseRequest(const String& receivedRequest, const ServerContext& s
 			return;
 		}
 	}
-	if (this->requestLine["method"] != "POST" && this->_requestIsWellFormed
-		&& this->headersDone && this->requestLineDone)
-		this->requestIscomplete = true;
 	if (this->requestLine["method"] == "POST" && !this->bodyDone && this->_requestIsWellFormed && this->status == 200)
 	{
 		setUploadingPath();
