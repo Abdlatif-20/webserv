@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/07 20:27:34 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/10 10:22:09 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@
 #include <fstream>
 #include <ctime>
 #include <sys/stat.h>
+#include <fcntl.h>
 
 namespace Utils
 {
@@ -54,6 +55,7 @@ namespace Utils
 		std::string getCurrentTime();
 		std::string readFile(const std::string& filePath);
 		std::string getFileExtension(const std::string& filePath);
+		std::string longlongToString(long long number);
 
 		class FileNotFoundException : public std::exception
 		{

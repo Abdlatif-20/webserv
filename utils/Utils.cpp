@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/07 20:26:36 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/11 09:30:33 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,19 +194,13 @@ bool Utils::stringStartsWith(const std::string& str, const std::string& prefix)
 
 std::string Utils::getCurrentTime()
 {
-    std::string strTime;
-    std::time_t t = std::time(0);
-    std::tm* now = std::localtime(&t);
-    int year, month, day, hour, min, sec;
-    year = now->tm_year + 1900;
-    month = now->tm_mon + 1;
-    day = now->tm_mday;
-    hour = now->tm_hour;
-    min = now->tm_min;
-    sec = now->tm_sec;
-    strTime = Utils::intToString(year) + "-" + Utils::intToString(month) + "-" + Utils::intToString(day);
-    strTime += " " + Utils::intToString(hour) + ":" + Utils::intToString(min) + ":" + Utils::intToString(sec);
-    return strTime;
+	time_t rawTime;
+	struct tm * tmInfo;
+	char buffer[128];
+	time(&rawTime);
+	tmInfo = localtime(&rawTime);
+	strftime(buffer, 80, "%a, %d %b %Y %H:%M:%S %Z", tmInfo);
+	return buffer;
 }
 
 std::string Utils::readFile(const std::string& filePath)
@@ -232,4 +226,11 @@ std::string Utils::getFileExtension(const std::string& filePath)
     if (i != std::string::npos)
         return filePath.substr(i, filePath.length());
     return "";
+}
+
+std::string Utils::longlongToString(long long number)
+{
+	std::stringstream ss;
+	ss << number;
+	return ss.str();
 }

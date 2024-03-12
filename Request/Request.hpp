@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/12 13:05:52 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/12 17:15:09 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ enum Errors
 typedef std::vector<std::string> Vector;
 typedef std::map<std::string, std::string> Map;
 typedef std::string String;
-typedef std::invalid_argument InvalidRequest;
 
 class Config;
 
@@ -73,8 +72,8 @@ class Request
 		unsigned int	contentLength;
 		unsigned int	remainingChunkLength;
 		//config
-		ServerContext serverCTX;
-		LocationContext locationCtx;
+		Context			*context;
+		LocationContext	locationCtx;
 		//maps
 		Map	_headers;
 		Map	requestLine;
@@ -125,9 +124,8 @@ class Request
 		Request& operator=(const Request& obj);
 
 	/* *************************** methods ****************************** */
-
-		void	parseRequest(const String& receivedRequest, const ServerContext& serverCTX);
 		void	resetRequest();
+		void	parseRequest(const std::string& receivedRequest, Context* serverCTX);
 
 	/* *************************** getters ************************************ */
 		bool					isDone(void) const;
@@ -147,4 +145,7 @@ class Request
 		const bool& 			getRequestIsWellFormed(void) const;
 		const String 			getHeaderByName(const String& name) const;
 
+		bool	isDone(void) const;
+		Context* getContext() const;
+		const std::string& getRequestPath() const;
 };

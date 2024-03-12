@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/12 14:46:04 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/12 17:16:00 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,13 @@ Client::Client(const Client &cpy)
 	*this = cpy;
 }
 
-int	Client::recvRequest(void)
+ssize_t	Client::recvRequest(void)
 {
 	std::memset(buff, 0, sizeof(buff));
 	len = recv(sockId, buff, 1023, 0);
 	if (len > 0)
 	{
-		request.parseRequest(std::string(buff, len), serverCTX);
+		request.parseRequest(std::string(buff, len), &serverCTX);
 		requestDone = request.isDone();
 		if (!serverSelected)
 			selectServerCTX();
@@ -55,13 +55,13 @@ void	Client::sendResponse(void)
 	if (requestDone)
 	{
 		serverSelected = false;
+		response.setRequest(&request);
 		response.setServerCtx(serverCTX);
-		response.setRequest(request);
-		resp = response.generateResponse();
-		send(sockId, resp.c_str(), resp.length(), 0);
-		response.setStatusCode(0);
 		requestDone = false;
 		responseDone = true;
+		// requestDone = false;
+		// responseDone = false;
+		// send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
 	}
 }
 

@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/16 15:14:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/18 11:23:39 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/09 10:25:22 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,8 @@ static void checkReturn(const Context& ctx)
     if (it != ctx.getDirectives().cend())
     {
         StringVector::const_iterator vec_it = it->second.cbegin();
-        if (!isNumber(*vec_it))
+        int code = std::atoi((*vec_it).c_str());
+        if (!isNumber(*vec_it) || code < 300 || code > 307)
             throw LogicalErrorException("invalid value for `return` directive");
     }
 }

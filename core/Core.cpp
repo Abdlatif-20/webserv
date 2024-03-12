@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/12 14:45:44 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/12 17:18:10 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ void	Core::traceEvents(void)
 		{
 			if (checklist[i].revents & POLLIN)
 				clients[checklist[i].fd].recvRequest();
-			if (checklist[i].revents & POLLOUT && clients[checklist[i].fd].isRequestDone())
+			else if ((checklist[i].revents & POLLOUT) && clients[checklist[i].fd].isRequestDone())
 				clients[checklist[i].fd].sendResponse();
 			if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].isResponseDone())
 			{
