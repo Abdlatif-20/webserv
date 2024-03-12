@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/10 09:31:02 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/12 16:59:29 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,17 +89,17 @@ Request::~Request()
 
 /* *************************** getters *************************** */
 
-const std::string&	Request::getBody() const
+const String&	Request::getBody() const
 {
 	return (_body);
 }
 
-const std::map<std::string, std::string>&	Request::getHeaders() const
+const std::map<String, String>&	Request::getHeaders() const
 {
 	return (_headers);
 }
 
-const std::map<std::string, std::string>&	Request::getRequestLine() const
+const std::map<String, String>&	Request::getRequestLine() const
 {
 	return (requestLine);
 }
@@ -129,8 +129,19 @@ const bool& Request::getHeadersDone() const
 	return (headersDone);
 }
 
-const std::string& Request::getHeaderByName(const std::string& name) const
+const String Request::getHeaderByName(const String& name) const
 {
+	Utils::toLower((String&)name);
+	try
+	{
+		_headers.at(name);
+	}
+	catch(const std::exception& e)
+	{
+		if (name == "connection")
+			return ("keep-alive");
+		return ("");
+	}
 	return (_headers.at(name));
 }
 
@@ -154,13 +165,27 @@ bool	Request::hostIsDetected(void) const
 	return (detectHost);
 }
 
-const std::string &Request::getMethod() const
+const String Request::getMethod() const
 {
+	try{
+		requestLine.at("method");
+	}
+	catch(const std::exception& e)
+	{
+		return ("");
+	}
 	return requestLine.at("method");
 }
 
-const std::string& Request::getHost() const
+const String Request::getHost() const
 {
+	try{
+		_headers.at("host");
+	}
+	catch(const std::exception& e)
+	{
+		return ("");
+	}
 	return _headers.at("host");
 }
 
@@ -204,13 +229,12 @@ void	Request::resetRequest()
 }
 
 //main function to parse the request
-void	Request::parseRequest(const std::string& receivedRequest, const ServerContext& serverCTX)
+void	Request::parseRequest(const String& receivedRequest, const ServerContext& serverCTX)
 {
 	if (receivedRequest.empty())
 		return;
 	this->serverCTX = serverCTX;
 	std::srand(time(0));
-	setUploadingPath();
 	if (!this->requestLineDone || !this->headersDone || !this->_requestIsWellFormed)
 	{
 		if (takingRequests(receivedRequest))
@@ -223,11 +247,9 @@ void	Request::parseRequest(const std::string& receivedRequest, const ServerConte
 			return;
 		}
 	}
-	if (this->requestLine["method"] != "POST" && this->_requestIsWellFormed
-		&& this->headersDone && this->requestLineDone)
-		this->requestIscomplete = true;
 	if (this->requestLine["method"] == "POST" && !this->bodyDone && this->_requestIsWellFormed && this->status == 200)
 	{
+		setUploadingPath();
 		if (this->receivecount > 1)
 		{
 			if (receivedRequest.front() == CR && this->requestInProgress)

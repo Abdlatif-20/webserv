@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/09 19:43:16 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/12 13:26:24 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,18 +25,26 @@ void	Request::setUploadingPath()
 void	Request::parseTransferEncoding()
 {
 	if (_headers["transfer-encoding"] != "chunked")
-	{
-		this->status = NotImplemented;
-		requestIscomplete = true;
-	}
+		return (this->status = NotImplemented, requestIscomplete = true, void());
+}
+
+void	Request::isMethodAllowedInLocation()
+{
+	Vector allowedMethods = locationCtx.getAllowedMethods();
+	if (std::find(allowedMethods.begin(), allowedMethods.end(), requestLine["method"]) == allowedMethods.end())
+		return (std::cout << "Method not allowed in location" << std::endl, this->status = MethodNotAllowed, requestIscomplete = true, void());
+	_requestIsWellFormed = true;
+	std::cout << "Method is allowed in location" << std::endl;
 }
 
 //function to check if the request Line is well formed And Set the status To true If all is well
 void	Request::requestIsWellFormed()
 {
+	if (this->status != OK)
+		return;
 	if (this->requestLine["path"].size() > 2048)
 		return (this->status = RequestURITooLong, requestIscomplete = true, void());
-	if (this->requestLine["path"].find_first_not_of(ALLOWED_CHARACTERS) != std::string::npos)
+	if (this->requestLine["path"].find_first_not_of(ALLOWED_CHARACTERS) != String::npos)
 		return (this->status = BadRequest, requestIscomplete = true, void());
 	if (this->requestLine["method"] == "POST")
 	{
@@ -50,17 +58,21 @@ void	Request::requestIsWellFormed()
 		else
 			return (this->status = BadRequest, requestIscomplete = true, void());
 	}
-	_requestIsWellFormed = true;
+	isMethodAllowedInLocation();
+	if (this->requestLine["method"] != "POST" && this->_requestIsWellFormed
+			&& this->headersDone && this->requestLineDone)
+		this->requestIscomplete = true;
 }
 
 //function to find the uri in the config file and set the status to true if found
 void	Request::findUri()
 {
-	std::string uri = requestLine["path"];
+	String uri = requestLine["path"];
 	LocationContext _locationCtx = serverCTX.matchLocation(uri);
 	if (_locationCtx.getPrefix() != "")
 	{
 		this->locationCtx = _locationCtx;
+		std::cout <<"Matched location: " << _locationCtx.getPrefix() << std::endl;
 		foundUri = true;
 		return;
 	}
@@ -69,10 +81,10 @@ void	Request::findUri()
 }
 
 //function to separate the request line And the headers from the request
-void	Request::separateRequest(std::string receivedRequest)
+void	Request::separateRequest(String receivedRequest)
 {
 	size_t pos = receivedRequest.find("\r\n\r\n");
-	if (pos != std::string::npos)
+	if (pos != String::npos)
 	{
 		this->headers = receivedRequest.substr(0, pos + 4);
 		this->_body = receivedRequest.substr(pos + 4);
@@ -86,7 +98,7 @@ void	Request::separateRequest(std::string receivedRequest)
 
 void	Request::parseUri()
 {
-	if (this->requestLine["path"].find("%") != std::string::npos)
+	if (this->requestLine["path"].find("%") != String::npos)
 		Utils::decodeUri(this->requestLine["path"]);
 }
 
@@ -107,66 +119,56 @@ void	Request::parseBody()
 }
 
 //function to parse the request line and fill it to the map and return 1 if the request line is separated
-int	Request::parseRequestLine(const std::string& requestLine)
+int	Request::parseRequestLine(const String& requestLine)
 {
 	if (!requestLine.size())
 		return 0;
-	if (requestLine.find("\r\n\r\n") == std::string::npos)
+	if (requestLine.find("\r\n\r\n") == String::npos)
 	{
-		if (requestLine.find("\r\n") == std::string::npos)
-		{
-			requestLineInProgress = true;
-			requestLineData += requestLine;
-			return 1;
-		}
+		if (requestLine.find("\r\n") == String::npos)
+			return (requestLineInProgress = true, requestLineData += requestLine, 1);
 		if (requestLineInProgress)
 		{
 			requestLineData += requestLine;
 			this->requestVector = Utils::splitRequest(requestLineData, CRLF);
-			fillRequestLine(this->requestVector[0]); //fill the request line
 			this->requestInProgress = true;
 			requestLineInProgress = false;
 		}
 		else
 		{
 			this->requestVector = Utils::splitRequest(requestLine, CRLF);
-			fillRequestLine(this->requestVector[0]); //fill the request line
 			this->requestInProgress = true;
 		}
-		return 1;
+		return (fillRequestLine(this->requestVector[0]), 1);
 	}
-	else
-	{
-		this->requestVector = Utils::splitRequest(requestLine, CRLF);
-		fillRequestLine(this->requestVector[0]); //fill the request line
-	}
-	return 0;
+	return (this->requestVector = Utils::splitRequest(requestLine,
+			CRLF), fillRequestLine(this->requestVector[0]),0);
 }
 
 //check if the request line or host is duplicated
-int	Request::checkDuplicate(const std::string& receivedRequest)
+int	Request::checkDuplicate(const String& receivedRequest)
 {
 	if (requestInProgress)
 	{
 		if (receivedRequest == CRLF && !requestLineInProgress)
 			return 0;
 		size_t pos = receivedRequest.find(" ");
-		if (pos != std::string::npos)
+		if (pos != String::npos)
 		{
-			std::string value = receivedRequest.substr(0, pos);
-			if (value.find("GET") != std::string::npos
-				|| value.find("POST") != std::string::npos
-				|| value.find("DELETE") != std::string::npos
-				|| value.find("HEAD") != std::string::npos
-				|| value.find("PUT") != std::string::npos
-				|| value.find("CONNECT") != std::string::npos
-				|| value.find("OPTIONS") != std::string::npos
-				|| value.find("TRACE") != std::string::npos)
+			String value = receivedRequest.substr(0, pos);
+			if (value.find("GET") != String::npos
+				|| value.find("POST") != String::npos
+				|| value.find("DELETE") != String::npos
+				|| value.find("HEAD") != String::npos
+				|| value.find("PUT") != String::npos
+				|| value.find("CONNECT") != String::npos
+				|| value.find("OPTIONS") != String::npos
+				|| value.find("TRACE") != String::npos)
 					return (this->status = BadRequest, requestIscomplete = true, 0);
 		}
-		if (receivedRequest.find("host") != std::string::npos)
+		if (receivedRequest.find("host") != String::npos)
 			detectHost++;
-		if (receivedRequest.find("\r\n") == std::string::npos)
+		if (receivedRequest.find("\r\n") == String::npos)
 			return (requestData += receivedRequest, receivecount++, requestLineInProgress = true, 1);
 		if (requestLineInProgress)
 			return (requestData += receivedRequest, requestLineInProgress = false, 1);
@@ -176,7 +178,7 @@ int	Request::checkDuplicate(const std::string& receivedRequest)
 }
 
 //function to take the separated request or complete request and parse it
-int	Request::takingRequests(const std::string& receivedRequest)
+int	Request::takingRequests(const String& receivedRequest)
 {
 	if (!this->requestLineDone)
 	{
@@ -188,8 +190,8 @@ int	Request::takingRequests(const std::string& receivedRequest)
 		if (checkDuplicate(receivedRequest))
 			return 1;
 	}
-	// if (foundUri)
-	// {
+	if (foundUri)
+	{
 		if (requestInProgress)
 			requestVector = Utils::splitRequest(requestData, CRLF);
 		else
@@ -200,6 +202,6 @@ int	Request::takingRequests(const std::string& receivedRequest)
 		fillHeaders(requestVector); //fill the headers to the map
 		requestIsWellFormed(); //check if the request is well formed
 		receivecount++;
-	// }
+	}
 	return 0;
 }

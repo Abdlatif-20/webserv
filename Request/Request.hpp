@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/09 16:28:21 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/12 13:05:52 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,32 +24,15 @@
 #include <sys/stat.h> // For mkdir
 
 
-
-/*
-
-GET / HTTP/1.1
-
-POST / HTTP/1.1
-
-host:localhost:5002
-connection:keep-alive
-accept-encoding:gzip, deflate, br
-Content-Length: 11
-Content-Type: text/plain
-
-Hello world
-
-*/
-
 enum Errors
 {
 	OK = 200,
 	NotFound = 404,
 	BadRequest = 400,
+	NotImplemented = 501,
 	LengthRequired = 411,
 	MovedPermanently = 301,
 	MethodNotAllowed = 405,
-	NotImplemented = 501,
 	RequestURITooLong = 414,
 	RequestEntityTooLarge = 413,
 };
@@ -62,6 +45,7 @@ enum Errors
 
 typedef std::vector<std::string> Vector;
 typedef std::map<std::string, std::string> Map;
+typedef std::string String;
 typedef std::invalid_argument InvalidRequest;
 
 class Config;
@@ -70,65 +54,68 @@ class Request
 {
 	private:
 		//status
-		int status;
-		bool foundUri;
-		bool bodyDone;
-		int	detectHost;
-		bool multipart;
-		bool _setLength;
-		bool isComplete;
-		int	receivecount;
-		bool headersDone;
-		bool requestLineDone;
-		bool requestInProgress;
-		bool requestLineInProgress;
-		bool _requestIsWellFormed;
-		unsigned int remainingChunkLength;
-		// content length
-		unsigned int	contentLength;
+		int		status;
+		bool	foundUri;
+		bool	bodyDone;
+		bool	multipart;
+		int		detectHost;
+		bool	_setLength;
+		bool	headersDone;
+		bool	isComplete;
+		int		receivecount;
+		bool	requestLineDone;
+		bool	requestInProgress;
+		bool	requestIscomplete;
+		bool	requestLineInProgress;
+		bool	_requestIsWellFormed;
+		//unsigned int
 		unsigned int	sizeBoundary;
+		unsigned int	contentLength;
+		unsigned int	remainingChunkLength;
+		//config
 		ServerContext serverCTX;
 		LocationContext locationCtx;
 		//maps
-		Map _headers;
-		Map requestLine;
-		Map params;
+		Map	_headers;
+		Map	requestLine;
+		Map	params;
 		//vector
 		Vector	requestVector;
 		Vector	files;
 		//strings
-		std::string _path;
-		std::string _body;
-		std::string	headers;
-		std::string	requestData;
-		std::string	requestLineData;
-		std::string boundaryName;
-		std::string _chunkedName;
+		String	_path;
+		String	_body;
+		String	headers;
+		String	requestData;
+		String	requestLineData;
+		String	boundaryName;
+		String	_chunkedName;
+
 		/* *************************** methods ********************************* */
-			void	findUri();
-			void	parseUri();
-			void	parseBody();
-			void	fillParams();
-			void	parseBoundary();
-			void	ContentLength();
-			void	parseChunkedBody();
-			void	parseContentType();
-			void	setUploadingPath();
-			void	parseContentLength();
-			void	requestIsWellFormed();
-			void	parseTransferEncoding();
-			void	fillHeaders(Vector headers);
-			bool directoryExists(const char *path);
-			std::string	prepareFileName(std::string line);
-			unsigned int convertToDecimal(std::string hex);
-			std::string& isExist(Map& headers, std::string key);
-			void	separateRequest(std::string receivedRequest);
-			void	fillRequestLine(const std::string& requestLine);
-			int		parseRequestLine(const std::string& requestLine);
-			int		checkDuplicate(const std::string& receivedRequest);
-			int		takingRequests(const std::string& receivedRequest);
-			void	preparLengthAndName(size_t pos, std::string& length, std::ofstream& file);
-			bool requestIscomplete;
+			void			findUri();
+			void			parseUri();
+			void			parseBody();
+			void			fillParams();
+			void			parseBoundary();
+			void			ContentLength();
+			void			parseChunkedBody();
+			void			parseContentType();
+			void			setUploadingPath();
+			void			parseContentLength();
+			void			requestIsWellFormed();
+			void			parseTransferEncoding();
+			void			isMethodAllowedInLocation();
+			void			fillHeaders(Vector headers);
+			String			prepareFileName(String line);
+			unsigned int	convertToDecimal(String hex);
+			bool			directoryExists(const char *path);
+			String& 		isExist(Map& headers, String key);
+			void			separateRequest(String receivedRequest);
+			void			fillRequestLine(const String& requestLine);
+			int				parseRequestLine(const String& requestLine);
+			int				checkDuplicate(const String& receivedRequest);
+			int				takingRequests(const String& receivedRequest);
+			void			preparLengthAndName(size_t pos, String& length, std::ofstream& file);
 	public:
 	/* *************************** constructors ****************************** */
 	
@@ -139,25 +126,25 @@ class Request
 
 	/* *************************** methods ****************************** */
 
-		void	parseRequest(const std::string& receivedRequest, const ServerContext& serverCTX);
+		void	parseRequest(const String& receivedRequest, const ServerContext& serverCTX);
 		void	resetRequest();
 
 	/* *************************** getters ************************************ */
-		const int& getStatus() const;
-		void setStatus(int status);
-		const std::string& getBody() const;
-		const Map& getHeaders() const;
-		const Map& getRequestLine() const;
-		const bool& getRequestIsWellFormed() const;
-		const bool& getBodyDone() const;
-		const bool& getHeadersDone() const;
-		const std::string& getHeaderByName(const std::string& name) const;
-		const bool& getRequestLineDone() const;
-		const bool& getFoundUri() const;
+		bool					isDone(void) const;
+		const String 			getHost(void) const;
+		const String&			getBody(void) const;
+		void					setStatus(int status);
+		const String 			getMethod(void) const;
+		const int&				getStatus(void) const;
+		const Map& 				getHeaders(void) const;
+		const bool& 			getBodyDone(void) const;
+		const bool& 			getFoundUri(void) const;
+		const bool& 			getHeadersDone(void) const;
+		const Map& 				getRequestLine(void) const;
+		const LocationContext&	getLocationCtx(void) const;
+		bool					hostIsDetected(void) const;
+		const bool& 			getRequestLineDone(void) const;
+		const bool& 			getRequestIsWellFormed(void) const;
+		const String 			getHeaderByName(const String& name) const;
 
-		bool	isDone(void) const;
-		bool	hostIsDetected(void) const;
-		const std::string& getMethod() const;
-		const std::string& getHost() const;
-		const LocationContext& getLocationCtx() const;
 };

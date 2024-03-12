@@ -6,14 +6,14 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:40:48 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/08 02:46:46 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/10 20:49:46 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
 // function to convert hex to decimal
-unsigned int Request::convertToDecimal(std::string hex)
+unsigned int Request::convertToDecimal(String hex)
 {
 	if (hex.empty())
 		return (0);
@@ -26,9 +26,9 @@ unsigned int Request::convertToDecimal(std::string hex)
 }
 
 // function to prepare the length and the name of the file
-void	Request::preparLengthAndName(size_t pos, std::string& length, std::ofstream& file)
+void	Request::preparLengthAndName(size_t pos, String& length, std::ofstream& file)
 {
-	if (!_setLength && (pos = _body.find("\r\n")) != std::string::npos)
+	if (!_setLength && (pos = _body.find("\r\n")) != String::npos)
 	{
 		length = _body.substr(0, pos);
 		remainingChunkLength = convertToDecimal(length);
