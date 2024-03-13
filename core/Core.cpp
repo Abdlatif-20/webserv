@@ -6,12 +6,14 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/09 17:52:49 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/12 17:18:10 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 
 #include "Core.hpp"
+
+std::vector<Server>	Core::servers;
 
 Core::Core(void)
 {
@@ -34,7 +36,7 @@ Core::Core(const Config &conf)
 		servers.push_back(Server(*it++));
 	std::sort(servers.begin(), servers.end());
 	for (size_t i = 0; i < servers.size(); i++)
-		std::cout << servers[i].getHostPort() << std::endl;
+		std::cout << servers[i].getHostPort()<< " " << servers[i].getServerNames()[0] << std::endl;
 	std::cout << "================================================" << std::endl;
 }
 
@@ -88,10 +90,16 @@ void	Core::traceEvents(void)
 				clients[fd].setSockId(fd);
 				clients[fd].setServerCTX(it->getServerCTX());
 				checklist.push_back((pollfd){fd, POLLIN | POLLOUT | POLLHUP, 0});
-				std::cout << it->getHostPort() << std::endl;
+				clients[fd].setServersBegin(it - servers.begin());
+				while (it + 1 != servers.end() && *it == *(it + 1))
+					it++;
+				clients[fd].setServersEnd(it - servers.begin() + 1);
 			}
-			if (it + 1 != servers.end() && *it == *(it + 1))
-				it++;
+			else
+			{
+				while (it + 1 != servers.end() && *it == *(it + 1))
+					it++;
+			}
 		}
 		if (!checklist.size())
 			continue ;
@@ -99,14 +107,8 @@ void	Core::traceEvents(void)
 		for (i = 0; i < checklist.size(); i++)
 		{
 			if (checklist[i].revents & POLLIN)
-			{
 				clients[checklist[i].fd].recvRequest();
-				if (clients[checklist[i].fd].hostIsDetected())
-				{
-					
-				}
-			}
-			if (checklist[i].revents & POLLOUT && clients[checklist[i].fd].isRequestDone())
+			else if ((checklist[i].revents & POLLOUT) && clients[checklist[i].fd].isRequestDone())
 				clients[checklist[i].fd].sendResponse();
 			if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].isResponseDone())
 			{
@@ -126,7 +128,11 @@ Core &Core::operator=(const Core &cpy)
 {
 	if (this != &cpy)
 	{
+		size = cpy.size;
+		config = cpy.config;
+		clients = cpy.clients;
 		servers = cpy.servers;
+		checklist = cpy.checklist;
 		serversConf = cpy.serversConf;
 	}
 	return (*this);

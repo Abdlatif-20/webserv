@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/07 14:01:29 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/12 11:45:57 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,16 +17,35 @@
 
 class Response
 {
+    enum Method
+    {
+        GET, POST, DELETE  
+    };
+    enum Status
+    {
+        FORBIDDEN = 403  
+    };
     private:
-        ServerContext serverCtx;
-        Request request;
+        Request *request;
+        Context *context;
+        Method responseMethod;
+
+        char buffer[1024];
+        int fd;
 
         int statusCode;
-        std::map<std::string, std::string> headers;
+        std::string headers;
         std::string body;
+        std::string bodyPath;
+        bool headersSent;
+        bool responseDone;
 
-        std::string toString();
         std::string generateHtmlErrorPage();
+        void generateResponseError();
+        void prepareHeaders();
+        void prepareGETBody();
+        void prepareGET();
+
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;
     public:
@@ -35,22 +54,17 @@ class Response
         Response& operator=(const Response& obj);
         ~Response();
         
-        /* Setters */
-        void setServerCtx(const ServerContext& serverCtx);
-        void setRequest(const Request& request);
-        void setStatusCode(int statusCode);
-        void addHeader(const std::string& key, const std::string& value);
-        void setBody(const std::string& body);
-
-        /* Getters */
-        const ServerContext& getServerCtx() const;
-        const Request& getRequest() const;
-        int getStatusCode() const;
-        const std::map<std::string, std::string>& getHeaders() const;
+        void setRequest(Request* request);
+        void setContext(Context* context);
+        void setMethod(int method);
+        void setHeadersSent(bool flag);
+        static std::string getMimeType(const std::string& extension);
         const std::string& getBody() const;
-        std::string getMimeType(const std::string& extension);
+        const std::string& getHeaders() const;
+        bool getHeadersSent() const;
+        bool responseIsDone() const;
 
-        std::string generateResponse();
+        void prepareResponse();
 
         static void initReasonPhrases();
         static void initMimeTypes();

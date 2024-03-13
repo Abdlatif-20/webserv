@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   contentLength.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/10 20:49:13 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/12 17:21:07 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,16 @@
 //function to parse the content length
 void	Request::parseContentLength()
 {
-	if (_headers["content-length"].find_first_not_of("0123456789") != String::npos)
-		return (status = BadRequest, requestIscomplete = true, void());
-	if (Utils::stringToInt(_headers["content-length"]) > MAX_BODY_SIZE)
-		return (status = RequestEntityTooLarge, requestIscomplete = true, void());
+	if (_headers["content-length"].find_first_not_of("0123456789") != std::string::npos)
+	{
+		status = BadRequest;
+		requestIscomplete = true;
+	}
+	if (Utils::stringToInt(_headers["content-length"]) > context->getClientMaxBodySize())
+	{
+		status = RequestEntityTooLarge;
+		requestIscomplete = true;
+	}
 	contentLength = Utils::stringToInt(_headers["content-length"]);
 }
 

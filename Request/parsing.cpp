@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/12 13:26:24 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/12 17:23:50 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 //function to set the path to the upload store
 void	Request::setUploadingPath()
 {
-	this->_path = serverCTX.getUploadStore();
+	this->_path = context->getUploadStore();
 	this->_path += "/";
 	if (!directoryExists(this->_path.c_str()))
 		mkdir(this->_path.c_str(), 0777);
@@ -67,12 +67,14 @@ void	Request::requestIsWellFormed()
 //function to find the uri in the config file and set the status to true if found
 void	Request::findUri()
 {
-	String uri = requestLine["path"];
-	LocationContext _locationCtx = serverCTX.matchLocation(uri);
-	if (_locationCtx.getPrefix() != "")
+	/* cast from context to SERVERCTX */
+	std::string uri = requestLine["path"];
+	ServerContext* serverCtx = dynamic_cast<ServerContext*>(context);
+	LocationContext locationCtx = serverCtx->matchLocation(uri);
+	if (locationCtx.getPrefix() != "")
 	{
-		this->locationCtx = _locationCtx;
-		std::cout <<"Matched location: " << _locationCtx.getPrefix() << std::endl;
+		this->locationCtx = locationCtx;
+		this->context = &this->locationCtx;
 		foundUri = true;
 		return;
 	}

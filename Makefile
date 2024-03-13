@@ -6,7 +6,7 @@
 #    By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/03/09 16:22:40 by houmanso         ###   ########.fr        #
+#    Updated: 2024/03/12 17:02:34 by houmanso         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,11 +42,11 @@ obj/%.o: %.cpp $(INC)
 	@echo "$(CYAN)Compiling$(NC) $< ... $$(($(CURRENT)*100/$(TOTAL)))%$(NC)\r"
 
 clean:
-	@rm -rf obj
-	@echo "$(YELLOW)Cleaning object files...$(NC)"
+	rm -rf $(OBJS)
 
 fclean: clean
-	@rm -f $(NAME)
-	@echo "$(YELLOW)Cleaning executable...$(NC)"
+	rm -rf $(NAME)
 
-re: clean all
+re: clean fclean all
+
+.PHONY: clean server utils config

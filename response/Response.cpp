@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/08 11:01:08 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/13 11:49:40 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,14 @@ std::map<std::string, std::string> Response::mimeTypes;
 
 Response::Response()
 {
+    request = NULL;
+    context = NULL;
     statusCode = 0;
+    responseDone = false;
+    headersSent = false;
+    std::memset(buffer, 0, sizeof(buffer));
+    fd = INT_MIN;
+    responseDone = false;
 }
 
 Response::Response(const Response &obj)
@@ -29,11 +36,17 @@ Response& Response::operator=(const Response& obj)
 {
     if (this == &obj)
         return *this;
-    this->serverCtx = obj.serverCtx;
-    this->request = obj.request;
-    this->statusCode = obj.statusCode;
-    this->headers = obj.headers;
-    this->body = obj.body;
+    request = obj.request;
+    context = obj.context;
+    statusCode = obj.statusCode;
+    responseDone = obj.responseDone;
+    headers = obj.headers;
+    responseMethod = obj.responseMethod;
+    headersSent = obj.headersSent;
+    bodyPath = obj.bodyPath;
+    std::memcpy(buffer, obj.buffer, sizeof(obj.buffer));
+    fd = obj.fd;
+    responseDone = obj.responseDone;
     return *this;
 }
 
@@ -42,114 +55,52 @@ Response::~Response()
 
 }
 
-void Response::setServerCtx(const ServerContext& serverCtx)
-{
-    this->serverCtx = serverCtx;
-}
-
-void Response::setRequest(const Request& request)
+void Response::setRequest(Request* request)
 {
     this->request = request;
 }
 
-void Response::setStatusCode(int statusCode)
+void Response::setContext(Context* context)
 {
-    this->statusCode = statusCode;
+    this->context = context;
 }
 
-void Response::addHeader(const std::string& key, const std::string& value)
+void Response::setMethod(int method)
 {
-    headers[key] = value;
+    responseMethod = static_cast<Method>(method);
 }
 
-void Response::setBody(const std::string& body)
+void Response::setHeadersSent(bool flag)
 {
-    this->body = body;
-}
-
-const ServerContext &Response::getServerCtx() const
-{
-    return serverCtx;
-}
-
-const Request &Response::getRequest() const
-{
-    return request;
-}
-
-int Response::getStatusCode() const
-{
-    return statusCode;
-}
-
-const std::map<std::string, std::string>& Response::getHeaders() const
-{
-    return headers;
-}
-
-const std::string &Response::getBody() const
-{
-    return body;
+    headersSent = flag;
 }
 
 std::string Response::getMimeType(const std::string& extension)
 {
-    std::map<std::string, std::string>::const_iterator it = mimeTypes.find(extension);
-    if (it == mimeTypes.cend())
+    std::map<std::string, std::string>::iterator it = mimeTypes.find(extension);
+    if (it == mimeTypes.end())
         return UNKNOWN_MIMETYPE;
     return it->second;
 }
 
-std::string Response::generateResponse()
+const std::string& Response::getBody() const
 {
-    if (!statusCode)
-        statusCode = request.getStatus();
-    std::string errorPage;
-    if (statusCode >= 400)
-    {
-        headers["Date"] = Utils::getCurrentTime();
-        headers["Server"] = "WebServer 1.0";
-        headers["Connection"] = "Closed";
-        try
-        {
-            errorPage = serverCtx.getErrorPage(Utils::intToString(statusCode));
-            errorPage.empty() ? throw Utils::FileNotFoundException() : errorPage = serverCtx.getRoot() + errorPage;
-            body = Utils::readFile(errorPage);
-            headers["Content-Type"] = getMimeType(Utils::getFileExtension(errorPage));
-            headers["Content-Length"] = body.length();
-            return toString();
-        }
-        catch (const Utils::FileNotFoundException& e)
-        {
-            if (statusCode != 404)
-                return (statusCode = 404, generateResponse());
-        }
-        catch (const Utils::FilePermissionDenied& e)
-        {
-            if (statusCode != 403)
-                return (statusCode = 403, generateResponse());
-        }
-        body = generateHtmlErrorPage();
-        headers["Content-Type"] = "text/html";
-        headers["Content-Length"] = body.length();
-    }
-    else if (statusCode == 200)
-    {
-        // std::cout << request.getLocationCtx().getIndex() << std::endl;
-    }
-    return toString();
+    return body;
 }
 
-
-std::string Response::toString()
+const std::string& Response::getHeaders() const
 {
-    // std::string httpVersion = HTTP_VERSION;
-    std::string responseText = HTTP_VERSION" " + Utils::intToString(statusCode) + " " + reasonPhrases[statusCode] + CRLF;
-    std::map<std::string, std::string>::const_iterator it = headers.cbegin();
-    while (it != headers.cend())
-        responseText += it->first + ": " + (it++)->second + CRLF;
-    responseText += CRLF"abcd";
-    return responseText;
+    return headers;
+}
+
+bool Response::getHeadersSent() const
+{
+    return headersSent;
+}
+
+bool Response::responseIsDone() const
+{
+    return responseDone;
 }
 
 std::string Response::generateHtmlErrorPage()
@@ -157,6 +108,121 @@ std::string Response::generateHtmlErrorPage()
     return "<!DOCTYPE html><html><body><h1 style='text-align: center;'>Error "
         + Utils::intToString(statusCode) + " - "
         + reasonPhrases[statusCode] + "</body></html>";
+}
+
+void Response::generateResponseError()
+{
+    const std::string& errorPage = context->getErrorPage(Utils::intToString(statusCode));
+    std::cout << Utils::intToString(statusCode) << std::endl;
+    if (errorPage.empty())
+        body = generateHtmlErrorPage();
+    else
+    {
+        std::string path = context->getRoot() + errorPage;
+        if (Utils::isDirectory(path) || !Utils::isReadableFile(path))
+        {
+            return;
+        }
+        bodyPath = path;
+    }
+}
+
+void Response::prepareHeaders()
+{
+    if (headersSent)
+        return;
+    headers += std::string(HTTP_VERSION) + SPACE + Utils::intToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
+    headers += "Connection: " + request->getHeaderByName("connection") + CRLF;
+    headers += "Server: " + std::string(SERVER) + CRLF;
+    headers += "Date: " + Utils::getCurrentTime() + CRLF;
+    headers += "Content-Length: " + Utils::longlongToString(Utils::getFileSize(bodyPath)) + CRLF;
+    headers += std::string("Accept-Ranges: bytes") + CRLF;
+    headers += "Content-Type: ";
+    bodyPath.empty() ? headers += "text/html" : headers += getMimeType(Utils::getFileExtension(bodyPath));
+    headers += CRLF;
+    headers += CRLF;
+}
+
+void Response::prepareGETBody()
+{
+    if (bodyPath.empty())
+    {
+        
+    }
+    if (fd == INT_MIN)
+        fd = open(bodyPath.c_str(), O_RDONLY);
+    if (fd == -1)
+    {
+        /* ERROR WHILE OPENING FILE TO BE HANDLED LATER */
+    }
+    body.clear();
+    ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
+    if (readedBytes <= 0)
+	{
+        responseDone = true;
+        return;
+    }
+    body.append(buffer, readedBytes);
+}
+
+void Response::prepareGET()
+{
+    LocationContext* locationCtx = dynamic_cast<LocationContext*>(context);
+    std::string requestedResource = locationCtx->getRoot() + request->getRequestPath();
+    if (!Utils::checkIfPathExists(requestedResource))
+    {
+        statusCode = NotFound;
+        generateResponseError();
+        return;
+    }
+    if (Utils::isDirectory(requestedResource))
+        requestedResource += "/";
+    if (Utils::stringEndsWith(requestedResource, "/"))
+    {
+        std::string index = locationCtx->getIndex(requestedResource);
+        if (index.empty())
+        {
+            if (locationCtx->getAutoIndex())
+            {
+                /* AUTO_INDEX CODE HERE ! */
+            }
+            else
+            {
+                statusCode = FORBIDDEN;
+                generateResponseError();
+            }
+        }
+        else
+        {
+            bodyPath = requestedResource + index;
+            if (Utils::isDirectory(bodyPath) || !Utils::isReadableFile(bodyPath))
+            {
+                statusCode = FORBIDDEN;
+                generateResponseError();
+                return;
+            }
+            statusCode = OK;
+        }
+    }
+}
+
+void Response::prepareResponse()
+{
+    switch (responseMethod)
+    {
+        case GET:
+            prepareGET();
+            prepareGETBody();
+            prepareHeaders();
+            break;
+        case POST:
+        
+            break;
+        case DELETE:
+            break;
+        default:
+            break;
+    }
 }
 
 void Response::initReasonPhrases()

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/12 13:05:52 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/13 11:41:02 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ enum Errors
 typedef std::vector<std::string> Vector;
 typedef std::map<std::string, std::string> Map;
 typedef std::string String;
-typedef std::invalid_argument InvalidRequest;
 
 class Config;
 
@@ -73,8 +72,8 @@ class Request
 		unsigned int	contentLength;
 		unsigned int	remainingChunkLength;
 		//config
-		ServerContext serverCTX;
-		LocationContext locationCtx;
+		Context			*context;
+		LocationContext	locationCtx;
 		//maps
 		Map	_headers;
 		Map	requestLine;
@@ -125,9 +124,8 @@ class Request
 		Request& operator=(const Request& obj);
 
 	/* *************************** methods ****************************** */
-
-		void	parseRequest(const String& receivedRequest, const ServerContext& serverCTX);
 		void	resetRequest();
+		void	parseRequest(const std::string& receivedRequest, Context* serverCTX);
 
 	/* *************************** getters ************************************ */
 		bool					isDone(void) const;
@@ -136,11 +134,13 @@ class Request
 		void					setStatus(int status);
 		const String 			getMethod(void) const;
 		const int&				getStatus(void) const;
+		Context*				getContext(void) const;
 		const Map& 				getHeaders(void) const;
 		const bool& 			getBodyDone(void) const;
 		const bool& 			getFoundUri(void) const;
 		const bool& 			getHeadersDone(void) const;
 		const Map& 				getRequestLine(void) const;
+		const std::string&		getRequestPath(void) const;
 		const LocationContext&	getLocationCtx(void) const;
 		bool					hostIsDetected(void) const;
 		const bool& 			getRequestLineDone(void) const;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/07 20:26:36 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/12 11:22:45 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,14 +129,6 @@ int Utils::stringToInt(const std::string& str)
 	return result;
 }
 
-void	Utils::setupAddr(sockaddr_in *addr, int port)
-{
-	std::memset(addr, 0, sizeof(sockaddr_in));
-	addr->sin_port = htons(port);
-	addr->sin_family = AF_INET;
-	addr->sin_addr.s_addr = INADDR_ANY;
-}
-
 std::string Utils::getTokenNameFromDirective(t_directive d)
 {
 	switch (d)
@@ -192,38 +184,46 @@ bool Utils::stringStartsWith(const std::string& str, const std::string& prefix)
 	return (!std::strncmp(str.c_str(), prefix.c_str(), prefix.length()));
 }
 
-std::string Utils::getCurrentTime()
+bool Utils::stringEndsWith(const std::string& str, const std::string& suffix)
 {
-    std::string strTime;
-    std::time_t t = std::time(0);
-    std::tm* now = std::localtime(&t);
-    int year, month, day, hour, min, sec;
-    year = now->tm_year + 1900;
-    month = now->tm_mon + 1;
-    day = now->tm_mday;
-    hour = now->tm_hour;
-    min = now->tm_min;
-    sec = now->tm_sec;
-    strTime = Utils::intToString(year) + "-" + Utils::intToString(month) + "-" + Utils::intToString(day);
-    strTime += " " + Utils::intToString(hour) + ":" + Utils::intToString(min) + ":" + Utils::intToString(sec);
-    return strTime;
+	if (suffix.size() > str.size())
+		return false;
+	return !str.compare(str.size() - suffix.size(), suffix.size(), suffix);
 }
 
-std::string Utils::readFile(const std::string& filePath)
+std::string Utils::getCurrentTime()
 {
-    std::string line;
-    struct stat statBuffer;
-    if (stat(filePath.c_str(), &statBuffer) == -1)
-        throw FileNotFoundException();
-    if (S_ISDIR(statBuffer.st_mode) || !(S_IRUSR & statBuffer.st_mode))
-        throw FilePermissionDenied();
-    std::ifstream ifs(filePath);
-    std::string text;
-    if (!ifs.good())
-        throw FileNotFoundException();
-    while (std::getline(ifs, line))
-        text += line;
-    return text;
+	time_t rawTime;
+	struct tm * tmInfo;
+	char buffer[128];
+	time(&rawTime);
+	tmInfo = localtime(&rawTime);
+	std::strftime(buffer, 128, "%a, %d %b %Y %H:%M:%S %Z", tmInfo);
+	return buffer;
+}
+
+bool Utils::checkIfPathExists(const std::string& path)
+{
+	struct stat statBuff;
+	if (stat(path.c_str(), &statBuff) < 0)
+		return false;
+	return true;
+}
+
+bool Utils::isDirectory(const std::string& path)
+{
+	struct stat statBuff;
+	if (stat(path.c_str(), &statBuff) >= 0 && S_ISDIR(statBuff.st_mode))
+		return true;
+	return false;
+}
+
+bool Utils::isReadableFile(const std::string& path)
+{
+	struct stat statBuff;
+	if (stat(path.c_str(), &statBuff) >= 0 && (statBuff.st_mode & S_IRUSR))
+		return true;
+	return false;
 }
 
 std::string Utils::getFileExtension(const std::string& filePath)
@@ -232,4 +232,19 @@ std::string Utils::getFileExtension(const std::string& filePath)
     if (i != std::string::npos)
         return filePath.substr(i, filePath.length());
     return "";
+}
+
+long long Utils::getFileSize(const std::string& filePath)
+{
+	struct stat statBuff;
+	if (stat(filePath.c_str(), &statBuff) >= 0)
+		return statBuff.st_size;
+	return -1;
+}
+
+std::string Utils::longlongToString(long long number)
+{
+	std::stringstream ss;
+	ss << number;
+	return ss.str();
 }

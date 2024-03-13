@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/13 16:23:57 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/09 11:23:06 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/10 11:41:33 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ class Server
 		const std::string&	getPort(void) const;
 		const std::string&	getHostPort(void) const;
 
+		const StringVector&	getServerNames(void) const;
 		const ServerContext&	getServerCTX(void) const;
 
 		Server&	operator=(const Server& cpy);

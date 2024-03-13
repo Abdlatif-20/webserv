@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:55:56 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/09 11:23:53 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/12 17:19:39 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,9 @@ Server::Server(const ServerContext &_serverCTX)
 	hints.ai_flags = AI_PASSIVE;
 	if ((ret = getaddrinfo(host.c_str(), port.c_str(), &hints, &res)) < 0)
 		throw (Fail(gai_strerror(ret)));
+	std::cout << "Setup Server " << host << ":" << port << " ...\n";
 	serverNames = serverCTX.getServerName();
+	serverNames.push_back(host_port);
 	serverNames.push_back(host);
 }
 
@@ -83,7 +85,12 @@ const std::string &Server::getHostPort(void) const
 	return (host_port);
 }
 
-const ServerContext& Server::getServerCTX(void) const
+const StringVector &Server::getServerNames(void) const
+{
+	return (serverNames);
+}
+
+const ServerContext &Server::getServerCTX(void) const
 {
 	return (serverCTX);
 }

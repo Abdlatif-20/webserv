@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/06 19:28:20 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/11 16:04:10 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ class Context
         Context();
         Context(const Context& obj);
         Context& operator=(const Context& obj);
-        ~Context();
+        virtual ~Context();
 
         void addDirective(Directive _directive);
         void appendDirective(Directive _directive);
@@ -38,10 +38,11 @@ class Context
         const DirectivesMap& getDirectives() const;
         const std::vector<StringVector>& getErrorPages() const;
         std::string getRoot() const;
-        std::string getIndex() const;
+        std::string getIndex(const std::string& path) const;
         bool getAutoIndex() const;
         int getClientMaxBodySize() const;
         StringVector getAllowedMethods() const;
         std::string getUploadStore() const;
         std::string getErrorPage(const std::string& status) const;
+        StringVector getHttpRedirection() const;
 };
