@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Context.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/12 15:54:58 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/13 13:04:21 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,9 +114,9 @@ std::string Context::getIndex(const std::string& path) const
             vec_iter++;
         }
     }
-    else
-        return "";
-    return *vec_iter;
+    // else
+        return ""; // still dont know why thats happen and what should happen
+    // return *vec_iter;
 }
 
 /* The `bool Context::getAutoIndex() const` function in the `Context` class is a const member function
