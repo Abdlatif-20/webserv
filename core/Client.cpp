@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/09 20:34:16 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/12 13:32:44 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ int	Client::recvRequest(void)
 		request.parseRequest("\r\n", serverCTX);
 	requestDone = request.isDone();
 	responseDone = false;
-	std::cout << len << " => " << buff << std::endl;
 	return (len);
 }
 
