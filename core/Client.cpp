@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/12 17:16:00 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/13 11:37:04 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,16 +52,28 @@ ssize_t	Client::recvRequest(void)
 
 void	Client::sendResponse(void)
 {
-	if (requestDone)
+	if (requestDone && !responseDone)
 	{
-		serverSelected = false;
-		response.setRequest(&request);
-		response.setServerCtx(serverCTX);
 		requestDone = false;
 		responseDone = true;
-		// requestDone = false;
-		// responseDone = false;
-		// send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
+		serverSelected = false;
+		response.setRequest(&request);
+		response.setContext(request.getContext());
+		if (request.getMethod() == "GET")
+			response.setMethod(0);
+		else if (request.getMethod() == "POST")
+			response.setMethod(1);
+		else if (request.getMethod() == "DELETE")
+			response.setMethod(2);
+		response.prepareResponse();
+		if (!response.getHeadersSent())
+		{
+			send(sockId, response.getHeaders().c_str(), response.getHeaders().size(), 0);
+			std::cout << response.getHeaders() << std::endl;
+			response.setHeadersSent(true);
+		}
+		responseDone = response.responseIsDone();
+		send(sockId, response.getBody().c_str(), response.getBody().size(), 0);
 	}
 }
 

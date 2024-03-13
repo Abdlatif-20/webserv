@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/11 09:30:33 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/12 11:22:45 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,14 +129,6 @@ int Utils::stringToInt(const std::string& str)
 	return result;
 }
 
-void	Utils::setupAddr(sockaddr_in *addr, int port)
-{
-	std::memset(addr, 0, sizeof(sockaddr_in));
-	addr->sin_port = htons(port);
-	addr->sin_family = AF_INET;
-	addr->sin_addr.s_addr = INADDR_ANY;
-}
-
 std::string Utils::getTokenNameFromDirective(t_directive d)
 {
 	switch (d)
@@ -192,6 +184,13 @@ bool Utils::stringStartsWith(const std::string& str, const std::string& prefix)
 	return (!std::strncmp(str.c_str(), prefix.c_str(), prefix.length()));
 }
 
+bool Utils::stringEndsWith(const std::string& str, const std::string& suffix)
+{
+	if (suffix.size() > str.size())
+		return false;
+	return !str.compare(str.size() - suffix.size(), suffix.size(), suffix);
+}
+
 std::string Utils::getCurrentTime()
 {
 	time_t rawTime;
@@ -199,25 +198,32 @@ std::string Utils::getCurrentTime()
 	char buffer[128];
 	time(&rawTime);
 	tmInfo = localtime(&rawTime);
-	strftime(buffer, 80, "%a, %d %b %Y %H:%M:%S %Z", tmInfo);
+	std::strftime(buffer, 128, "%a, %d %b %Y %H:%M:%S %Z", tmInfo);
 	return buffer;
 }
 
-std::string Utils::readFile(const std::string& filePath)
+bool Utils::checkIfPathExists(const std::string& path)
 {
-    std::string line;
-    struct stat statBuffer;
-    if (stat(filePath.c_str(), &statBuffer) == -1)
-        throw FileNotFoundException();
-    if (S_ISDIR(statBuffer.st_mode) || !(S_IRUSR & statBuffer.st_mode))
-        throw FilePermissionDenied();
-    std::ifstream ifs(filePath);
-    std::string text;
-    if (!ifs.good())
-        throw FileNotFoundException();
-    while (std::getline(ifs, line))
-        text += line;
-    return text;
+	struct stat statBuff;
+	if (stat(path.c_str(), &statBuff) < 0)
+		return false;
+	return true;
+}
+
+bool Utils::isDirectory(const std::string& path)
+{
+	struct stat statBuff;
+	if (stat(path.c_str(), &statBuff) >= 0 && S_ISDIR(statBuff.st_mode))
+		return true;
+	return false;
+}
+
+bool Utils::isReadableFile(const std::string& path)
+{
+	struct stat statBuff;
+	if (stat(path.c_str(), &statBuff) >= 0 && (statBuff.st_mode & S_IRUSR))
+		return true;
+	return false;
 }
 
 std::string Utils::getFileExtension(const std::string& filePath)
@@ -226,6 +232,14 @@ std::string Utils::getFileExtension(const std::string& filePath)
     if (i != std::string::npos)
         return filePath.substr(i, filePath.length());
     return "";
+}
+
+long long Utils::getFileSize(const std::string& filePath)
+{
+	struct stat statBuff;
+	if (stat(filePath.c_str(), &statBuff) >= 0)
+		return statBuff.st_size;
+	return -1;
 }
 
 std::string Utils::longlongToString(long long number)

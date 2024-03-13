@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/12 17:15:09 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/13 11:41:02 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,18 +134,17 @@ class Request
 		void					setStatus(int status);
 		const String 			getMethod(void) const;
 		const int&				getStatus(void) const;
+		Context*				getContext(void) const;
 		const Map& 				getHeaders(void) const;
 		const bool& 			getBodyDone(void) const;
 		const bool& 			getFoundUri(void) const;
 		const bool& 			getHeadersDone(void) const;
 		const Map& 				getRequestLine(void) const;
+		const std::string&		getRequestPath(void) const;
 		const LocationContext&	getLocationCtx(void) const;
 		bool					hostIsDetected(void) const;
 		const bool& 			getRequestLineDone(void) const;
 		const bool& 			getRequestIsWellFormed(void) const;
 		const String 			getHeaderByName(const String& name) const;
 
-		bool	isDone(void) const;
-		Context* getContext() const;
-		const std::string& getRequestPath() const;
 };

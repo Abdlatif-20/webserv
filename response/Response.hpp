@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/10 19:08:56 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/12 11:45:57 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,20 +17,35 @@
 
 class Response
 {
-    enum state
+    enum Method
     {
-        Initial,
-        Reading,
-        Finished
+        GET, POST, DELETE  
     };
-
+    enum Status
+    {
+        FORBIDDEN = 403  
+    };
     private:
         Request *request;
         Context *context;
-        
+        Method responseMethod;
+
+        char buffer[1024];
+        int fd;
+
         int statusCode;
-        
+        std::string headers;
+        std::string body;
+        std::string bodyPath;
+        bool headersSent;
+        bool responseDone;
+
         std::string generateHtmlErrorPage();
+        void generateResponseError();
+        void prepareHeaders();
+        void prepareGETBody();
+        void prepareGET();
+
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;
     public:
@@ -39,10 +54,17 @@ class Response
         Response& operator=(const Response& obj);
         ~Response();
         
-        /* Setters */
         void setRequest(Request* request);
+        void setContext(Context* context);
+        void setMethod(int method);
+        void setHeadersSent(bool flag);
+        static std::string getMimeType(const std::string& extension);
+        const std::string& getBody() const;
+        const std::string& getHeaders() const;
+        bool getHeadersSent() const;
+        bool responseIsDone() const;
 
-        std::string getMimeType(const std::string& extension);
+        void prepareResponse();
 
         static void initReasonPhrases();
         static void initMimeTypes();
