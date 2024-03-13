@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/12 17:42:59 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/12 17:16:00 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,12 @@ void	Client::sendResponse(void)
 	{
 		serverSelected = false;
 		response.setRequest(&request);
+		response.setServerCtx(serverCTX);
 		requestDone = false;
 		responseDone = true;
-		send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 13\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\n aiatoha l3ba", 98, 0);
+		// requestDone = false;
+		// responseDone = false;
+		// send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
 	}
 }
 

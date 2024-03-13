@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/12 17:40:46 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/12 17:13:36 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,6 @@ Request::Request()
 	this->_path = "";
 	this->_body = "";
 	this->headers = "";
-	this->context = NULL ;
 	this->requestData = "";
 	this->boundaryName = "";
 	this->_chunkedName = "";
@@ -229,7 +228,6 @@ void	Request::resetRequest()
 	this->requestData = "";
 	this->boundaryName = "";
 	this->_chunkedName = "";
-	this->context = NULL;
 	this->requestLine.clear();
 	this->params.clear();
 	this->headers.clear();
