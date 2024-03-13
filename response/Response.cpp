@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/13 11:37:22 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/13 11:49:40 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,12 +157,8 @@ void Response::prepareGETBody()
     }
     body.clear();
     ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
-    if (readedBytes == -1)
-    {
-        /* Read fail */
-    }
-    if (readedBytes == 0)
-    {
+    if (readedBytes <= 0)
+	{
         responseDone = true;
         return;
     }
