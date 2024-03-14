@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 11:15:21 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/18 13:34:13 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/13 14:22:52 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,8 @@ void Lexer::getToken(const std::string& line, size_t lineIndex)
             tokens.push_back(Token(";", SEMICOLON, lineIndex));
         else if (s[i] == '#')
             break;
-        i++;
+        if (s[i])
+            i++;
     }
 }
 

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/13 23:20:36 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/14 14:28:50 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,6 @@ void	Client::sendResponse(void)
 		if (!response.getHeadersSent())
 		{
 			send(sockId, response.getHeaders().c_str(), response.getHeaders().size(), 0);
-			std::cout << response.getHeaders() << std::endl;
 			response.setHeadersSent(true);
 		}
 		responseDone = response.responseIsDone();

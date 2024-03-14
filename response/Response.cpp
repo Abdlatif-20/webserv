@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/13 11:49:40 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/14 14:29:49 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,19 +110,48 @@ std::string Response::generateHtmlErrorPage()
         + reasonPhrases[statusCode] + "</body></html>";
 }
 
+bool Response::checkErrorPage(const std::string& path)
+{
+    if (!Utils::checkIfPathExists(path))
+    {
+        bodyPath.clear();
+        statusCode = NotFound;
+        body = generateHtmlErrorPage();
+        return false;
+    }
+    else if (Utils::isDirectory(path) || !Utils::isReadableFile(path))
+    {
+        bodyPath.clear();
+        statusCode = FORBIDDEN;
+        body = generateHtmlErrorPage();
+        return false;
+    }
+    return true;
+}
+
+void Response::checkPath(const std::string& path)
+{
+    if (!Utils::checkIfPathExists(path))
+        throw Utils::FileNotFoundException();
+    else if (Utils::isDirectory(path))
+        throw Utils::PathIsDirectory();
+    else if (!Utils::isReadableFile(path))
+        throw Utils::FilePermissionDenied();
+}
+
 void Response::generateResponseError()
 {
-    const std::string& errorPage = context->getErrorPage(Utils::intToString(statusCode));
-    std::cout << Utils::intToString(statusCode) << std::endl;
+    std::string errorPage = context->getErrorPage(Utils::intToString(statusCode));
     if (errorPage.empty())
+    {
+        bodyPath.clear();
         body = generateHtmlErrorPage();
+    }
     else
     {
         std::string path = context->getRoot() + errorPage;
-        if (Utils::isDirectory(path) || !Utils::isReadableFile(path))
-        {
+        if (!checkErrorPage(path))
             return;
-        }
         bodyPath = path;
     }
 }
@@ -135,11 +164,9 @@ void Response::prepareHeaders()
     headers += "Connection: " + request->getHeaderByName("connection") + CRLF;
     headers += "Server: " + std::string(SERVER) + CRLF;
     headers += "Date: " + Utils::getCurrentTime() + CRLF;
-    headers += "Content-Length: " + Utils::longlongToString(Utils::getFileSize(bodyPath)) + CRLF;
+    headers += "Content-Length: " + (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))) + CRLF;
     headers += std::string("Accept-Ranges: bytes") + CRLF;
-    headers += "Content-Type: ";
-    bodyPath.empty() ? headers += "text/html" : headers += getMimeType(Utils::getFileExtension(bodyPath));
-    headers += CRLF;
+    headers += "Content-Type: " + (bodyPath.empty() ? headers += "text/html" : getMimeType(Utils::getFileExtension(bodyPath))) + CRLF;
     headers += CRLF;
 }
 
@@ -147,7 +174,8 @@ void Response::prepareGETBody()
 {
     if (bodyPath.empty())
     {
-        
+        responseDone = true;
+        return;
     }
     if (fd == INT_MIN)
         fd = open(bodyPath.c_str(), O_RDONLY);
@@ -155,20 +183,18 @@ void Response::prepareGETBody()
     {
         /* ERROR WHILE OPENING FILE TO BE HANDLED LATER */
     }
-    body.clear();
     ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
     if (readedBytes <= 0)
 	{
         responseDone = true;
         return;
-    }
+    } // to be handled later
     body.append(buffer, readedBytes);
 }
 
 void Response::prepareGET()
 {
-    LocationContext* locationCtx = dynamic_cast<LocationContext*>(context);
-    std::string requestedResource = locationCtx->getRoot() + request->getRequestPath();
+    std::string requestedResource = context->getRoot() + request->getRequestPath();
     if (!Utils::checkIfPathExists(requestedResource))
     {
         statusCode = NotFound;
@@ -176,33 +202,46 @@ void Response::prepareGET()
         return;
     }
     if (Utils::isDirectory(requestedResource))
-        requestedResource += "/";
-    if (Utils::stringEndsWith(requestedResource, "/"))
     {
-        std::string index = locationCtx->getIndex(requestedResource);
-        if (index.empty())
+        try
         {
-            if (locationCtx->getAutoIndex())
+            std::string index = context->getIndex(requestedResource);
+            if (index.empty())
             {
-                /* AUTO_INDEX CODE HERE ! */
-            }
-            else
-            {
-                statusCode = FORBIDDEN;
-                generateResponseError();
-            }
-        }
-        else
-        {
-            bodyPath = requestedResource + index;
-            if (Utils::isDirectory(bodyPath) || !Utils::isReadableFile(bodyPath))
-            {
-                statusCode = FORBIDDEN;
-                generateResponseError();
+                if (context->getAutoIndex())
+                {
+                    /* AUTO_INDEX CODE HERE ! */
+                }
+                else
+                {
+                    statusCode = FORBIDDEN;
+                    generateResponseError();
+                }
                 return;
             }
+            bodyPath = requestedResource + index;
             statusCode = OK;
         }
+        catch (const Utils::FilePermissionDenied& e)
+        {
+            statusCode = FORBIDDEN;
+            generateResponseError();
+        }
+        catch (const Utils::FileNotFoundException& e)
+        {
+            statusCode = NotFound;
+            generateResponseError();
+        }
+    }
+    else
+    {
+        if (!Utils::isReadableFile(requestedResource))
+        {
+            statusCode = FORBIDDEN;
+            generateResponseError();
+            return;
+        }
+        bodyPath = requestedResource;
     }
 }
 

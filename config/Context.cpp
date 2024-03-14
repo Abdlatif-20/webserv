@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/13 13:04:21 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/14 14:28:35 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,6 @@ std::string Context::getIndex(const std::string& path) const
 {
     DirectivesMap::const_iterator it = directives.find("index");
     std::string indexPath = "";
-    std::ifstream ifs;
     StringVector::const_iterator vec_iter;
 
     if (it != directives.cend())
@@ -107,16 +106,16 @@ std::string Context::getIndex(const std::string& path) const
         while (vec_iter != it->second.cend())
         {
             indexPath = path + (*vec_iter);
-            ifs.open(indexPath);
-            if (ifs.good())
-                return (ifs.close(), *vec_iter);
-            ifs.close();
+            if (Utils::checkIfPathExists(indexPath) && Utils::isReadableFile(indexPath))
+                return (*vec_iter);
             vec_iter++;
         }
+        if (!Utils::checkIfPathExists(indexPath))
+            throw Utils::FileNotFoundException();
+        if (Utils::isDirectory(indexPath) || !Utils::isReadableFile(indexPath))
+            throw Utils::FilePermissionDenied();
     }
-    // else
-        return ""; // still dont know why thats happen and what should happen
-    // return *vec_iter;
+    return "";
 }
 
 /* The `bool Context::getAutoIndex() const` function in the `Context` class is a const member function
