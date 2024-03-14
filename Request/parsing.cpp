@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/12 17:23:50 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/14 00:05:42 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,8 @@ void	Request::isMethodAllowedInLocation()
 {
 	Vector allowedMethods = locationCtx.getAllowedMethods();
 	if (std::find(allowedMethods.begin(), allowedMethods.end(), requestLine["method"]) == allowedMethods.end())
-		return (std::cout << "Method not allowed in location" << std::endl, this->status = MethodNotAllowed, requestIscomplete = true, void());
+		return (this->status = MethodNotAllowed, requestIscomplete = true, void());
 	_requestIsWellFormed = true;
-	std::cout << "Method is allowed in location" << std::endl;
 }
 
 //function to check if the request Line is well formed And Set the status To true If all is well
