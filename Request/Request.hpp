@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/13 11:41:02 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/14 14:38:21 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,7 @@ class Request
 		const bool& 			getFoundUri(void) const;
 		const bool& 			getHeadersDone(void) const;
 		const Map& 				getRequestLine(void) const;
-		const std::string&		getRequestPath(void) const;
+		const std::string		getRequestPath(void) const;
 		const LocationContext&	getLocationCtx(void) const;
 		bool					hostIsDetected(void) const;
 		const bool& 			getRequestLineDone(void) const;
