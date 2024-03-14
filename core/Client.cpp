@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/12 12:44:53 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/13 17:26:17 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,12 +58,9 @@ void	Client::sendResponse(void)
 		if (!response.getHeadersSent())
 		{
 			send(sockId, response.getHeaders().c_str(), response.getHeaders().size(), 0);
-			std::cout << response.getHeaders() << std::endl;
 			response.setHeadersSent(true);
 		}
 		responseDone = response.responseIsDone();
-		// std::cout << response.getBody();
-		//requestDone = false;
 		send(sockId, response.getBody().c_str(), response.getBody().size(), 0);
 		// send(sockId, "HTTP/1.1 200 OK\r\nContent-Length: 4\r\nContent-Type: text/html\r\nConnection: Closed\r\n\r\nabcd", 87, 0);
 	}

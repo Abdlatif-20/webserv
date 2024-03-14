@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/12 11:45:57 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/13 23:09:40 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ class Response
         bool responseDone;
 
         std::string generateHtmlErrorPage();
+        bool checkErrorPage(const std::string& path);
+        void checkPath(const std::string& path);
         void generateResponseError();
         void prepareHeaders();
         void prepareGETBody();
