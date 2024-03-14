@@ -6,14 +6,14 @@
 #    By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/03/12 17:02:34 by houmanso         ###   ########.fr        #
+#    Updated: 2024/03/13 23:17:12 by houmanso         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserv
 CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
 SRCS = $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
-OBJS = $(patsubst %.cpp,obj/%.o,$(SRCS))
+OBJS = $(patsubst %.cpp,.obj/%.o,$(SRCS))
 INC  = $(wildcard *.hpp) $(wildcard */*.hpp)
 ALLFLAGS = $(CPPFLAGS) -I config -I utils -I request -I core -I response
 
@@ -34,7 +34,7 @@ $(NAME): $(OBJS)
 	@echo "\033[1m\033[35mWebserv is ready to use\033[0m"
 	@echo "\033[1m\033[32mRun ./webserv webserv.conf\033[0m"
 
-obj/%.o: %.cpp $(INC)
+.obj/%.o: %.cpp $(INC)
 	@mkdir -p $(dir $@)
 	@c++ $(ALLFLAGS) -c $< -o $@
 	@clear
@@ -42,7 +42,7 @@ obj/%.o: %.cpp $(INC)
 	@echo "$(CYAN)Compiling$(NC) $< ... $$(($(CURRENT)*100/$(TOTAL)))%$(NC)\r"
 
 clean:
-	rm -rf $(OBJS)
+	rm -rf $(OBJS) .obj
 
 fclean: clean
 	rm -rf $(NAME)

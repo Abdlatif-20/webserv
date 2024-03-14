@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/12 17:18:10 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/14 14:23:34 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,6 @@ Core::Core(const Config &conf)
 	while (it != serversConf.end())
 		servers.push_back(Server(*it++));
 	std::sort(servers.begin(), servers.end());
-	for (size_t i = 0; i < servers.size(); i++)
-		std::cout << servers[i].getHostPort()<< " " << servers[i].getServerNames()[0] << std::endl;
-	std::cout << "================================================" << std::endl;
 }
 
 void	Core::run(void)
@@ -108,9 +105,12 @@ void	Core::traceEvents(void)
 		{
 			if (checklist[i].revents & POLLIN)
 				clients[checklist[i].fd].recvRequest();
-			else if ((checklist[i].revents & POLLOUT) && clients[checklist[i].fd].isRequestDone())
+			if ((checklist[i].revents & POLLOUT) && clients[checklist[i].fd].isRequestDone())
+			{
 				clients[checklist[i].fd].sendResponse();
-			if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].isResponseDone())
+				clients[checklist[i].fd].reset();
+			}
+			if (checklist[i].revents & POLLHUP || (clients[checklist[i].fd].isResponseDone() && !clients[checklist[i].fd].isALive()))
 			{
 				clients.erase(checklist[i].fd);
 				checklist.erase(checklist.begin() + i--);
@@ -118,11 +118,6 @@ void	Core::traceEvents(void)
 		}
 	}
 }
-
-// bool Core::countainHost(const server &server)
-// {
-// 	return ;
-// }
 
 Core &Core::operator=(const Core &cpy)
 {

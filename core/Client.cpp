@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/13 11:37:04 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/13 23:20:36 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,12 @@ Client::Client(const Client &cpy)
 	*this = cpy;
 }
 
-ssize_t	Client::recvRequest(void)
+void	Client::reset(void)
+{
+	request.resetRequest();
+}
+
+ssize_t Client::recvRequest(void)
 {
 	std::memset(buff, 0, sizeof(buff));
 	len = recv(sockId, buff, 1023, 0);
@@ -85,6 +90,16 @@ void	Client::setServerCTX(const ServerContext& serverCTX)
 bool	Client::hostIsDetected(void) const
 {
 	return (serverSelected);
+}
+
+bool	Client::isALive(void) const
+{
+	std::string	value;
+
+	value = request.getHeaderByName("connection");
+	if (value == "closed")
+		return (false);
+	return (true);
 }
 
 bool Client::isRequestDone(void) const
