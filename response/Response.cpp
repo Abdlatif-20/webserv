@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/15 13:59:08 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/15 14:16:57 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -256,7 +256,14 @@ void Response::resetResponse()
 {
     request = NULL;
     context = NULL;
-    
+    std::memset(buffer, 0, sizeof(buffer));
+    fd = INT_MIN;
+    statusCode = 0;
+    headers.clear();
+    body.clear();
+    bodyPath.clear();
+    headersSent = false;
+    responseDone = false;
 }
 
 void Response::initReasonPhrases()
