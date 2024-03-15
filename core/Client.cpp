@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/14 14:28:50 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/15 13:56:16 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,12 +64,6 @@ void	Client::sendResponse(void)
 		serverSelected = false;
 		response.setRequest(&request);
 		response.setContext(request.getContext());
-		if (request.getMethod() == "GET")
-			response.setMethod(0);
-		else if (request.getMethod() == "POST")
-			response.setMethod(1);
-		else if (request.getMethod() == "DELETE")
-			response.setMethod(2);
 		response.prepareResponse();
 		if (!response.getHeadersSent())
 		{

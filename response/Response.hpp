@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/13 23:09:40 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/15 13:58:26 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,6 @@
 
 class Response
 {
-    enum Method
-    {
-        GET, POST, DELETE  
-    };
     enum Status
     {
         FORBIDDEN = 403  
@@ -28,7 +24,6 @@ class Response
     private:
         Request *request;
         Context *context;
-        Method responseMethod;
 
         char buffer[1024];
         int fd;
@@ -42,7 +37,6 @@ class Response
 
         std::string generateHtmlErrorPage();
         bool checkErrorPage(const std::string& path);
-        void checkPath(const std::string& path);
         void generateResponseError();
         void prepareHeaders();
         void prepareGETBody();
@@ -58,7 +52,6 @@ class Response
         
         void setRequest(Request* request);
         void setContext(Context* context);
-        void setMethod(int method);
         void setHeadersSent(bool flag);
         static std::string getMimeType(const std::string& extension);
         const std::string& getBody() const;
@@ -67,6 +60,7 @@ class Response
         bool responseIsDone() const;
 
         void prepareResponse();
+        void resetResponse();
 
         static void initReasonPhrases();
         static void initMimeTypes();

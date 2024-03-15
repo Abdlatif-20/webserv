@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/14 14:33:24 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/15 13:59:08 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,6 @@ Response& Response::operator=(const Response& obj)
     statusCode = obj.statusCode;
     responseDone = obj.responseDone;
     headers = obj.headers;
-    responseMethod = obj.responseMethod;
     headersSent = obj.headersSent;
     bodyPath = obj.bodyPath;
     std::memcpy(buffer, obj.buffer, sizeof(obj.buffer));
@@ -63,11 +62,6 @@ void Response::setRequest(Request* request)
 void Response::setContext(Context* context)
 {
     this->context = context;
-}
-
-void Response::setMethod(int method)
-{
-    responseMethod = static_cast<Method>(method);
 }
 
 void Response::setHeadersSent(bool flag)
@@ -129,16 +123,6 @@ bool Response::checkErrorPage(const std::string& path)
     return true;
 }
 
-void Response::checkPath(const std::string& path)
-{
-    if (!Utils::checkIfPathExists(path))
-        throw Utils::FileNotFoundException();
-    else if (Utils::isDirectory(path))
-        throw Utils::PathIsDirectory();
-    else if (!Utils::isReadableFile(path))
-        throw Utils::FilePermissionDenied();
-}
-
 void Response::generateResponseError()
 {
     std::string errorPage = context->getErrorPage(Utils::intToString(statusCode));
@@ -181,6 +165,7 @@ void Response::prepareGETBody()
         fd = open(bodyPath.c_str(), O_RDONLY);
     if (fd == -1)
     {
+        /*INTERRNAL SERVER ERROR 500*/
         /* ERROR WHILE OPENING FILE TO BE HANDLED LATER */
     }
     ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
@@ -247,21 +232,31 @@ void Response::prepareGET()
 
 void Response::prepareResponse()
 {
-    switch (responseMethod)
+	if (request->getMethod() == "GET")
     {
-        case GET:
-            prepareGET();
-            prepareGETBody();
-            prepareHeaders();
-            break;
-        case POST:
-        
-            break;
-        case DELETE:
-            break;
-        default:
-            break;
+        prepareGET();
+        prepareGETBody();
+        prepareHeaders();
     }
+	else if (request->getMethod() == "POST")
+    {
+        /* Prepare POST */
+    }
+	else if (request->getMethod() == "DELETE")
+    {
+        /* Prepare DELETE */
+    }
+    else
+    {
+        
+    }
+}
+
+void Response::resetResponse()
+{
+    request = NULL;
+    context = NULL;
+    
 }
 
 void Response::initReasonPhrases()
