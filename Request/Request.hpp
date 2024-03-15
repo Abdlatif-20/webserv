@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/15 18:01:47 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/15 20:24:46 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,9 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
-#include "Config.hpp"
+#include "Server.hpp"
 #include <fcntl.h>
 #include <sys/stat.h> // For mkdir
-#include "Core.hpp"
 
 
 enum Errors
@@ -128,9 +127,12 @@ class Request
 		Request(const Request& obj);
 		Request& operator=(const Request& obj);
 
+		
+		static std::vector<Server>	servers;
+
 	/* *************************** methods ****************************** */
 		void	resetRequest();
-		void	selectServerContext();
+		void	selectServerContext(const String& host);
 		void	setServerCTXEnd(size_t i);
 		void	setServerCTXBegin(size_t i);
 		void	parseRequest(const std::string& receivedRequest, Context* serverCTX);

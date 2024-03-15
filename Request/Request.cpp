@@ -6,12 +6,14 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/15 17:44:54 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/15 22:57:03 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
 #include "Request.hpp"
+
+std::vector<Server> Request::servers;
 
 /* *************************** Constructors *************************** */
 
@@ -236,26 +238,21 @@ void	Request::resetRequest()
 	this->requestVector.clear();
 }
 
-void	Request::selectServerContext()
+void	Request::selectServerContext(const String& host)
 {
-	std::string	host;
 	servers_it it, end;
 	StringVector::iterator	name;
 
-	end = Core::servers.begin() + serv_end;
-	it  = Core::servers.begin() + serv_begin;
-
-	host = getHost();
-	if (host.empty())
-		return;
+	end = Request::servers.begin() + serv_end;
+	it  = Request::servers.begin() + serv_begin;
 	while (it != end)
 	{
 		StringVector hosts(it->getServerNames());
 		name = std::find(hosts.begin(), hosts.end(), host);
 		if (name != hosts.end())
 		{
-			serverCTX = it->getServerCTX();
-			serverSelected = true;
+			ServerContext& s = *dynamic_cast<ServerContext*>(context);
+			s = it->getServerCTX();
 			break;
 		}
 		it++;

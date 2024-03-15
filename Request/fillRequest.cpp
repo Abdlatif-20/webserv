@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/15 17:26:35 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/15 20:25:02 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	Request::fillHeaders(Vector headers)
 			{
 				if (value.empty())
 					return(this->status = BadRequest, requestIscomplete = true, void());
-				selectServerContext();
+				selectServerContext(value);
 			}
 			this->_headers[key] = value;
 		}

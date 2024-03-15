@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/15 15:58:59 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/15 20:11:27 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,9 @@ void	Core::run(void)
 			std::cerr << servers[i].getHostPort() << " : " << e.what() << std::endl;
 		}
 	}
+	Request::servers = servers;
+	Response::initReasonPhrases();
+	Response::initMimeTypes();
 	if (binded > 0)
 		traceEvents();
 	else
