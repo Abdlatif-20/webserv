@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/13 11:41:02 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/15 00:18:13 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,12 +77,12 @@ class Request
 		//maps
 		Map	_headers;
 		Map	requestLine;
-		Map	params;
 		//vector
 		Vector	requestVector;
 		Vector	files;
 		//strings
 		String	_path;
+		String	_params;
 		String	_body;
 		String	headers;
 		String	requestData;

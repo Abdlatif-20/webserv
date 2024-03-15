@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/14 00:05:42 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/15 00:10:46 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,6 +114,9 @@ void	Request::parseBody()
 		&& _headers.find("content-type") != _headers.end()
 		&& _headers.find("transfer-encoding") == _headers.end())
 			parseBoundary();
+	else if (this->requestLine["method"] == "POST"
+		&& _headers.find("content-type") != _headers.end() && _headers.find("transfer-encoding") != _headers.end())
+			return (this->status = NotImplemented, requestIscomplete = true, void());
 	else if (this->requestLine["method"] == "POST"
 			&& _headers.find("content-length") != _headers.end())
 				ContentLength();
