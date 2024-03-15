@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/14 14:38:21 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/15 18:01:47 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include "Config.hpp"
 #include <fcntl.h>
 #include <sys/stat.h> // For mkdir
+#include "Core.hpp"
 
 
 enum Errors
@@ -47,6 +48,7 @@ typedef std::vector<std::string> Vector;
 typedef std::map<std::string, std::string> Map;
 typedef std::string String;
 
+class Core;
 class Config;
 
 class Request
@@ -67,6 +69,9 @@ class Request
 		bool	requestIscomplete;
 		bool	requestLineInProgress;
 		bool	_requestIsWellFormed;
+		// serverctxs range
+		size_t	serv_end;
+		size_t	serv_begin;
 		//unsigned int
 		unsigned int	sizeBoundary;
 		unsigned int	contentLength;
@@ -125,6 +130,9 @@ class Request
 
 	/* *************************** methods ****************************** */
 		void	resetRequest();
+		void	selectServerContext();
+		void	setServerCTXEnd(size_t i);
+		void	setServerCTXBegin(size_t i);
 		void	parseRequest(const std::string& receivedRequest, Context* serverCTX);
 
 	/* *************************** getters ************************************ */

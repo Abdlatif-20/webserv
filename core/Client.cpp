@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/14 14:28:50 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/15 17:28:53 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,6 @@ ssize_t Client::recvRequest(void)
 	{
 		request.parseRequest(std::string(buff, len), &serverCTX);
 		requestDone = request.isDone();
-		if (!serverSelected)
-			selectServerCTX();
 	}
 	else
 		requestDone = true;;
@@ -78,6 +76,7 @@ void	Client::sendResponse(void)
 		}
 		responseDone = response.responseIsDone();
 		send(sockId, response.getBody().c_str(), response.getBody().size(), 0);
+		reset(); // reset request and restponse;
 	}
 }
 
@@ -111,53 +110,15 @@ bool	Client::isResponseDone(void) const
 	return (responseDone);
 }
 
-void Client::selectServerCTX(void)
-{
-	std::string	host;
-	servers_it it, end;
-	StringVector::iterator	name;
-
-	end = Core::servers.begin() + serv_end;
-	it  = Core::servers.begin() + serv_begin;
-	try
-	{
-		host = request.getHost();
-	}
-	catch(...){
-		return ;
-	}
-	while (it != end)
-	{
-		StringVector hosts(it->getServerNames());
-		name = std::find(hosts.begin(), hosts.end(), host);
-		if (name != hosts.end())
-		{
-			serverCTX = it->getServerCTX();
-			serverSelected = true;
-			break;
-		}
-		it++;
-	}
-}
 
 void Client::setServersEnd(size_t it)
 {
-	serv_end = it;
+	request.setServerCTXEnd(it);
 }
 
 void Client::setServersBegin(size_t it)
 {
-	serv_begin = it;
-}
-
-size_t Client::serversEnd(void) const
-{
-	return (serv_end);
-}
-
-size_t Client::serversBegin(void) const
-{
-	return (serv_begin);
+	request.setServerCTXBegin(it);
 }
 
 const Request &Client::getRequest(void) const
@@ -182,9 +143,7 @@ Client	&Client::operator=(const Client &cpy)
 		sockId = cpy.sockId;
 		request = cpy.request;
 		response = cpy.response;
-		serv_end = cpy.serv_end;
 		serverCTX = cpy.serverCTX;
-		serv_begin = cpy.serv_begin;
 		requestDone = cpy.requestDone;
 		responseDone = cpy.responseDone;
 		serverSelected = cpy.serverSelected;

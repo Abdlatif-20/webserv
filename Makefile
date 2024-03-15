@@ -6,47 +6,71 @@
 #    By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/03/13 23:17:12 by houmanso         ###   ########.fr        #
+#    Updated: 2024/03/15 17:43:23 by houmanso         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = webserv
-CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
-SRCS = $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
-OBJS = $(patsubst %.cpp,.obj/%.o,$(SRCS))
-INC  = $(wildcard *.hpp) $(wildcard */*.hpp)
-ALLFLAGS = $(CPPFLAGS) -I config -I utils -I request -I core -I response
+# NAME = webserv
+# CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
+# SRCS = $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
+# OBJS = $(patsubst %.cpp,.obj/%.o,$(SRCS))
+# INC  = $(wildcard *.hpp) $(wildcard */*.hpp)
+# ALLFLAGS = $(CPPFLAGS) -I config -I utils -I request -I core -I response
 
-TOTAL := $(words $(SRCS))
-CURRENT = 0
+# TOTAL := $(words $(SRCS))
+# CURRENT = 0
 
-# ANSI color codes
-GREEN = \033[0;32m
-CYAN = \033[0;36m
-YELLOW = \033[0;33m
-NC = \033[0m
+# # ANSI color codes
+# GREEN = \033[0;32m
+# CYAN = \033[0;36m
+# YELLOW = \033[0;33m
+# NC = \033[0m
 
-all: $(NAME)
+# all: $(NAME)
 
-$(NAME): $(OBJS)
-	@c++ $(ALLFLAGS) $(OBJS) -o $(NAME)
-	@clear
-	@echo "\033[1m\033[35mWebserv is ready to use\033[0m"
-	@echo "\033[1m\033[32mRun ./webserv webserv.conf\033[0m"
+# $(NAME): $(OBJS)
+# 	@c++ $(ALLFLAGS) $(OBJS) -o $(NAME)
+# 	@clear
+# 	@echo "\033[1m\033[35mWebserv is ready to use\033[0m"
+# 	@echo "\033[1m\033[32mRun ./webserv webserv.conf\033[0m"
 
-.obj/%.o: %.cpp $(INC)
-	@mkdir -p $(dir $@)
-	@c++ $(ALLFLAGS) -c $< -o $@
-	@clear
-	@$(eval CURRENT=$(shell echo "$$(($(CURRENT)+1))"))
-	@echo "$(CYAN)Compiling$(NC) $< ... $$(($(CURRENT)*100/$(TOTAL)))%$(NC)\r"
+# .obj/%.o: %.cpp $(INC)
+# 	@mkdir -p $(dir $@)
+# 	@c++ $(ALLFLAGS) -c $< -o $@
+# 	@clear
+# 	@$(eval CURRENT=$(shell echo "$$(($(CURRENT)+1))"))
+# 	@echo "$(CYAN)Compiling$(NC) $< ... $$(($(CURRENT)*100/$(TOTAL)))%$(NC)\r"
 
-clean:
-	rm -rf $(OBJS) .obj
+# clean:
+# 	rm -rf $(OBJS) .obj
+
+# fclean: clean
+# 	rm -rf $(NAME)
+
+# re: clean fclean all
+
+# .PHONY: clean server utils config
+NAME	= webserv
+SRC		= $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
+HDR		= $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
+OBJ		= $(SRC:.cpp=.o)
+CPPFLAGS= -Wall -Wextra -Werror -std=c++98
+CPPFLAGS+=  -I config -I utils -I request -I core -I response
+
+all : $(NAME)
+
+$(NAME)	:$(OBJ)
+	c++ $(CPPFLAGS) $(OBJ) -o $@
+
+%.o : %.cpp $(HDR)
+	c++ $(CPPFLAGS) -c $< -o $@
+
+clean :
+	rm -rf $(OBJ)
 
 fclean: clean
 	rm -rf $(NAME)
 
-re: clean fclean all
+re : fclean all
 
-.PHONY: clean server utils config
+.PHONY: clean
