@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/16 13:36:01 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/16 17:05:56 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,9 @@ Response::Response()
     statusCode = 0;
     responseDone = false;
     headersSent = false;
-    buffer = NULL;
+    std::memset(buffer, 0, sizeof(buffer));
     fd = INT_MIN;
     responseDone = false;
-    bodySize = 0;
 }
 
 Response::Response(const Response &obj)
@@ -44,10 +43,9 @@ Response& Response::operator=(const Response& obj)
     headers = obj.headers;
     headersSent = obj.headersSent;
     bodyPath = obj.bodyPath;
-    *buffer = *obj.buffer;
+    std::memcpy(buffer, obj.buffer, sizeof(buffer));
     fd = obj.fd;
     responseDone = obj.responseDone;
-    bodySize = obj.bodySize;
     return *this;
 }
 
@@ -79,9 +77,9 @@ std::string Response::getMimeType(const std::string& extension)
     return it->second;
 }
 
-const char* Response::getBody() const
+const std::string& Response::getBody() const
 {
-    return buffer;
+    return body;
 }
 
 const std::string& Response::getHeaders() const
@@ -97,11 +95,6 @@ bool Response::getHeadersSent() const
 bool Response::responseIsDone() const
 {
     return responseDone;
-}
-
-ssize_t Response::getBodySize() const
-{
-    return bodySize;
 }
 
 std::string Response::generateHtmlErrorPage()
@@ -175,25 +168,15 @@ void Response::prepareGETBody()
         /*INTERRNAL SERVER ERROR 500*/
         /* ERROR WHILE OPENING FILE TO BE HANDLED LATER */
     }
-    struct stat statBuff;
-    stat(bodyPath.c_str(), &statBuff);
-    bodySize = statBuff.st_size;
-    buffer = new char[bodySize];
-    ssize_t readedBytes = read(fd, buffer, statBuff.st_size);
+    ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
     if (readedBytes <= 0)
     {
-
+        close(fd);
+        responseDone = true;
+        return;
     }
-    responseDone = true;
-    close(fd);
-    // std::cout << readedBytes << std::endl;
-    // if (readedBytes <= 0)
-	// {
-    //     responseDone = true;
-    //     close(fd);
-    //     return;
-    // } // to be handled later
-    //body.append(buffer, readedBytes);
+    body.append(buffer, readedBytes);
+    std::cout << body << std::endl;
 }
 
 void Response::prepareGET()
@@ -275,17 +258,15 @@ void Response::resetResponse()
 {
     request = NULL;
     context = NULL;
-    delete[] buffer;
-    buffer = NULL;
     close(fd);
     fd = INT_MIN;
+    std::memset(buffer, 0, sizeof(buffer));
     statusCode = 0;
     headers.clear();
     body.clear();
     bodyPath.clear();
     headersSent = false;
     responseDone = false;
-    bodySize = 0;
 }
 
 void Response::initReasonPhrases()

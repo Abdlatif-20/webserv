@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/16 13:36:26 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/16 16:57:51 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,8 +58,6 @@ void	Client::sendResponse(void)
 {
 	if (requestDone && !responseDone)
 	{
-		requestDone = request.isDone();
-		// responseDone = true;
 		serverSelected = false;
 		response.setRequest(&request);
 		response.setContext(request.getContext());
@@ -69,11 +67,8 @@ void	Client::sendResponse(void)
 			send(sockId, response.getHeaders().c_str(), response.getHeaders().size(), 0);
 			response.setHeadersSent(true);
 		}
-		send(sockId, response.getBody(), response.getBodySize(), 0);
+		send(sockId, response.getBody().c_str(), response.getBody().size(), 0);
 		responseDone = response.responseIsDone();
-		// responseDone = true;
-		// send(sockId, JJJ, 202, 0);
-		 // reset request and restponse;
 	}
 	if (requestDone)
 		request.resetRequest();
