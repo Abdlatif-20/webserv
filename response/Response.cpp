@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/16 17:05:56 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/16 17:21:32 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,7 +149,7 @@ void Response::prepareHeaders()
     headers += "Server: " + std::string(SERVER) + CRLF;
     headers += "Date: " + Utils::getCurrentTime() + CRLF;
     headers += "Content-Length: " + (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))) + CRLF;
-    headers += std::string("Accept-Ranges: bytes") + CRLF;
+    //headers += std::string("Accept-Ranges: bytes") + CRLF;
     headers += "Content-Type: " + (bodyPath.empty() ? headers += "text/html" : getMimeType(Utils::getFileExtension(bodyPath))) + CRLF;
     headers += CRLF;
 }
@@ -169,6 +169,7 @@ void Response::prepareGETBody()
         /* ERROR WHILE OPENING FILE TO BE HANDLED LATER */
     }
     ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
+    body.clear();
     if (readedBytes <= 0)
     {
         close(fd);
@@ -176,7 +177,6 @@ void Response::prepareGETBody()
         return;
     }
     body.append(buffer, readedBytes);
-    std::cout << body << std::endl;
 }
 
 void Response::prepareGET()

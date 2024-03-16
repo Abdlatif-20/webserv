@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/16 16:57:51 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/16 17:21:05 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,11 @@ Client::Client(const Client &cpy)
 
 void	Client::reset(void)
 {
-	request.resetRequest();
-	response.resetResponse();
+	if (responseDone)
+	{
+		request.resetRequest();
+		response.resetResponse();
+	}
 }
 
 ssize_t Client::recvRequest(void)
@@ -69,11 +72,8 @@ void	Client::sendResponse(void)
 		}
 		send(sockId, response.getBody().c_str(), response.getBody().size(), 0);
 		responseDone = response.responseIsDone();
+		reset();
 	}
-	if (requestDone)
-		request.resetRequest();
-	if (responseDone)
-		response.resetResponse();
 }
 
 void	Client::setServerCTX(const ServerContext& serverCTX)
