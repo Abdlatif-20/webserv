@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/15 22:15:32 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/16 01:45:32 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ std::vector<std::string> Utils::splitRequest(const std::string& str, const char 
 		start = pos + _sep.size();
 		pos = str.find(sep, start);
 	}
-	result.push_back(str.substr(start, (pos - start)));
 	return result;
 }
 
@@ -83,6 +82,7 @@ std::vector<std::string> Utils::split(const std::string& str, const char sep)
 
 void    Utils::printMap(const std::map<std::string, std::string>& map)
 {
+	std::cout << "Printing map" << std::endl;
 	for (std::map<std::string, std::string>::const_iterator it = map.begin(); it != map.end(); ++it)
 		std::cout << "header[" << it->first << "]: " << "value[" << it->second << "]" << std::endl;
 }

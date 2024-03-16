@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fillRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/15 20:25:02 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/16 03:41:43 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 //function to fill the headers to the map
 void	Request::fillHeaders(Vector headers)
 {
+	// Utils::printVector(headers);
 	int checkHostIsFound = 0;
 	Vector::iterator it;
 	it = headers.begin();
@@ -85,16 +86,5 @@ void	Request::fillParams()
 		return;
 	sepPath = Utils::split(path, '?');
 	this->requestLine["path"] = sepPath[0];
-	if (sepPath.size() > 1)
-	{
-		Vector sepParams;
-		sepParams = Utils::split(sepPath[1], '&');
-		for (size_t i = 0; i < sepParams.size(); i++)
-		{
-			Vector sepParam;
-			sepParam = Utils::split(sepParams[i], '=');
-			if (sepParam.size() == 2)
-				this->params[sepParam[0]] = sepParam[1];
-		}
-	}
+	this->_params = sepPath[1];
 }
