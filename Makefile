@@ -6,12 +6,12 @@
 #    By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/03/16 00:55:47 by aben-nei         ###   ########.fr        #
+#    Updated: 2024/03/16 02:04:13 by aben-nei         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserv
-CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g #-fsanitize=address
 SRCS = $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
 OBJS = $(patsubst %.cpp,obj/%.o,$(SRCS))
 INC  = $(wildcard *.hpp) $(wildcard */*.hpp)
@@ -49,4 +49,6 @@ fclean: clean
 	@rm -f $(NAME)
 	@echo "$(YELLOW)Cleaning executable...$(NC)"
 
-re: clean all
+re: clean fclean all
+
+.PHONY: clean server utils config

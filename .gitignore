@@ -6,7 +6,8 @@
 *.pdf
 *.tldr
 *.txt
-obj/
+.*
+.obj/
 .vscode/
 webserv
 .DS_Store

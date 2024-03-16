@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/15 00:17:52 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/16 03:41:43 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 //function to fill the headers to the map
 void	Request::fillHeaders(Vector headers)
 {
+	// Utils::printVector(headers);
 	int checkHostIsFound = 0;
 	Vector::iterator it;
 	it = headers.begin();
@@ -31,8 +32,12 @@ void	Request::fillHeaders(Vector headers)
 			if (key == "host")
 				checkHostIsFound++;
 			value = Utils::strTrim(Utils::strTrim(it->substr(pos + 1), CR), ' ');
-			if (key == "host" && value.empty())
-				return(this->status = BadRequest, requestIscomplete = true, void());
+			if (key == "host")
+			{
+				if (value.empty())
+					return(this->status = BadRequest, requestIscomplete = true, void());
+				selectServerContext(value);
+			}
 			this->_headers[key] = value;
 		}
 	}
@@ -71,8 +76,6 @@ void	Request::fillRequestLine(const String& requestLine)
 	this->requestLineDone = true;
 	this->requestLine = requestLineMap;	
 	fillParams();
-	findUri();
-	parseUri();
 }
 
 void	Request::fillParams()

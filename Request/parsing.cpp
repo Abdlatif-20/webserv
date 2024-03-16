@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/15 00:10:46 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/16 04:31:32 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,11 @@ int	Request::parseRequestLine(const String& requestLine)
 		else
 		{
 			this->requestVector = Utils::splitRequest(requestLine, CRLF);
+			if (this->requestVector.size() != 1)
+			{
+				for (size_t i = 1; i < this->requestVector.size(); i++)
+					requestData += this->requestVector[i] + CRLF;
+			}
 			this->requestInProgress = true;
 		}
 		return (fillRequestLine(this->requestVector[0]), 1);
@@ -182,30 +187,35 @@ int	Request::checkDuplicate(const String& receivedRequest)
 }
 
 //function to take the separated request or complete request and parse it
-int	Request::takingRequests(const String& receivedRequest)
+int	Request::takingRequests(String receivedRequest)
 {
 	if (!this->requestLineDone)
 	{
-		if (parseRequestLine(receivedRequest))
+		if (parseRequestLine(receivedRequest) && requestData.empty())
 			return 1;
+		else if (!requestData.empty())
+		{
+			receivedRequest = receivedRequest.substr(receivedRequest.find("\r\n") + 2);
+		}
 	}
 	if (!headersDone)
 	{
 		if (checkDuplicate(receivedRequest))
-			return 1;
-	}
-	if (foundUri)
-	{
-		if (requestInProgress)
-			requestVector = Utils::splitRequest(requestData, CRLF);
-		else
 		{
-			separateRequest(receivedRequest);
-			requestVector = Utils::splitRequest(headers, CRLF);
+			return 1;
 		}
-		fillHeaders(requestVector); //fill the headers to the map
-		requestIsWellFormed(); //check if the request is well formed
-		receivecount++;
 	}
+	if (requestInProgress)
+		requestVector = Utils::splitRequest(requestData, CRLF);
+	else
+	{
+		separateRequest(receivedRequest);
+		requestVector = Utils::splitRequest(headers, CRLF);
+	}
+	fillHeaders(requestVector); //fill the headers to the map
+	findUri();
+	parseUri();
+	requestIsWellFormed(); //check if the request is well formed
+	receivecount++;
 	return 0;
 }

@@ -6,12 +6,14 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/15 01:10:59 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/16 04:28:35 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
 #include "Request.hpp"
+
+std::vector<Server> Request::servers;
 
 /* *************************** Constructors *************************** */
 
@@ -34,15 +36,15 @@ Request::Request()
 	this->remainingChunkLength = 0;
 	this->_requestIsWellFormed = false;
 	this->requestLineInProgress = false;
-	this->_path = "";
-	this->_body = "";
-	this->_params = "";
-	this->headers = "";
+	this->_path.clear();
+	this->_body.clear();
+	this->_params.clear();
+	this->headers.clear();
 	this->context = NULL;
-	this->requestData = "";
-	this->boundaryName = "";
-	this->_chunkedName = "";
-	this->requestLineData = "";
+	this->requestData.clear();
+	this->boundaryName.clear();
+	this->_chunkedName.clear();
+	this->requestLineData.clear();
 }
 
 Request::Request(const Request& obj)
@@ -56,19 +58,21 @@ Request& Request::operator=(const Request& obj)
 	{
 		this->_body = obj._body;
 		this->_path = obj._path;
+		serv_end = obj.serv_end;
 		this->status = obj.status;
+		serv_begin = obj.serv_begin;
+		this->_params = obj._params;
 		this->headers = obj.headers;
-		this->headers = obj.headers;
-		this->bodyDone = obj.bodyDone;
 		this->context = obj.context;
+		this->bodyDone = obj.bodyDone;
 		this->foundUri = obj.foundUri;
 		this->multipart = obj.multipart;
-		this->_params = obj._params;
 		this->_setLength = obj._setLength;
 		this->isComplete = obj.isComplete;
 		this->detectHost = obj.detectHost;
 		this->requestLine = obj.requestLine;
 		this->headersDone = obj.headersDone;
+		this->locationCtx = obj.locationCtx;
 		this->requestData = obj.requestData;
 		this->receivecount = obj.receivecount;
 		this->_chunkedName = obj._chunkedName;
@@ -81,8 +85,6 @@ Request& Request::operator=(const Request& obj)
 		this->requestInProgress = obj.requestInProgress;
 		this->_requestIsWellFormed = obj._requestIsWellFormed;
 		this->remainingChunkLength = obj.remainingChunkLength;
-		this->locationCtx = obj.locationCtx;
-		this->context = obj.context;
 	}
 	return (*this);
 }
@@ -221,18 +223,49 @@ void	Request::resetRequest()
 	this->remainingChunkLength = 0;
 	this->_requestIsWellFormed = false;
 	this->requestLineInProgress = false;
-	this->_path = "";
-	this->_body = "";
-	this->_params = "";
-	this->headers = "";
+	this->_path.clear();
+	this->_body.clear();
+	this->_params.clear();
+	this->headers.clear();
 	this->context = NULL;
-	this->requestData = "";
-	this->boundaryName = "";
-	this->_chunkedName = "";
+	this->requestData.clear();
+	this->boundaryName.clear();
+	this->_chunkedName.clear();
 	this->requestLine.clear();
 	this->headers.clear();
 	this->requestData.clear();
 	this->requestVector.clear();
+}
+
+void	Request::selectServerContext(const String& host)
+{
+	servers_it it, end;
+	StringVector::iterator	name;
+
+	end = Request::servers.begin() + serv_end;
+	it  = Request::servers.begin() + serv_begin;
+	while (it != end)
+	{
+		StringVector hosts(it->getServerNames());
+		name = std::find(hosts.begin(), hosts.end(), host);
+		if (name != hosts.end())
+		{
+			ServerContext& s = *dynamic_cast<ServerContext*>(context);
+			s = it->getServerCTX();
+			break;
+		}
+		it++;
+	}
+}
+
+void	Request::setServerCTXEnd(size_t i)
+{
+	serv_end = i;
+}
+
+void	Request::setServerCTXBegin(size_t i)
+{
+	serv_begin = i;
 }
 
 //main function to parse the request
@@ -255,7 +288,8 @@ void	Request::parseRequest(const std::string& receivedRequest, Context* serverCT
 			return;
 		}
 	}
-	if (this->requestLine["method"] == "POST" && !this->bodyDone && this->_requestIsWellFormed && this->status == 200)
+	std::cout << "status: " << status << std::endl;
+	if (this->requestLine["method"] == "POST" && !this->bodyDone && this->_requestIsWellFormed && this->status == 200 && foundUri)
 	{
 		setUploadingPath();
 		if (this->receivecount > 1)
@@ -268,3 +302,4 @@ void	Request::parseRequest(const std::string& receivedRequest, Context* serverCT
 			parseBody();
 	}
 }
+//requestData.empty() && 

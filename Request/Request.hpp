@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/15 00:22:35 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/16 03:36:18 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
-#include "Config.hpp"
+#include "Server.hpp"
 #include <fcntl.h>
 #include <sys/stat.h> // For mkdir
 
@@ -47,6 +47,7 @@ typedef std::vector<std::string> Vector;
 typedef std::map<std::string, std::string> Map;
 typedef std::string String;
 
+class Core;
 class Config;
 
 class Request
@@ -67,6 +68,9 @@ class Request
 		bool	requestIscomplete;
 		bool	requestLineInProgress;
 		bool	_requestIsWellFormed;
+		// serverctxs range
+		size_t	serv_end;
+		size_t	serv_begin;
 		//unsigned int
 		unsigned int	sizeBoundary;
 		unsigned int	contentLength;
@@ -113,7 +117,7 @@ class Request
 			void			fillRequestLine(const String& requestLine);
 			int				parseRequestLine(const String& requestLine);
 			int				checkDuplicate(const String& receivedRequest);
-			int				takingRequests(const String& receivedRequest);
+			int				takingRequests(String receivedRequest);
 			void			preparLengthAndName(size_t pos, String& length, std::ofstream& file);
 	public:
 	/* *************************** constructors ****************************** */
@@ -123,8 +127,14 @@ class Request
 		Request(const Request& obj);
 		Request& operator=(const Request& obj);
 
+		
+		static std::vector<Server>	servers;
+
 	/* *************************** methods ****************************** */
 		void	resetRequest();
+		void	selectServerContext(const String& host);
+		void	setServerCTXEnd(size_t i);
+		void	setServerCTXBegin(size_t i);
 		void	parseRequest(const std::string& receivedRequest, Context* serverCTX);
 
 	/* *************************** getters ************************************ */

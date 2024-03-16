@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/15 22:26:43 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/16 01:45:32 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ std::vector<std::string> Utils::splitRequest(const std::string& str, const char 
 		start = pos + _sep.size();
 		pos = str.find(sep, start);
 	}
-	result.push_back(str.substr(start, (pos - start)));
 	return result;
 }
 

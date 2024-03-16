@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/07 20:23:58 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/15 20:11:08 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,6 @@ int main(int argc, char **argv)
 		try
 		{
 			Config	_config(configPath);
-			Response::initReasonPhrases();
-			Response::initMimeTypes();
 			Core core(_config);
 			core.run();
 		}

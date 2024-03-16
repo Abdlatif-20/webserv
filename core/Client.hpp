@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:50:55 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/13 23:19:33 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/15 17:49:42 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,9 @@
 #define CLIENT_HPP
 
 #include <iostream>
-#include "Core.hpp"
 #include "Server.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
-
-class Core;
 
 class Client
 {
@@ -33,9 +30,7 @@ class Client
 		bool	serverSelected;
 
 		Request	request;
-		size_t	serv_end;
 		std::string	resp;
-		size_t	serv_begin;
 		Response	response;
 		ServerContext	serverCTX;
 
