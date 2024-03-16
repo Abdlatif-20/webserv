@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/16 17:21:05 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/16 17:27:11 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,8 +72,8 @@ void	Client::sendResponse(void)
 		}
 		send(sockId, response.getBody().c_str(), response.getBody().size(), 0);
 		responseDone = response.responseIsDone();
-		reset();
 	}
+	reset();
 }
 
 void	Client::setServerCTX(const ServerContext& serverCTX)

@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/16 17:21:32 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/16 22:12:09 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ Response::Response()
     std::memset(buffer, 0, sizeof(buffer));
     fd = INT_MIN;
     responseDone = false;
+    isWorking = false;
+    isRedirection = false;
 }
 
 Response::Response(const Response &obj)
@@ -46,6 +48,9 @@ Response& Response::operator=(const Response& obj)
     std::memcpy(buffer, obj.buffer, sizeof(buffer));
     fd = obj.fd;
     responseDone = obj.responseDone;
+    isWorking = obj.isWorking;
+    isRedirection = obj.isRedirection;
+    location = obj.location;
     return *this;
 }
 
@@ -149,8 +154,10 @@ void Response::prepareHeaders()
     headers += "Server: " + std::string(SERVER) + CRLF;
     headers += "Date: " + Utils::getCurrentTime() + CRLF;
     headers += "Content-Length: " + (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))) + CRLF;
-    //headers += std::string("Accept-Ranges: bytes") + CRLF;
+    headers += std::string("Accept-Ranges: bytes") + CRLF;
     headers += "Content-Type: " + (bodyPath.empty() ? headers += "text/html" : getMimeType(Utils::getFileExtension(bodyPath))) + CRLF;
+    if (isRedirection)
+        headers += "Location: " + location + CRLF;
     headers += CRLF;
 }
 
@@ -181,18 +188,29 @@ void Response::prepareGETBody()
 
 void Response::prepareGET()
 {
-    std::string requestedResource = context->getRoot() + request->getRequestPath();
-    if (!Utils::checkIfPathExists(requestedResource))
+    if (isWorking)
+        return;
+    std::string resource = context->getRoot() + request->getRequestPath();
+    if (!Utils::checkIfPathExists(resource))
     {
+        std::cout << resource << std::endl;
         statusCode = NotFound;
         generateResponseError();
         return;
     }
-    if (Utils::isDirectory(requestedResource))
+    if (Utils::isDirectory(resource) && !Utils::stringEndsWith(resource, "/"))
+    {
+        isRedirection = true;
+        statusCode = MovedPermanently;
+        location = "http://" + request->getHost() + request->getRequestPath() + "/";
+        bodyPath.clear();
+        return;
+    }
+    if (Utils::isDirectory(resource))
     {
         try
         {
-            std::string index = context->getIndex(requestedResource);
+            std::string index = context->getIndex(resource);
             if (index.empty())
             {
                 if (context->getAutoIndex())
@@ -206,7 +224,7 @@ void Response::prepareGET()
                 }
                 return;
             }
-            bodyPath = requestedResource + index;
+            bodyPath = resource + index;
             statusCode = OK;
         }
         catch (const Utils::FilePermissionDenied& e)
@@ -222,14 +240,16 @@ void Response::prepareGET()
     }
     else
     {
-        if (!Utils::isReadableFile(requestedResource))
+        if (!Utils::isReadableFile(resource))
         {
             statusCode = FORBIDDEN;
             generateResponseError();
             return;
         }
-        bodyPath = requestedResource;
+        bodyPath = resource;
+        statusCode = OK;
     }
+    isWorking = true;
 }
 
 void Response::prepareResponse()
@@ -267,6 +287,9 @@ void Response::resetResponse()
     bodyPath.clear();
     headersSent = false;
     responseDone = false;
+    isWorking = false;
+    isRedirection = false;
+    location.clear();
 }
 
 void Response::initReasonPhrases()
