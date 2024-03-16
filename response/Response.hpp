@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/15 13:58:26 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/16 13:35:09 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 #include "Request.hpp"
 #include "ServerContext.hpp"
+
+// class Request;
 
 class Response
 {
@@ -25,12 +27,13 @@ class Response
         Request *request;
         Context *context;
 
-        char buffer[1024];
+        char *buffer;
         int fd;
 
         int statusCode;
         std::string headers;
         std::string body;
+        ssize_t bodySize;
         std::string bodyPath;
         bool headersSent;
         bool responseDone;
@@ -54,10 +57,11 @@ class Response
         void setContext(Context* context);
         void setHeadersSent(bool flag);
         static std::string getMimeType(const std::string& extension);
-        const std::string& getBody() const;
+        const char* getBody() const;
         const std::string& getHeaders() const;
         bool getHeadersSent() const;
         bool responseIsDone() const;
+        ssize_t getBodySize() const;
 
         void prepareResponse();
         void resetResponse();

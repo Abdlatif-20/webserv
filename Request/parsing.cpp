@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/12 17:23:50 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/15 17:27:30 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,18 +192,17 @@ int	Request::takingRequests(const String& receivedRequest)
 		if (checkDuplicate(receivedRequest))
 			return 1;
 	}
-	if (foundUri)
+	if (requestInProgress)
+		requestVector = Utils::splitRequest(requestData, CRLF);
+	else
 	{
-		if (requestInProgress)
-			requestVector = Utils::splitRequest(requestData, CRLF);
-		else
-		{
-			separateRequest(receivedRequest);
-			requestVector = Utils::splitRequest(headers, CRLF);
-		}
-		fillHeaders(requestVector); //fill the headers to the map
-		requestIsWellFormed(); //check if the request is well formed
-		receivecount++;
+		separateRequest(receivedRequest);
+		requestVector = Utils::splitRequest(headers, CRLF);
 	}
+	fillHeaders(requestVector); //fill the headers to the map
+	findUri();
+	parseUri();
+	requestIsWellFormed(); //check if the request is well formed
+	receivecount++;
 	return 0;
 }

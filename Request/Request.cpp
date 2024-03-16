@@ -6,12 +6,14 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/14 14:37:48 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/15 22:57:03 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
 #include "Request.hpp"
+
+std::vector<Server> Request::servers;
 
 /* *************************** Constructors *************************** */
 
@@ -62,7 +64,9 @@ Request& Request::operator=(const Request& obj)
 		bodyDone = obj.bodyDone;
 		context = obj.context;
 		foundUri = obj.foundUri;
+		serv_end = obj.serv_end;
 		multipart = obj.multipart;
+		serv_begin = obj.serv_begin;
 		_setLength = obj._setLength;
 		isComplete = obj.isComplete;
 		detectHost = obj.detectHost;
@@ -234,6 +238,37 @@ void	Request::resetRequest()
 	this->requestVector.clear();
 }
 
+void	Request::selectServerContext(const String& host)
+{
+	servers_it it, end;
+	StringVector::iterator	name;
+
+	end = Request::servers.begin() + serv_end;
+	it  = Request::servers.begin() + serv_begin;
+	while (it != end)
+	{
+		StringVector hosts(it->getServerNames());
+		name = std::find(hosts.begin(), hosts.end(), host);
+		if (name != hosts.end())
+		{
+			ServerContext& s = *dynamic_cast<ServerContext*>(context);
+			s = it->getServerCTX();
+			break;
+		}
+		it++;
+	}
+}
+
+void	Request::setServerCTXEnd(size_t i)
+{
+	serv_end = i;
+}
+
+void	Request::setServerCTXBegin(size_t i)
+{
+	serv_begin = i;
+}
+
 //main function to parse the request
 void	Request::parseRequest(const std::string& receivedRequest, Context* serverCTX)
 {
@@ -254,7 +289,7 @@ void	Request::parseRequest(const std::string& receivedRequest, Context* serverCT
 			return;
 		}
 	}
-	if (this->requestLine["method"] == "POST" && !this->bodyDone && this->_requestIsWellFormed && this->status == 200)
+	if (this->requestLine["method"] == "POST" && !this->bodyDone && this->_requestIsWellFormed && this->status == 200 && foundUri)
 	{
 		setUploadingPath();
 		if (this->receivecount > 1)

@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/15 13:56:16 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/16 13:36:26 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,7 @@ Client::Client(const Client &cpy)
 void	Client::reset(void)
 {
 	request.resetRequest();
+	response.resetResponse();
 }
 
 ssize_t Client::recvRequest(void)
@@ -46,8 +47,6 @@ ssize_t Client::recvRequest(void)
 	{
 		request.parseRequest(std::string(buff, len), &serverCTX);
 		requestDone = request.isDone();
-		if (!serverSelected)
-			selectServerCTX();
 	}
 	else
 		requestDone = true;;
@@ -59,8 +58,8 @@ void	Client::sendResponse(void)
 {
 	if (requestDone && !responseDone)
 	{
-		requestDone = false;
-		responseDone = true;
+		requestDone = request.isDone();
+		// responseDone = true;
 		serverSelected = false;
 		response.setRequest(&request);
 		response.setContext(request.getContext());
@@ -70,9 +69,16 @@ void	Client::sendResponse(void)
 			send(sockId, response.getHeaders().c_str(), response.getHeaders().size(), 0);
 			response.setHeadersSent(true);
 		}
+		send(sockId, response.getBody(), response.getBodySize(), 0);
 		responseDone = response.responseIsDone();
-		send(sockId, response.getBody().c_str(), response.getBody().size(), 0);
+		// responseDone = true;
+		// send(sockId, JJJ, 202, 0);
+		 // reset request and restponse;
 	}
+	if (requestDone)
+		request.resetRequest();
+	if (responseDone)
+		response.resetResponse();
 }
 
 void	Client::setServerCTX(const ServerContext& serverCTX)
@@ -105,53 +111,15 @@ bool	Client::isResponseDone(void) const
 	return (responseDone);
 }
 
-void Client::selectServerCTX(void)
-{
-	std::string	host;
-	servers_it it, end;
-	StringVector::iterator	name;
-
-	end = Core::servers.begin() + serv_end;
-	it  = Core::servers.begin() + serv_begin;
-	try
-	{
-		host = request.getHost();
-	}
-	catch(...){
-		return ;
-	}
-	while (it != end)
-	{
-		StringVector hosts(it->getServerNames());
-		name = std::find(hosts.begin(), hosts.end(), host);
-		if (name != hosts.end())
-		{
-			serverCTX = it->getServerCTX();
-			serverSelected = true;
-			break;
-		}
-		it++;
-	}
-}
 
 void Client::setServersEnd(size_t it)
 {
-	serv_end = it;
+	request.setServerCTXEnd(it);
 }
 
 void Client::setServersBegin(size_t it)
 {
-	serv_begin = it;
-}
-
-size_t Client::serversEnd(void) const
-{
-	return (serv_end);
-}
-
-size_t Client::serversBegin(void) const
-{
-	return (serv_begin);
+	request.setServerCTXBegin(it);
 }
 
 const Request &Client::getRequest(void) const
@@ -176,9 +144,7 @@ Client	&Client::operator=(const Client &cpy)
 		sockId = cpy.sockId;
 		request = cpy.request;
 		response = cpy.response;
-		serv_end = cpy.serv_end;
 		serverCTX = cpy.serverCTX;
-		serv_begin = cpy.serv_begin;
 		requestDone = cpy.requestDone;
 		responseDone = cpy.responseDone;
 		serverSelected = cpy.serverSelected;

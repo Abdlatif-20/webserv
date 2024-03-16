@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/12 17:22:16 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/15 20:25:02 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,12 @@ void	Request::fillHeaders(Vector headers)
 			if (key == "host")
 				checkHostIsFound++;
 			value = Utils::strTrim(Utils::strTrim(it->substr(pos + 1), CR), ' ');
-			if (key == "host" && value.empty())
-				return(this->status = BadRequest, requestIscomplete = true, void());
+			if (key == "host")
+			{
+				if (value.empty())
+					return(this->status = BadRequest, requestIscomplete = true, void());
+				selectServerContext(value);
+			}
 			this->_headers[key] = value;
 		}
 	}
@@ -71,8 +75,6 @@ void	Request::fillRequestLine(const String& requestLine)
 	this->requestLineDone = true;
 	this->requestLine = requestLineMap;	
 	fillParams();
-	findUri();
-	parseUri();
 }
 
 void	Request::fillParams()
