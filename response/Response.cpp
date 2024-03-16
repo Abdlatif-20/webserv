@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/16 15:03:23 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/16 17:37:58 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ Response& Response::operator=(const Response& obj)
     headers = obj.headers;
     headersSent = obj.headersSent;
     bodyPath = obj.bodyPath;
-    std::memcpy(buffer, obj.buffer, sizeof(obj.buffer));
+    std::memcpy(buffer, obj.buffer, sizeof(buffer));
     fd = obj.fd;
     responseDone = obj.responseDone;
     return *this;
@@ -150,7 +150,7 @@ void Response::prepareHeaders()
     headers += "Server: " + std::string(SERVER) + CRLF;
     headers += "Date: " + Utils::getCurrentTime() + CRLF;
     headers += "Content-Length: " + (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))) + CRLF;
-    headers += std::string("Accept-Ranges: bytes") + CRLF;
+    //headers += std::string("Accept-Ranges: bytes") + CRLF;
     headers += "Content-Type: " + (bodyPath.empty() ? headers += "text/html" : getMimeType(Utils::getFileExtension(bodyPath))) + CRLF;
     headers += CRLF;
 }
@@ -172,13 +172,15 @@ void Response::prepareGETBody()
 	struct stat statBuff;
 	stat(bodyPath.c_str(), &statBuff);
     ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
+    body.clear();
     if (readedBytes <= 0)
-	{
+    {
+        close(fd);
         responseDone = true;
 		close(fd);
 		fd = INT_MIN;
         return;
-    } // to be handled later
+    }
     body.append(buffer, readedBytes);
 }
 
@@ -231,6 +233,7 @@ void Response::prepareGET()
             generateResponseError();
             return;
         }
+		statusCode = OK;
         bodyPath = requestedResource;
     }
 }
@@ -259,17 +262,17 @@ void Response::prepareResponse()
 
 void Response::resetResponse()
 {
-    request = NULL;
-    context = NULL;
-    std::memset(buffer, 0, sizeof(buffer));
-	close(fd);
     fd = INT_MIN;
+    context = NULL;
+    request = NULL;
     statusCode = 0;
-    headers.clear();
-    body.clear();
-    bodyPath.clear();
     headersSent = false;
     responseDone = false;
+    close(fd);
+    body.clear();
+    headers.clear();
+    bodyPath.clear();
+    std::memset(buffer, 0, sizeof(buffer));
 }
 
 void Response::initReasonPhrases()

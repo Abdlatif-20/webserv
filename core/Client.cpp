@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/16 15:52:28 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/16 17:33:37 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,10 +35,11 @@ Client::Client(const Client &cpy)
 
 void	Client::reset(void)
 {
-	if (requestDone)
-		request.resetRequest();
 	if (responseDone)
+	{
+		request.resetRequest();
 		response.resetResponse();
+	}
 }
 
 ssize_t Client::recvRequest(void)
@@ -69,9 +70,9 @@ void	Client::sendResponse(void)
 			send(sockId, response.getHeaders().c_str(), response.getHeaders().size(), 0);
 			response.setHeadersSent(true);
 		}
-		responseDone = response.responseIsDone();
 		send(sockId, response.getBody().c_str(), response.getBody().size(), 0);
-		reset(); // reset request and restponse;
+		responseDone = response.responseIsDone();
+		reset();
 	}
 }
 
