@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/15 22:15:35 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/16 15:02:07 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,10 @@ Client::Client(const Client &cpy)
 
 void	Client::reset(void)
 {
-	request.resetRequest();
+	if (requestDone)
+		request.resetRequest();
+	if (responseDone)
+		response.resetResponse();
 }
 
 ssize_t Client::recvRequest(void)
@@ -57,17 +60,9 @@ void	Client::sendResponse(void)
 {
 	if (requestDone && !responseDone)
 	{
-		requestDone = false;
-		responseDone = true;
 		serverSelected = false;
 		response.setRequest(&request);
 		response.setContext(request.getContext());
-		if (request.getMethod() == "GET")
-			response.setMethod(0);
-		else if (request.getMethod() == "POST")
-			response.setMethod(1);
-		else if (request.getMethod() == "DELETE")
-			response.setMethod(2);
 		response.prepareResponse();
 		if (!response.getHeadersSent())
 		{
