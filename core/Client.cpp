@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/13 14:06:56 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/15 22:26:38 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,19 @@ Client::Client(const Client &cpy)
 	*this = cpy;
 }
 
-ssize_t	Client::recvRequest(void)
+void	Client::reset(void)
+{
+	request.resetRequest();
+}
+
+ssize_t Client::recvRequest(void)
 {
 	std::memset(buff, 0, sizeof(buff));
 	len = recv(sockId, buff, 1023, 0);
 	if (len > 0)
 	{
 		request.parseRequest(std::string(buff, len), &serverCTX);
+		Utils::printMap(request.getHeaders());
 		requestDone = request.isDone();
 		if (!serverSelected)
 			selectServerCTX();
@@ -69,7 +75,6 @@ void	Client::sendResponse(void)
 		if (!response.getHeadersSent())
 		{
 			send(sockId, response.getHeaders().c_str(), response.getHeaders().size(), 0);
-			std::cout << response.getHeaders() << std::endl;
 			response.setHeadersSent(true);
 		}
 		responseDone = response.responseIsDone();
@@ -85,6 +90,16 @@ void	Client::setServerCTX(const ServerContext& serverCTX)
 bool	Client::hostIsDetected(void) const
 {
 	return (serverSelected);
+}
+
+bool	Client::isALive(void) const
+{
+	std::string	value;
+
+	value = request.getHeaderByName("connection");
+	if (value == "closed")
+		return (false);
+	return (true);
 }
 
 bool Client::isRequestDone(void) const

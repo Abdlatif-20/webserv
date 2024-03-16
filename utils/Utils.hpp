@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/12 11:21:21 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/13 23:13:07 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,12 +59,7 @@ namespace Utils
 		long long getFileSize(const std::string& filePath);
 		std::string longlongToString(long long number);
 
-		class FileNotFoundException : public std::exception
-		{
-			
-		};
-		class FilePermissionDenied : public std::exception
-		{
-			
-		};
+		class FileNotFoundException : public std::exception {};
+		class FilePermissionDenied : public std::exception {};
+		class PathIsDirectory : public std::exception {};
 };

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/15 00:19:33 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/15 01:10:59 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -138,15 +138,14 @@ const String Request::getHeaderByName(const String& name) const
 	Utils::toLower((String&)name);
 	try
 	{
-		_headers.at(name);
+		return (_headers.at(name));
 	}
 	catch(const std::exception& e)
 	{
 		if (name == "connection")
 			return ("keep-alive");
-		return ("");
 	}
-	return (_headers.at(name));
+	return ("");
 }
 
 const bool& Request::getRequestLineDone() const
@@ -172,25 +171,19 @@ bool	Request::hostIsDetected(void) const
 const String Request::getMethod() const
 {
 	try{
-		requestLine.at("method");
+		return requestLine.at("method");
 	}
-	catch(const std::exception& e)
-	{
-		return ("");
-	}
-	return requestLine.at("method");
+	catch(const std::exception& e) {}
+	return ("");
 }
 
 const String Request::getHost() const
 {
 	try{
-		_headers.at("host");
+		return (_headers.at("host"));
 	}
-	catch(const std::exception& e)
-	{
-		return ("");
-	}
-	return _headers.at("host");
+	catch(const std::exception& e){}
+	return ("");
 }
 
 Context* Request::getContext() const
@@ -198,9 +191,13 @@ Context* Request::getContext() const
 	return context;
 }
 
-const std::string& Request::getRequestPath() const
+const std::string Request::getRequestPath() const
 {
-	return requestLine.at("path");
+	try{
+		return (requestLine.at("path"));
+	}
+	catch(const std::exception& e){}
+	return ("");
 }
 
 /* *************************** methods *************************** */

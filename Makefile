@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+         #
+#    By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/03/12 17:02:34 by houmanso         ###   ########.fr        #
+#    Updated: 2024/03/16 00:55:47 by aben-nei         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -42,11 +42,11 @@ obj/%.o: %.cpp $(INC)
 	@echo "$(CYAN)Compiling$(NC) $< ... $$(($(CURRENT)*100/$(TOTAL)))%$(NC)\r"
 
 clean:
-	rm -rf $(OBJS)
+	@rm -rf obj
+	@echo "$(YELLOW)Cleaning object files...$(NC)"
 
 fclean: clean
-	rm -rf $(NAME)
+	@rm -f $(NAME)
+	@echo "$(YELLOW)Cleaning executable...$(NC)"
 
-re: clean fclean all
-
-.PHONY: clean server utils config
+re: clean all
