@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/16 04:31:32 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/16 22:40:52 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,16 +194,12 @@ int	Request::takingRequests(String receivedRequest)
 		if (parseRequestLine(receivedRequest) && requestData.empty())
 			return 1;
 		else if (!requestData.empty())
-		{
 			receivedRequest = receivedRequest.substr(receivedRequest.find("\r\n") + 2);
-		}
 	}
 	if (!headersDone)
 	{
 		if (checkDuplicate(receivedRequest))
-		{
 			return 1;
-		}
 	}
 	if (requestInProgress)
 		requestVector = Utils::splitRequest(requestData, CRLF);
@@ -213,6 +209,7 @@ int	Request::takingRequests(String receivedRequest)
 		requestVector = Utils::splitRequest(headers, CRLF);
 	}
 	fillHeaders(requestVector); //fill the headers to the map
+	// std::cout << "status: " << status << std::endl;
 	findUri();
 	parseUri();
 	requestIsWellFormed(); //check if the request is well formed
