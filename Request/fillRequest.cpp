@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/16 03:41:43 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/17 01:32:11 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,8 +53,6 @@ void	Request::fillHeaders(Vector headers)
 //function to Check if the request Line is well formed and fill it to the map
 void	Request::fillRequestLine(const String& requestLine)
 {
-	if (!requestLine.size())
-		return(this->status = BadRequest, requestIscomplete = true, void());
 	Vector requestLineVector;
 	Map requestLineMap;
 	requestLineVector = Utils::split(requestLine, ' ');

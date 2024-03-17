@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/15 17:50:03 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/16 21:34:28 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,10 +19,6 @@
 
 class Response
 {
-    enum Method
-    {
-        GET, POST, DELETE  
-    };
     enum Status
     {
         FORBIDDEN = 403  
@@ -30,7 +26,6 @@ class Response
     private:
         Request *request;
         Context *context;
-        Method responseMethod;
 
         char buffer[1024];
         int fd;
@@ -41,10 +36,12 @@ class Response
         std::string bodyPath;
         bool headersSent;
         bool responseDone;
+        bool isWorking;
+        bool isRedirection;
+        std::string location;
 
         std::string generateHtmlErrorPage();
         bool checkErrorPage(const std::string& path);
-        void checkPath(const std::string& path);
         void generateResponseError();
         void prepareHeaders();
         void prepareGETBody();
@@ -60,7 +57,6 @@ class Response
         
         void setRequest(Request* request);
         void setContext(Context* context);
-        void setMethod(int method);
         void setHeadersSent(bool flag);
         static std::string getMimeType(const std::string& extension);
         const std::string& getBody() const;
@@ -69,6 +65,7 @@ class Response
         bool responseIsDone() const;
 
         void prepareResponse();
+        void resetResponse();
 
         static void initReasonPhrases();
         static void initMimeTypes();

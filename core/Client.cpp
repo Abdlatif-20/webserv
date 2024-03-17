@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/16 01:03:58 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/17 01:32:51 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,11 @@ Client::Client(const Client &cpy)
 
 void	Client::reset(void)
 {
-	request.resetRequest();
+	if (responseDone)
+	{
+		request.resetRequest();
+		response.resetResponse();
+	}
 }
 
 ssize_t Client::recvRequest(void)
@@ -45,6 +49,7 @@ ssize_t Client::recvRequest(void)
 	if (len > 0)
 	{
 		request.parseRequest(std::string(buff, len), &serverCTX);
+		Utils::printMap(request.getHeaders());
 		requestDone = request.isDone();
 	}
 	else
@@ -57,27 +62,19 @@ void	Client::sendResponse(void)
 {
 	if (requestDone && !responseDone)
 	{
-		requestDone = false;
-		responseDone = true;
 		serverSelected = false;
 		response.setRequest(&request);
 		response.setContext(request.getContext());
-		if (request.getMethod() == "GET")
-			response.setMethod(0);
-		else if (request.getMethod() == "POST")
-			response.setMethod(1);
-		else if (request.getMethod() == "DELETE")
-			response.setMethod(2);
 		response.prepareResponse();
 		if (!response.getHeadersSent())
 		{
 			send(sockId, response.getHeaders().c_str(), response.getHeaders().size(), 0);
 			response.setHeadersSent(true);
 		}
-		responseDone = response.responseIsDone();
 		send(sockId, response.getBody().c_str(), response.getBody().size(), 0);
-		reset(); // reset request and restponse;
+		responseDone = response.responseIsDone();
 	}
+	reset();
 }
 
 void	Client::setServerCTX(const ServerContext& serverCTX)
