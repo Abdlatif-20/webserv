@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/16 22:35:34 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/17 02:01:34 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -271,6 +271,7 @@ void	Request::setServerCTXBegin(size_t i)
 //main function to parse the request
 void	Request::parseRequest(const std::string& receivedRequest, Context* serverCTX)
 {
+	std::cout << "parsing request" << std::endl;
 	if (receivedRequest.empty())
 		return;
 	if (!context)
@@ -301,4 +302,3 @@ void	Request::parseRequest(const std::string& receivedRequest, Context* serverCT
 			parseBody();
 	}
 }
-//requestData.empty() && 

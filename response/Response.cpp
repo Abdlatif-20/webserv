@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/16 22:12:09 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/17 01:41:00 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,8 @@ Response& Response::operator=(const Response& obj)
 
 Response::~Response()
 {
-    close(fd);
+	close(fd);
+	fd = INT_MIN;
 }
 
 void Response::setRequest(Request* request)
@@ -104,9 +105,9 @@ bool Response::responseIsDone() const
 
 std::string Response::generateHtmlErrorPage()
 {
-    return "<!DOCTYPE html><html><body><h1 style='text-align: center;'>Error "
+    return "<!DOCTYPE html><html><body style='text-align: center;'><h1>Error "
         + Utils::intToString(statusCode) + " - "
-        + reasonPhrases[statusCode] + "</body></html>";
+        + reasonPhrases[statusCode] + "</h1><hr><h3>WebServer 1.0</h3></body></html>";
 }
 
 bool Response::checkErrorPage(const std::string& path)
@@ -155,7 +156,7 @@ void Response::prepareHeaders()
     headers += "Date: " + Utils::getCurrentTime() + CRLF;
     headers += "Content-Length: " + (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))) + CRLF;
     headers += std::string("Accept-Ranges: bytes") + CRLF;
-    headers += "Content-Type: " + (bodyPath.empty() ? headers += "text/html" : getMimeType(Utils::getFileExtension(bodyPath))) + CRLF;
+    headers += "Content-Type: " + (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath))) + CRLF;
     if (isRedirection)
         headers += "Location: " + location + CRLF;
     headers += CRLF;
@@ -175,12 +176,16 @@ void Response::prepareGETBody()
         /*INTERRNAL SERVER ERROR 500*/
         /* ERROR WHILE OPENING FILE TO BE HANDLED LATER */
     }
+	struct stat statBuff;
+	stat(bodyPath.c_str(), &statBuff);
     ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
     body.clear();
     if (readedBytes <= 0)
     {
         close(fd);
         responseDone = true;
+		close(fd);
+		fd = INT_MIN;
         return;
     }
     body.append(buffer, readedBytes);
@@ -193,7 +198,6 @@ void Response::prepareGET()
     std::string resource = context->getRoot() + request->getRequestPath();
     if (!Utils::checkIfPathExists(resource))
     {
-        std::cout << resource << std::endl;
         statusCode = NotFound;
         generateResponseError();
         return;
@@ -202,11 +206,10 @@ void Response::prepareGET()
     {
         isRedirection = true;
         statusCode = MovedPermanently;
-        location = "http://" + request->getHost() + request->getRequestPath() + "/";
-        bodyPath.clear();
+        location = request->getRequestPath() + "/";
         return;
     }
-    if (Utils::isDirectory(resource))
+    if (Utils::stringEndsWith(resource, "/")) /* Is directory */
     {
         try
         {
@@ -215,7 +218,7 @@ void Response::prepareGET()
             {
                 if (context->getAutoIndex())
                 {
-                    /* AUTO_INDEX CODE HERE ! */
+                    
                 }
                 else
                 {
@@ -252,8 +255,29 @@ void Response::prepareGET()
     isWorking = true;
 }
 
+void Response::listDirectories()
+{
+    // struct dirent *entry;
+    // while ((entry = readdir(dir)) != NULL) {
+    //     // Print the entry name (excluding "." and "..")
+    //     if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
+    //     printf("%s\n", entry->d_name);
+    //     }
+    // }
+}
+
 void Response::prepareResponse()
 {
+    /* Handle request Errors */
+    if (request->getStatus() >= 400)
+    {
+        statusCode = request->getStatus();
+        std::cout <<statusCode<<std::endl;
+        generateResponseError();
+        prepareHeaders();
+        responseDone = true;
+        return;
+    }
 	if (request->getMethod() == "GET")
     {
         prepareGET();
@@ -276,15 +300,10 @@ void Response::prepareResponse()
 
 void Response::resetResponse()
 {
-    request = NULL;
-    context = NULL;
-    close(fd);
     fd = INT_MIN;
-    std::memset(buffer, 0, sizeof(buffer));
+    context = NULL;
+    request = NULL;
     statusCode = 0;
-    headers.clear();
-    body.clear();
-    bodyPath.clear();
     headersSent = false;
     responseDone = false;
     isWorking = false;
