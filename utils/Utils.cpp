@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 15:26:30 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/17 17:13:16 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,9 +237,9 @@ std::string Utils::getFileExtension(const std::string& filePath)
 long long Utils::getFileSize(const std::string& filePath)
 {
 	struct stat statBuff;
-	if (stat(filePath.c_str(), &statBuff) >= 0)
-		return statBuff.st_size;
-	return -1;
+	if (stat(filePath.c_str(), &statBuff) < 0 || isDirectory(filePath))
+		return -1;
+	return statBuff.st_size;
 }
 
 std::string Utils::longlongToString(long long number)
@@ -258,4 +258,16 @@ std::string Utils::replaceAll(std::string str, const std::string& s1, const std:
 		pos += s2.length();
   	}
 	return str;
+}
+
+std::string Utils::get_last_modified_date(const std::string& path)
+{
+	struct stat statbuf;
+	char buffer[1024];
+	if (stat(path.c_str(), &statbuf) < 0)
+		return "--";
+	time_t last_modified = statbuf.st_mtime;
+	tm *lastTm = localtime(&last_modified);
+	std::strftime(buffer, 128, "%Y-%m-%d %H:%M:%S", lastTm);
+	return buffer;
 }
