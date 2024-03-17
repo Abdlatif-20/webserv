@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 21:10:12 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/17 21:23:42 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,7 @@ ssize_t Client::recvRequest(void)
 		request.parseRequest(std::string(buff, len), &serverCTX);
 		Utils::printMap(request.getHeaders());
 		requestDone = request.isDone();
-		last_update_time = std::time(NULL);
-		std::cout << "read " << last_update_time << std::endl;
+		// last_update_time = std::time(NULL); to think about later
 	}
 	else
 		requestDone = true;;

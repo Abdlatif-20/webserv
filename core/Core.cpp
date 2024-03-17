@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/17 18:23:40 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/17 21:25:37 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,6 @@ void	Core::traceEvents(void)
 				while (it + 1 != servers.end() && *it == *(it + 1))
 					it++;
 				clients[fd].setServersEnd(it - servers.begin() + 1);
-				std::cout << clients[fd].getLastUpdateTime() << std::endl;
 			}
 			else
 			{
@@ -104,6 +103,7 @@ void	Core::traceEvents(void)
 		}
 		if (!checklist.size())
 			continue ;
+		// the requests header failing  (sending response  without waiting the empty line)
 		hooks = poll(checklist.data(), checklist.size(), 0);
 		for (i = 0; i < checklist.size(); i++)
 		{
