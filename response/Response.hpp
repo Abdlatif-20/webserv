@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/16 21:34:28 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/17 01:30:16 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include "Request.hpp"
 #include "ServerContext.hpp"
+#include <dirent.h>
 
 // class Request;
 
@@ -46,6 +47,7 @@ class Response
         void prepareHeaders();
         void prepareGETBody();
         void prepareGET();
+        void listDirectories();
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;
