@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/15 20:24:46 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/16 03:36:18 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,12 +81,12 @@ class Request
 		//maps
 		Map	_headers;
 		Map	requestLine;
-		Map	params;
 		//vector
 		Vector	requestVector;
 		Vector	files;
 		//strings
 		String	_path;
+		String	_params;
 		String	_body;
 		String	headers;
 		String	requestData;
@@ -117,7 +117,7 @@ class Request
 			void			fillRequestLine(const String& requestLine);
 			int				parseRequestLine(const String& requestLine);
 			int				checkDuplicate(const String& receivedRequest);
-			int				takingRequests(const String& receivedRequest);
+			int				takingRequests(String receivedRequest);
 			void			preparLengthAndName(size_t pos, String& length, std::ofstream& file);
 	public:
 	/* *************************** constructors ****************************** */

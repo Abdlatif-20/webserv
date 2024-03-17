@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 01:30:16 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/17 01:38:23 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ class Response
         Request *request;
         Context *context;
 
-        char buffer[1024];
+        char buffer[10240];// modified
         int fd;
 
         int statusCode;

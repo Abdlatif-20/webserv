@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/15 17:27:30 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/16 15:52:39 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,9 +32,8 @@ void	Request::isMethodAllowedInLocation()
 {
 	Vector allowedMethods = locationCtx.getAllowedMethods();
 	if (std::find(allowedMethods.begin(), allowedMethods.end(), requestLine["method"]) == allowedMethods.end())
-		return (std::cout << "Method not allowed in location" << std::endl, this->status = MethodNotAllowed, requestIscomplete = true, void());
+		return (this->status = MethodNotAllowed, requestIscomplete = true, void());
 	_requestIsWellFormed = true;
-	std::cout << "Method is allowed in location" << std::endl;
 }
 
 //function to check if the request Line is well formed And Set the status To true If all is well
@@ -116,6 +115,9 @@ void	Request::parseBody()
 		&& _headers.find("transfer-encoding") == _headers.end())
 			parseBoundary();
 	else if (this->requestLine["method"] == "POST"
+		&& _headers.find("content-type") != _headers.end() && _headers.find("transfer-encoding") != _headers.end())
+			return (this->status = NotImplemented, requestIscomplete = true, void());
+	else if (this->requestLine["method"] == "POST"
 			&& _headers.find("content-length") != _headers.end())
 				ContentLength();
 }
@@ -139,6 +141,11 @@ int	Request::parseRequestLine(const String& requestLine)
 		else
 		{
 			this->requestVector = Utils::splitRequest(requestLine, CRLF);
+			if (this->requestVector.size() != 1)
+			{
+				for (size_t i = 1; i < this->requestVector.size(); i++)
+					requestData += this->requestVector[i] + CRLF;
+			}
 			this->requestInProgress = true;
 		}
 		return (fillRequestLine(this->requestVector[0]), 1);
@@ -180,17 +187,23 @@ int	Request::checkDuplicate(const String& receivedRequest)
 }
 
 //function to take the separated request or complete request and parse it
-int	Request::takingRequests(const String& receivedRequest)
+int	Request::takingRequests(String receivedRequest)
 {
 	if (!this->requestLineDone)
 	{
-		if (parseRequestLine(receivedRequest))
+		if (parseRequestLine(receivedRequest) && requestData.empty())
 			return 1;
+		else if (!requestData.empty())
+		{
+			receivedRequest = receivedRequest.substr(receivedRequest.find("\r\n") + 2);
+		}
 	}
 	if (!headersDone)
 	{
 		if (checkDuplicate(receivedRequest))
+		{
 			return 1;
+		}
 	}
 	if (requestInProgress)
 		requestVector = Utils::splitRequest(requestData, CRLF);

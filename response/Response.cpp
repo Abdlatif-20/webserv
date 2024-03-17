@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 01:33:19 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/17 01:41:00 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,8 @@ Response& Response::operator=(const Response& obj)
 
 Response::~Response()
 {
-    close(fd);
+	close(fd);
+	fd = INT_MIN;
 }
 
 void Response::setRequest(Request* request)
@@ -175,12 +176,16 @@ void Response::prepareGETBody()
         /*INTERRNAL SERVER ERROR 500*/
         /* ERROR WHILE OPENING FILE TO BE HANDLED LATER */
     }
+	struct stat statBuff;
+	stat(bodyPath.c_str(), &statBuff);
     ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
     body.clear();
     if (readedBytes <= 0)
     {
         close(fd);
         responseDone = true;
+		close(fd);
+		fd = INT_MIN;
         return;
     }
     body.append(buffer, readedBytes);
@@ -267,6 +272,7 @@ void Response::prepareResponse()
     if (request->getStatus() >= 400)
     {
         statusCode = request->getStatus();
+        std::cout <<statusCode<<std::endl;
         generateResponseError();
         prepareHeaders();
         responseDone = true;
@@ -294,15 +300,10 @@ void Response::prepareResponse()
 
 void Response::resetResponse()
 {
-    request = NULL;
-    context = NULL;
-    close(fd);
     fd = INT_MIN;
-    std::memset(buffer, 0, sizeof(buffer));
+    context = NULL;
+    request = NULL;
     statusCode = 0;
-    headers.clear();
-    body.clear();
-    bodyPath.clear();
     headersSent = false;
     responseDone = false;
     isWorking = false;

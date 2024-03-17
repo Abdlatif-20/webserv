@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/15 22:57:03 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/16 17:43:25 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,14 +36,15 @@ Request::Request()
 	this->remainingChunkLength = 0;
 	this->_requestIsWellFormed = false;
 	this->requestLineInProgress = false;
-	this->_path = "";
-	this->_body = "";
-	this->headers = "";
+	this->_path.clear();
+	this->_body.clear();
+	this->_params.clear();
+	this->headers.clear();
 	this->context = NULL;
-	this->requestData = "";
-	this->boundaryName = "";
-	this->_chunkedName = "";
-	this->requestLineData = "";
+	this->requestData.clear();
+	this->boundaryName.clear();
+	this->_chunkedName.clear();
+	this->requestLineData.clear();
 }
 
 Request::Request(const Request& obj)
@@ -55,37 +56,35 @@ Request& Request::operator=(const Request& obj)
 {
 	if (this != &obj)
 	{
-		_body = obj._body;
-		_path = obj._path;
-		status = obj.status;
-		params = obj.params;
-		headers = obj.headers;
-		headers = obj.headers;
-		bodyDone = obj.bodyDone;
-		context = obj.context;
-		foundUri = obj.foundUri;
+		this->_body = obj._body;
+		this->_path = obj._path;
 		serv_end = obj.serv_end;
-		multipart = obj.multipart;
+		this->status = obj.status;
 		serv_begin = obj.serv_begin;
-		_setLength = obj._setLength;
-		isComplete = obj.isComplete;
-		detectHost = obj.detectHost;
-		requestLine = obj.requestLine;
-		headersDone = obj.headersDone;
-		requestData = obj.requestData;
-		receivecount = obj.receivecount;
-		_chunkedName = obj._chunkedName;
-		sizeBoundary = obj.sizeBoundary;
-		boundaryName = obj.boundaryName;
-		contentLength = obj.contentLength;
-		requestVector = obj.requestVector;
-		requestLineDone = obj.requestLineDone;
-		requestIscomplete = obj.requestIscomplete;
-		requestInProgress = obj.requestInProgress;
-		_requestIsWellFormed = obj._requestIsWellFormed;
-		remainingChunkLength = obj.remainingChunkLength;
-		locationCtx = obj.locationCtx;
-		context = obj.context;
+		this->_params = obj._params;
+		this->headers = obj.headers;
+		this->context = obj.context;
+		this->bodyDone = obj.bodyDone;
+		this->foundUri = obj.foundUri;
+		this->multipart = obj.multipart;
+		this->_setLength = obj._setLength;
+		this->isComplete = obj.isComplete;
+		this->detectHost = obj.detectHost;
+		this->requestLine = obj.requestLine;
+		this->headersDone = obj.headersDone;
+		this->locationCtx = obj.locationCtx;
+		this->requestData = obj.requestData;
+		this->receivecount = obj.receivecount;
+		this->_chunkedName = obj._chunkedName;
+		this->sizeBoundary = obj.sizeBoundary;
+		this->boundaryName = obj.boundaryName;
+		this->contentLength = obj.contentLength;
+		this->requestVector = obj.requestVector;
+		this->requestLineDone = obj.requestLineDone;
+		this->requestIscomplete = obj.requestIscomplete;
+		this->requestInProgress = obj.requestInProgress;
+		this->_requestIsWellFormed = obj._requestIsWellFormed;
+		this->remainingChunkLength = obj.remainingChunkLength;
 	}
 	return (*this);
 }
@@ -224,15 +223,15 @@ void	Request::resetRequest()
 	this->remainingChunkLength = 0;
 	this->_requestIsWellFormed = false;
 	this->requestLineInProgress = false;
-	this->_path = "";
-	this->_body = "";
-	this->headers = "";
+	this->_path.clear();
+	this->_body.clear();
+	this->_params.clear();
+	this->headers.clear();
 	this->context = NULL;
-	this->requestData = "";
-	this->boundaryName = "";
-	this->_chunkedName = "";
+	this->requestData.clear();
+	this->boundaryName.clear();
+	this->_chunkedName.clear();
 	this->requestLine.clear();
-	this->params.clear();
 	this->headers.clear();
 	this->requestData.clear();
 	this->requestVector.clear();
@@ -276,7 +275,7 @@ void	Request::parseRequest(const std::string& receivedRequest, Context* serverCT
 		return;
 	if (!context)
 		this->context = serverCTX;
-	std::srand(time(0));
+	std::srand(time(NULL));
 	if (!this->requestLineDone || !this->headersDone || !this->_requestIsWellFormed)
 	{
 		if (takingRequests(receivedRequest))
@@ -302,3 +301,4 @@ void	Request::parseRequest(const std::string& receivedRequest, Context* serverCT
 			parseBody();
 	}
 }
+//requestData.empty() && 
