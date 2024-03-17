@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/16 17:34:58 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/17 01:38:23 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include "Request.hpp"
 #include "ServerContext.hpp"
+#include <dirent.h>
 
 // class Request;
 
@@ -36,6 +37,9 @@ class Response
         std::string bodyPath;
         bool headersSent;
         bool responseDone;
+        bool isWorking;
+        bool isRedirection;
+        std::string location;
 
         std::string generateHtmlErrorPage();
         bool checkErrorPage(const std::string& path);
@@ -43,6 +47,7 @@ class Response
         void prepareHeaders();
         void prepareGETBody();
         void prepareGET();
+        void listDirectories();
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;
