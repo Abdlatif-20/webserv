@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Core.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/16 00:01:20 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/17 18:23:40 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ void	Core::traceEvents(void)
 				while (it + 1 != servers.end() && *it == *(it + 1))
 					it++;
 				clients[fd].setServersEnd(it - servers.begin() + 1);
+				std::cout << clients[fd].getLastUpdateTime() << std::endl;
 			}
 			else
 			{
@@ -110,7 +111,8 @@ void	Core::traceEvents(void)
 				clients[checklist[i].fd].recvRequest();
 			if ((checklist[i].revents & POLLOUT) && clients[checklist[i].fd].isRequestDone())
 				clients[checklist[i].fd].sendResponse();
-			if (checklist[i].revents & POLLHUP || (clients[checklist[i].fd].isResponseDone()))// && !clients[checklist[i].fd].isALive()))
+			if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].timeout()
+				|| (clients[checklist[i].fd].isResponseDone() && !clients[checklist[i].fd].isALive()))
 			{
 				clients.erase(checklist[i].fd);
 				checklist.erase(checklist.begin() + i--);

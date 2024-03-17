@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/16 17:33:37 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/17 18:25:42 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ Client::Client(void)
 	sockId = -1;
 	requestDone = false;
 	responseDone = false;
-	serverSelected = false;
+	last_update_time = std::time(NULL);
 }
 
 Client::Client(int sock)
@@ -25,7 +25,7 @@ Client::Client(int sock)
 	sockId = sock;
 	requestDone = false;
 	responseDone = false;
-	serverSelected = false;
+	last_update_time = std::time(NULL);
 }
 
 Client::Client(const Client &cpy)
@@ -50,6 +50,8 @@ ssize_t Client::recvRequest(void)
 	{
 		request.parseRequest(std::string(buff, len), &serverCTX);
 		requestDone = request.isDone();
+		last_update_time = std::time(NULL);
+		std::cout << "read " << last_update_time << std::endl;
 	}
 	else
 		requestDone = true;;
@@ -61,17 +63,18 @@ void	Client::sendResponse(void)
 {
 	if (requestDone && !responseDone)
 	{
-		serverSelected = false;
 		response.setRequest(&request);
 		response.setContext(request.getContext());
 		response.prepareResponse();
 		if (!response.getHeadersSent())
 		{
-			send(sockId, response.getHeaders().c_str(), response.getHeaders().size(), 0);
+			len = send(sockId, response.getHeaders().c_str(), response.getHeaders().size(), 0);
 			response.setHeadersSent(true);
 		}
-		send(sockId, response.getBody().c_str(), response.getBody().size(), 0);
+		len = send(sockId, response.getBody().c_str(), response.getBody().size(), 0);// when fail?
+		last_update_time = std::time(NULL);
 		responseDone = response.responseIsDone();
+		std::cout << "write " << last_update_time << std::endl;
 		reset();
 	}
 }
@@ -79,11 +82,6 @@ void	Client::sendResponse(void)
 void	Client::setServerCTX(const ServerContext& serverCTX)
 {
 	this->serverCTX = serverCTX;
-}
-
-bool	Client::hostIsDetected(void) const
-{
-	return (serverSelected);
 }
 
 bool	Client::isALive(void) const
@@ -94,6 +92,17 @@ bool	Client::isALive(void) const
 	if (value == "closed")
 		return (false);
 	return (true);
+}
+
+bool Client::timeout(void) const
+{
+	double	t;
+
+	t = std::difftime(std::time(NULL), last_update_time);
+	std::cout << t << std::endl;
+	if (t > 60)
+		return true;
+	return false;
 }
 
 bool Client::isRequestDone(void) const
@@ -127,6 +136,11 @@ const Response &Client::getResponse(void) const
 	return (response);
 }
 
+time_t Client::getLastUpdateTime(void) const
+{
+	return (last_update_time);
+}
+
 void	Client::setSockId(int sock)
 {
 	sockId = sock;
@@ -142,7 +156,7 @@ Client	&Client::operator=(const Client &cpy)
 		serverCTX = cpy.serverCTX;
 		requestDone = cpy.requestDone;
 		responseDone = cpy.responseDone;
-		serverSelected = cpy.serverSelected;
+		last_update_time = cpy.last_update_time;
 	}
 	return (*this);
 }
