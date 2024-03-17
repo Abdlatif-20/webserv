@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 01:38:48 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/17 15:26:30 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -247,4 +247,15 @@ std::string Utils::longlongToString(long long number)
 	std::stringstream ss;
 	ss << number;
 	return ss.str();
+}
+
+std::string Utils::replaceAll(std::string str, const std::string& s1, const std::string& s2)
+{
+	size_t pos = 0;
+	while ((pos = str.find(s1, pos)) != std::string::npos) {
+		str.erase(pos, s1.length());
+		str.insert(pos, s2);
+		pos += s2.length();
+  	}
+	return str;
 }
