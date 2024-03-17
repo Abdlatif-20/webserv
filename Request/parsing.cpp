@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/17 01:49:29 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/17 03:20:35 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,14 +141,14 @@ int	Request::parseRequestLine(const String& requestLine)
 		else
 		{
 			this->requestVector = Utils::splitRequest(requestLine, CRLF);
-			if (this->requestVector.size() == 0)
-				return (this->status = BadRequest, requestIscomplete = true, 0);
-			if (this->requestVector.size() != 1)
-			{
-				for (size_t i = 1; i < this->requestVector.size(); i++)
-					requestData += this->requestVector[i] + CRLF;
-			}
 			this->requestInProgress = true;
+		}
+		if (this->requestVector.size() == 0)
+			return (this->status = BadRequest, requestIscomplete = true, 0);
+		if (this->requestVector.size() != 1)
+		{
+			for (size_t i = 1; i < this->requestVector.size(); i++)
+				requestData += this->requestVector[i] + CRLF;
 		}
 		return (fillRequestLine(this->requestVector[0]), 1);
 	}
