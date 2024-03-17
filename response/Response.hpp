@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 01:38:23 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/17 14:15:35 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ class Response
         void prepareHeaders();
         void prepareGETBody();
         void prepareGET();
-        void listDirectories();
+        void listDirectories(const std::string& path);
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;

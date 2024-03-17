@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 01:41:00 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/17 18:12:45 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ Response::Response()
 {
     request = NULL;
     context = NULL;
-    statusCode = 0;
+    statusCode = 200;
     responseDone = false;
     headersSent = false;
     std::memset(buffer, 0, sizeof(buffer));
@@ -176,18 +176,18 @@ void Response::prepareGETBody()
         /*INTERRNAL SERVER ERROR 500*/
         /* ERROR WHILE OPENING FILE TO BE HANDLED LATER */
     }
-	struct stat statBuff;
-	stat(bodyPath.c_str(), &statBuff);
     ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
-    body.clear();
-    if (readedBytes <= 0)
+    if (readedBytes == -1)
+    {
+        
+    }
+    if (readedBytes == 0)
     {
         close(fd);
         responseDone = true;
-		close(fd);
-		fd = INT_MIN;
         return;
     }
+    body.clear();
     body.append(buffer, readedBytes);
 }
 
@@ -218,7 +218,7 @@ void Response::prepareGET()
             {
                 if (context->getAutoIndex())
                 {
-                    
+                    listDirectories(resource);
                 }
                 else
                 {
@@ -255,15 +255,29 @@ void Response::prepareGET()
     isWorking = true;
 }
 
-void Response::listDirectories()
+void Response::listDirectories(const std::string& path)
 {
-    // struct dirent *entry;
-    // while ((entry = readdir(dir)) != NULL) {
-    //     // Print the entry name (excluding "." and "..")
-    //     if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0) {
-    //     printf("%s\n", entry->d_name);
-    //     }
-    // }
+    struct dirent *entry;
+    DIR *dir;
+    std::string html = "<!DOCTYPE html><html><head><title>Index of $indexof$</title><link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Madimi+One&family=Manjari:wght@100;400;700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap' rel='stylesheet'><style>body{font-family: 'Manjari', sans-serif;font-weight: 300;font-style: normal;}table, tr, th, td {border-collapse: collapse;border: 1px solid rgb(186, 186, 186);padding:8px;font-size: 15px;letter-spacing: 1px;text-align: left;}</style></head><body><h1>Index of $indexof$</h1><hr><table style='width: 70%;'><tr><th>Name</th><th>Last Modified</th><th>Size</th><th>Type</th></tr>";
+    html = Utils::replaceAll(html, "$indexof$", request->getRequestPath());
+    dir = opendir(path.c_str());
+    while ((entry = readdir(dir)))
+    {
+        if (Utils::isDirectory(path + entry->d_name))
+            html += "<tr><td><i class='glyphicon glyphicon-folder-close'></i>";
+        else
+            html += "<tr><td><i class='glyphicon glyphicon-file'></i>";
+        html+= "<a style='text-decoration:none'; href='" + std::string(entry->d_name) + "'> " + entry->d_name + "</td>";
+        html += "<td>" + Utils::get_last_modified_date(path + entry->d_name) + "</td>";
+        html += "<td>" + (Utils::getFileSize(path + entry->d_name) == -1 ? "--" : Utils::longlongToString(Utils::getFileSize(path + entry->d_name))) + "</td>";
+        html += "<td>" + (Utils::isDirectory(path + entry->d_name) ? "Directory" : Utils::getFileExtension(path + entry->d_name)) + "</td>";
+        html += "</tr>";
+    }
+    html += "</table></body></html>";
+    body = html;
+    bodyPath.clear();
+    statusCode = OK;
 }
 
 void Response::prepareResponse()
@@ -272,7 +286,6 @@ void Response::prepareResponse()
     if (request->getStatus() >= 400)
     {
         statusCode = request->getStatus();
-        std::cout <<statusCode<<std::endl;
         generateResponseError();
         prepareHeaders();
         responseDone = true;
@@ -303,12 +316,15 @@ void Response::resetResponse()
     fd = INT_MIN;
     context = NULL;
     request = NULL;
-    statusCode = 0;
+    statusCode = 200;
     headersSent = false;
     responseDone = false;
     isWorking = false;
     isRedirection = false;
     location.clear();
+    body.clear();
+    bodyPath.clear();
+    headers.clear();
 }
 
 void Response::initReasonPhrases()

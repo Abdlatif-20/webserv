@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 19:44:42 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/17 21:10:12 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,10 +73,8 @@ void	Client::sendResponse(void)
 			response.setHeadersSent(true);
 		}
 		len = send(sockId, response.getBody().c_str(), response.getBody().size(), 0);// when fail?
-		last_update_time = std::time(NULL);
 		responseDone = response.responseIsDone();
-		std::cout << "write " << last_update_time << std::endl;
-		reset();
+		last_update_time = std::time(NULL);
 	}
 	reset();
 }
@@ -98,13 +96,9 @@ bool	Client::isALive(void) const
 
 bool Client::timeout(void) const
 {
-	double	t;
-
-	t = std::difftime(std::time(NULL), last_update_time);
-	std::cout << t << std::endl;
-	if (t > 60)
-		return true;
-	return false;
+	if (std::difftime(std::time(NULL), last_update_time) > 60)
+		return (true);
+	return (false);
 }
 
 bool Client::isRequestDone(void) const
