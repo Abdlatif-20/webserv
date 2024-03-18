@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 14:15:35 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/18 02:31:02 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,8 @@ class Response
 {
     enum Status
     {
-        FORBIDDEN = 403  
+        FORBIDDEN = 403,
+        INTERNAL_SERVER_ERROR = 500
     };
     private:
         Request *request;
@@ -45,9 +46,10 @@ class Response
         bool checkErrorPage(const std::string& path);
         void generateResponseError();
         void prepareHeaders();
-        void prepareGETBody();
+        void prepareBody();
         void prepareGET();
-        void listDirectories(const std::string& path);
+        void prepareRedirection(int _status, const std::string& _location);
+        void autoIndex(const std::string& path);
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;

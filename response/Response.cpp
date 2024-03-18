@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 18:12:45 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/18 02:37:39 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,9 +105,9 @@ bool Response::responseIsDone() const
 
 std::string Response::generateHtmlErrorPage()
 {
-    return "<!DOCTYPE html><html><body style='text-align: center;'><h1>Error "
+    return "<!DOCTYPE html><html><body style='text-align: center;'><h2>Error "
         + Utils::intToString(statusCode) + " - "
-        + reasonPhrases[statusCode] + "</h1><hr><h3>WebServer 1.0</h3></body></html>";
+        + reasonPhrases[statusCode] + "</h2><hr><h4>WebServer 1.0</h4></body></html>";
 }
 
 bool Response::checkErrorPage(const std::string& path)
@@ -162,7 +162,7 @@ void Response::prepareHeaders()
     headers += CRLF;
 }
 
-void Response::prepareGETBody()
+void Response::prepareBody()
 {
     if (bodyPath.empty())
     {
@@ -171,10 +171,12 @@ void Response::prepareGETBody()
     }
     if (fd == INT_MIN)
         fd = open(bodyPath.c_str(), O_RDONLY);
-    if (fd == -1)
+    if (fd)
     {
-        /*INTERRNAL SERVER ERROR 500*/
-        /* ERROR WHILE OPENING FILE TO BE HANDLED LATER */
+        statusCode = INTERNAL_SERVER_ERROR;
+        generateResponseError();
+        responseDone = true;
+        return;
     }
     ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
     if (readedBytes == -1)
@@ -202,43 +204,40 @@ void Response::prepareGET()
         generateResponseError();
         return;
     }
-    if (Utils::isDirectory(resource) && !Utils::stringEndsWith(resource, "/"))
+    if (Utils::isDirectory(resource))
     {
-        isRedirection = true;
-        statusCode = MovedPermanently;
-        location = request->getRequestPath() + "/";
-        return;
-    }
-    if (Utils::stringEndsWith(resource, "/")) /* Is directory */
-    {
-        try
+        if (!Utils::stringEndsWith(resource, "/"))
+            prepareRedirection(MovedPermanently, request->getRequestPath() + "/");
+        else
         {
-            std::string index = context->getIndex(resource);
-            if (index.empty())
+            try
             {
-                if (context->getAutoIndex())
+                std::string index = context->getIndex(resource);
+                std::cout << index << std::endl;
+                if (index.empty())
                 {
-                    listDirectories(resource);
+                    if (context->getAutoIndex())
+                        autoIndex(resource);
+                    else
+                    {
+                        statusCode = FORBIDDEN;
+                        generateResponseError();
+                    }
+                    return;
                 }
-                else
-                {
-                    statusCode = FORBIDDEN;
-                    generateResponseError();
-                }
-                return;
+                bodyPath = resource + index;
+                statusCode = OK;
             }
-            bodyPath = resource + index;
-            statusCode = OK;
-        }
-        catch (const Utils::FilePermissionDenied& e)
-        {
-            statusCode = FORBIDDEN;
-            generateResponseError();
-        }
-        catch (const Utils::FileNotFoundException& e)
-        {
-            statusCode = NotFound;
-            generateResponseError();
+            catch (const Utils::FilePermissionDenied& e)
+            {
+                statusCode = FORBIDDEN;
+                generateResponseError();
+            }
+            catch (const Utils::FileNotFoundException& e)
+            {
+                statusCode = NotFound;
+                generateResponseError();
+            }
         }
     }
     else
@@ -255,7 +254,14 @@ void Response::prepareGET()
     isWorking = true;
 }
 
-void Response::listDirectories(const std::string& path)
+void Response::prepareRedirection(int _status, const std::string& _location)
+{
+    isRedirection = true;
+    statusCode = _status;
+    location = _location;
+}
+
+void Response::autoIndex(const std::string& path)
 {
     struct dirent *entry;
     DIR *dir;
@@ -291,10 +297,18 @@ void Response::prepareResponse()
         responseDone = true;
         return;
     }
+    if (context->getHttpRedirection().size() > 0)
+    {
+        prepareRedirection(Utils::stringToInt(context->getHttpRedirection().at(0)), context->getHttpRedirection().at(1));
+        prepareBody();
+        prepareHeaders();
+        responseDone = true;
+        return;
+    }
 	if (request->getMethod() == "GET")
     {
         prepareGET();
-        prepareGETBody();
+        prepareBody();
         prepareHeaders();
     }
 	else if (request->getMethod() == "POST")
@@ -353,7 +367,7 @@ void Response::initReasonPhrases()
     reasonPhrases[402] = "Payment Required";
     reasonPhrases[403] = "Forbidden";
     reasonPhrases[404] = "Not Found";
-    reasonPhrases[405] = "Method Not Allowed";
+    reasonPhrases[405] = "Not Allowed";
     reasonPhrases[406] = "Not Acceptable";
     reasonPhrases[407] = "Proxy Authentication Required";
     reasonPhrases[408] = "Request Timeout";
