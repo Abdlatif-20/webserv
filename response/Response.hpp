@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/19 21:40:09 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/20 17:41:59 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,11 +20,6 @@
 
 class Response
 {
-    enum Status
-    {
-        FORBIDDEN = 403,
-        INTERNAL_SERVER_ERROR = 500
-    };
     private:
         Request *request;
         Context *context;

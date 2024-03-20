@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/17 16:19:50 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/20 03:04:06 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -289,9 +289,12 @@ void	Request::parseRequest(const std::string& receivedRequest, Context* serverCT
 			return;
 		}
 	}
-	if (this->requestLine["method"] == "POST" && !this->bodyDone && this->_requestIsWellFormed && this->status == 200 && foundUri)
+	if (this->requestLine["method"] == "POST" && !this->bodyDone
+		&& this->_requestIsWellFormed && this->status == 200 && foundUri)
 	{
 		setUploadingPath();
+		if (status != 200)
+			return;
 		if (this->receivecount > 1)
 		{
 			if (receivedRequest.front() == CR && this->requestInProgress)

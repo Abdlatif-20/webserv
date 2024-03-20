@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/19 21:42:24 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/20 17:42:32 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ bool Response::responseIsDone() const
 
 std::string Response::generateHtmlErrorPage()
 {
-    return "<!DOCTYPE html><html><head><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=M+PLUS+1p&display=swap' rel='stylesheet'><style>body{font-family: 'M PLUS 1p', sans-serif;font-weight: 400;font-size:13px;font-style: normal;text-align: center;}</style></head><body><h2>Error "
+    return "<!DOCTYPE html><html><head><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=M+PLUS+1p&display=swap' rel='stylesheet'><style>body{font-family: 'M PLUS 1p', sans-serif;font-weight: 400;font-size:13px;font-style: normal;text-align: center;}</style></head><body><h2>"
         + Utils::intToString(statusCode) + " - "
         + reasonPhrases[statusCode] + "</h2><hr><h4>WebServer 1.0</h4></body></html>";
 }
@@ -170,7 +170,7 @@ void Response::prepareBody()
     if (fd == INT_MIN)
         fd = open(bodyPath.c_str(), O_RDONLY);
     if (fd == -1)
-        throw ResponseErrorException(*this, INTERNAL_SERVER_ERROR);
+        throw ResponseErrorException(*this, InternalServerError);
     std::memset(buffer, 0, sizeof(buffer));
     ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
     if (readedBytes == -1)
@@ -273,7 +273,12 @@ void Response::autoIndex(const std::string& path)
 
 void Response::preparePOST()
 {
-    
+    if (!context->getUploadStore().empty())
+    {
+        statusCode = Created;
+        body = generateHtmlErrorPage();
+        bodyPath.clear();
+    }
 }
 
 void Response::prepareResponse()

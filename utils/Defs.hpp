@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 14:36:15 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/20 16:49:01 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/20 17:40:12 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ typedef enum e_directive
 enum StatusCodes
 {
 	OK = 200,
+    Created = 201,
 	NotFound = 404,
     FORBIDDEN = 403,
 	BadRequest = 400,
