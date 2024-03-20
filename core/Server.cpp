@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:55:56 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/17 21:23:54 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/20 12:12:35 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,19 +48,16 @@ int	Server::getSocketId(void) const
 void Server::setupServer(void)
 {
 	int a = 1;
+	sockID = socket(AF_INET, SOCK_STREAM, 0);
+	if (sockID == -1)
+		throw(Fail("Failed to create socket"));
+	if (setsockopt(sockID, SOL_SOCKET, SO_REUSEADDR, &a, sizeof a) < 0 // check port
+		|| setsockopt(sockID, SOL_SOCKET, SO_NOSIGPIPE, &a, sizeof a) < 0)
+		throw(Fail("Failed to set options"));
 	for (; res != NULL; res = res->ai_next)
 	{
-		sockID = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
-		if (sockID == -1)
-			continue ;
-		if (setsockopt(sockID, SOL_SOCKET, SO_REUSEADDR, &a, sizeof a) < 0
-			|| setsockopt(sockID, SOL_SOCKET, SO_NOSIGPIPE, &a, sizeof a) < 0
-			|| bind(sockID, res->ai_addr, res->ai_addrlen) < 0)
-		{
-			close(sockID);
-			continue ;
-		}
-		break;
+		if (bind(sockID, res->ai_addr, res->ai_addrlen) == 0)
+			break;
 	}
 	if (!res)
 		throw(Fail("Failed to bind with any address"));

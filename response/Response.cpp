@@ -3,15 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 18:12:45 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/20 12:19:28 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 
+char	**Response::env;
+std::string	Response::PATH;
 std::map<int, std::string> Response::reasonPhrases;
 std::map<std::string, std::string> Response::mimeTypes;
 
@@ -191,6 +193,45 @@ void Response::prepareGETBody()
     body.append(buffer, readedBytes);
 }
 
+void Response::prepareCGI()
+{
+	std::stringstream ss(PATH);
+	std::string	line;
+	std::string	tt[2] = {".php", "php"};
+
+	while(std::getline(ss, line,':'))
+	{
+		line+="/php";
+		if (!access(line.c_str(), F_OK | X_OK))
+		{
+			std::cout << line << std::endl;
+			std::cout << bodyPath << std::endl;
+			const char *args[3] = {line.c_str(), bodyPath.c_str(), NULL};
+			std::string name = "/tmp/output_" ;
+			name += Utils::intToString(std::rand());
+			name += ".html";
+			std::cout << name << std::endl;
+			int fd = open(name.c_str(), O_TRUNC|O_CREAT|O_RDWR, 0664);
+			if (fd < 0)
+			{
+				std::cerr << "FAILED\n";
+			}
+			int pid = fork();
+			if (!pid)
+			{
+				dup2(fd, 1);
+				close(fd);
+				execve(args[0], (char *const*)args, env);
+				exit(0);
+			}
+			wait(NULL);
+			bodyPath = name;
+			break;
+		}
+	}
+	responseDone = true;
+}
+
 void Response::prepareGET()
 {
     if (isWorking)
@@ -294,6 +335,8 @@ void Response::prepareResponse()
 	if (request->getMethod() == "GET")
     {
         prepareGET();
+		if (1)
+			prepareCGI();
         prepareGETBody();
         prepareHeaders();
     }
@@ -325,6 +368,23 @@ void Response::resetResponse()
     body.clear();
     bodyPath.clear();
     headers.clear();
+}
+
+void Response::setupEnv(char **_env)
+{
+	std::string	var;
+	env = _env;
+	for (size_t i = 0; env && env[i]; i++)
+	{
+		var = env[i];
+		if (Utils::stringStartsWith(var, "PATH="))
+		{
+			PATH =  var.substr(5);
+			break;
+		}
+	}
+	if (!env || Response::PATH.empty())
+		throw Fail("needs PATH variable");
 }
 
 void Response::initReasonPhrases()

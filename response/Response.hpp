@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 14:15:35 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/19 22:36:32 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,6 @@
 #include "Request.hpp"
 #include "ServerContext.hpp"
 #include <dirent.h>
-
-// class Request;
 
 class Response
 {
@@ -28,7 +26,7 @@ class Response
         Request *request;
         Context *context;
 
-        char buffer[10240];// modified
+        char buffer[1024];// modified
         int fd;
 
         int statusCode;
@@ -46,12 +44,17 @@ class Response
         void generateResponseError();
         void prepareHeaders();
         void prepareGETBody();
+        void prepareCGI();
         void prepareGET();
         void listDirectories(const std::string& path);
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;
+
     public:
+		static char	**env;
+		static std::string	PATH;
+
         Response();
         Response(const Response& obj);
         Response& operator=(const Response& obj);
@@ -69,6 +72,8 @@ class Response
         void prepareResponse();
         void resetResponse();
 
-        static void initReasonPhrases();
+
         static void initMimeTypes();
+        static void initReasonPhrases();
+		static void	setupEnv(char **_env);
 };
