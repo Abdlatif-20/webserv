@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/20 02:16:34 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/20 17:05:17 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,10 +180,19 @@ function that retrieves the value associated with the "upload_store" directive f
 member variable. */
 std::string Context::getUploadStore() const
 {
+    std::string path;
     DirectivesMap::const_iterator it = directives.find("upload_store");
     if (it != directives.cend())
-        return getRoot() + *it->second.cbegin();
-    return "assets/upload";
+    {
+        path = getRoot() + *it->second.cbegin();
+        if (!Utils::checkIfPathExists(path))
+            throw Utils::FileNotFoundException();
+        else if (!Utils::isReadableFile(path) || !Utils::isDirectory(path))
+            throw Utils::FilePermissionDenied();
+    }
+    else
+        return "";
+    return path + "/";
 }
 
 /* The `std::string Context::getErrorPage(const std::string& status) const` function in the `Context`

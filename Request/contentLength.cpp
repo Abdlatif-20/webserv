@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   contentLength.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/12 17:21:07 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/20 16:49:01 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 void	Request::parseContentLength()
 {
 	if (_headers["content-length"].find_first_not_of("0123456789") != std::string::npos)
-	{
+	{ 
 		status = BadRequest;
 		requestIscomplete = true;
 	}
@@ -52,7 +52,7 @@ void	Request::ContentLength()
 			file.open(this->_path + path + randomStr + "." + extension, std::ios::app);
 		}
 		if (!file.is_open())
-			return (status = BadRequest, requestIscomplete = true, void());
+			return (status = InternalServerError, requestIscomplete = true, void());
 	}
 	if (bodyDone == false)
 	{

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/20 17:29:35 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/20 17:50:22 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,11 +18,6 @@
 
 class Response
 {
-    enum Status
-    {
-        FORBIDDEN = 403,
-        INTERNAL_SERVER_ERROR = 500
-    };
     private:
         Request *request;
         Context *context;

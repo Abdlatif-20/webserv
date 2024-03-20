@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/18 18:19:15 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/20 02:47:58 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,20 +22,6 @@
 #include "Server.hpp"
 #include <fcntl.h>
 #include <sys/stat.h> // For mkdir
-
-enum Errors
-{
-	OK = 200,
-	NotFound = 404,
-	BadRequest = 400,
-	NotImplemented = 501,
-	LengthRequired = 411,
-	MovedPermanently = 301,
-	MethodNotAllowed = 405,
-	RequestURITooLong = 414,
-	RequestEntityTooLarge = 413,
-	HTTPVersionNotSupported = 505
-};
 
 #define CR '\r'
 #define CRLF "\r\n"
@@ -110,7 +96,6 @@ class Request
 			void			fillHeaders(Vector headers);
 			String			prepareFileName(String line);
 			unsigned int	convertToDecimal(String hex);
-			bool			directoryExists(const char *path);
 			String& 		isExist(Map& headers, String key);
 			void			separateRequest(String receivedRequest);
 			void			fillRequestLine(const String& requestLine);

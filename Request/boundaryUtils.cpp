@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   boundaryUtils.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:12:18 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/10 20:50:12 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/20 02:39:36 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,18 +18,6 @@ String& Request::isExist(Map& headers, String key)
 	if (headers.find(key) != headers.end())
 		return headers[key];
 	return headers[key] = "";
-}
-
-// check if the directory exists
-bool Request::directoryExists(const char *path)
-{
-	struct stat st;
-	if (!stat(path, &st))
-	{
-		if (S_ISDIR(st.st_mode))
-			return true; // Directory exists
-	}
-	return false; // Directory does not exist
 }
 
 // function to prepare the filename and return it

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/17 03:20:35 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/20 17:49:50 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,15 @@
 //function to set the path to the upload store
 void	Request::setUploadingPath()
 {
-	this->_path = context->getUploadStore();
-	this->_path += "/";
-	if (!directoryExists(this->_path.c_str()))
-		mkdir(this->_path.c_str(), 0777);
+	try
+	{
+		this->_path = context->getUploadStore();
+	}
+	catch (std::exception& e)
+	{
+		status = InternalServerError;
+		requestIscomplete = true;
+	}
 }
 
 //function to Check if transfer encoding is chunked Or not
