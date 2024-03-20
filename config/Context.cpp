@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/18 02:23:58 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/20 02:16:34 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,7 +182,7 @@ std::string Context::getUploadStore() const
 {
     DirectivesMap::const_iterator it = directives.find("upload_store");
     if (it != directives.cend())
-        return *it->second.cbegin();
+        return getRoot() + *it->second.cbegin();
     return "assets/upload";
 }
 
