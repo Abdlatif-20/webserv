@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/16 03:36:18 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/18 18:19:15 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@
 #include <fcntl.h>
 #include <sys/stat.h> // For mkdir
 
-
 enum Errors
 {
 	OK = 200,
@@ -35,11 +34,11 @@ enum Errors
 	MethodNotAllowed = 405,
 	RequestURITooLong = 414,
 	RequestEntityTooLarge = 413,
+	HTTPVersionNotSupported = 505
 };
 
 #define CR '\r'
 #define CRLF "\r\n"
-#define MAX_BODY_SIZE 100000000
 #define ALLOWED_CHARACTERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJ\
 							KLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%"
 

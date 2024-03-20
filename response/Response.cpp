@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/20 12:19:28 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/20 17:36:48 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ Response::Response()
     headersSent = false;
     std::memset(buffer, 0, sizeof(buffer));
     fd = INT_MIN;
-    responseDone = false;
     isWorking = false;
     isRedirection = false;
 }
@@ -49,7 +48,6 @@ Response& Response::operator=(const Response& obj)
     bodyPath = obj.bodyPath;
     std::memcpy(buffer, obj.buffer, sizeof(buffer));
     fd = obj.fd;
-    responseDone = obj.responseDone;
     isWorking = obj.isWorking;
     isRedirection = obj.isRedirection;
     location = obj.location;
@@ -107,9 +105,9 @@ bool Response::responseIsDone() const
 
 std::string Response::generateHtmlErrorPage()
 {
-    return "<!DOCTYPE html><html><body style='text-align: center;'><h1>Error "
+    return "<!DOCTYPE html><html><head><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=M+PLUS+1p&display=swap' rel='stylesheet'><style>body{font-family: 'M PLUS 1p', sans-serif;font-weight: 400;font-size:13px;font-style: normal;text-align: center;}</style></head><body><h2>Error "
         + Utils::intToString(statusCode) + " - "
-        + reasonPhrases[statusCode] + "</h1><hr><h3>WebServer 1.0</h3></body></html>";
+        + reasonPhrases[statusCode] + "</h2><hr><h4>WebServer 1.0</h4></body></html>";
 }
 
 bool Response::checkErrorPage(const std::string& path)
@@ -121,7 +119,7 @@ bool Response::checkErrorPage(const std::string& path)
         body = generateHtmlErrorPage();
         return false;
     }
-    else if (Utils::isDirectory(path) || !Utils::isReadableFile(path))
+    if (Utils::isDirectory(path) || !Utils::isReadableFile(path))
     {
         bodyPath.clear();
         statusCode = FORBIDDEN;
@@ -154,7 +152,7 @@ void Response::prepareHeaders()
         return;
     headers += std::string(HTTP_VERSION) + SPACE + Utils::intToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
     headers += "Connection: " + request->getHeaderByName("connection") + CRLF;
-    headers += "Server: " + std::string(SERVER) + CRLF;
+    headers += "Server: " + std::string(SERVER) + " (" + OS_MAC + ")" + CRLF;
     headers += "Date: " + Utils::getCurrentTime() + CRLF;
     headers += "Content-Length: " + (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))) + CRLF;
     headers += std::string("Accept-Ranges: bytes") + CRLF;
@@ -164,7 +162,7 @@ void Response::prepareHeaders()
     headers += CRLF;
 }
 
-void Response::prepareGETBody()
+void Response::prepareBody()
 {
     if (bodyPath.empty())
     {
@@ -174,14 +172,15 @@ void Response::prepareGETBody()
     if (fd == INT_MIN)
         fd = open(bodyPath.c_str(), O_RDONLY);
     if (fd == -1)
-    {
-        /*INTERRNAL SERVER ERROR 500*/
-        /* ERROR WHILE OPENING FILE TO BE HANDLED LATER */
-    }
+        throw ResponseErrorException(*this, INTERNAL_SERVER_ERROR);
+    std::memset(buffer, 0, sizeof(buffer));
     ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
     if (readedBytes == -1)
     {
-        
+        close(fd);
+        statusCode = OK;
+        responseDone = true;
+        return;
     }
     if (readedBytes == 0)
     {
@@ -238,71 +237,63 @@ void Response::prepareGET()
         return;
     std::string resource = context->getRoot() + request->getRequestPath();
     if (!Utils::checkIfPathExists(resource))
+        throw ResponseErrorException(*this, NotFound);
+    if (Utils::isDirectory(resource))
     {
-        statusCode = NotFound;
-        generateResponseError();
-        return;
-    }
-    if (Utils::isDirectory(resource) && !Utils::stringEndsWith(resource, "/"))
-    {
-        isRedirection = true;
-        statusCode = MovedPermanently;
-        location = request->getRequestPath() + "/";
-        return;
-    }
-    if (Utils::stringEndsWith(resource, "/")) /* Is directory */
-    {
-        try
+        if (!Utils::stringEndsWith(resource, "/"))
+            prepareRedirection(MovedPermanently, request->getRequestPath() + "/");
+        else
         {
-            std::string index = context->getIndex(resource);
-            if (index.empty())
+            try
             {
-                if (context->getAutoIndex())
+                std::string index = context->getIndex(resource);
+                if (index.empty())
                 {
-                    listDirectories(resource);
+                    if (context->getAutoIndex())
+                        autoIndex(resource);
+                    else
+                        throw ResponseErrorException(*this, FORBIDDEN);
+                    return;
                 }
-                else
-                {
-                    statusCode = FORBIDDEN;
-                    generateResponseError();
-                }
-                return;
+                bodyPath = resource + index;
+                statusCode = OK;
             }
-            bodyPath = resource + index;
-            statusCode = OK;
-        }
-        catch (const Utils::FilePermissionDenied& e)
-        {
-            statusCode = FORBIDDEN;
-            generateResponseError();
-        }
-        catch (const Utils::FileNotFoundException& e)
-        {
-            statusCode = NotFound;
-            generateResponseError();
+            catch (const Utils::FilePermissionDenied& e)
+            {
+                throw ResponseErrorException(*this, FORBIDDEN);
+            }
+            catch (const Utils::FileNotFoundException& e)
+            {
+                throw ResponseErrorException(*this, NotFound);
+            }
         }
     }
     else
     {
         if (!Utils::isReadableFile(resource))
-        {
-            statusCode = FORBIDDEN;
-            generateResponseError();
-            return;
-        }
+            throw ResponseErrorException(*this, FORBIDDEN);
         bodyPath = resource;
         statusCode = OK;
     }
     isWorking = true;
 }
 
-void Response::listDirectories(const std::string& path)
+void Response::prepareRedirection(int _status, const std::string& _location)
+{
+    isRedirection = true;
+    statusCode = _status;
+    location = _location;
+}
+
+void Response::autoIndex(const std::string& path)
 {
     struct dirent *entry;
     DIR *dir;
-    std::string html = "<!DOCTYPE html><html><head><title>Index of $indexof$</title><link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Madimi+One&family=Manjari:wght@100;400;700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap' rel='stylesheet'><style>body{font-family: 'Manjari', sans-serif;font-weight: 300;font-style: normal;}table, tr, th, td {border-collapse: collapse;border: 1px solid rgb(186, 186, 186);padding:8px;font-size: 15px;letter-spacing: 1px;text-align: left;}</style></head><body><h1>Index of $indexof$</h1><hr><table style='width: 70%;'><tr><th>Name</th><th>Last Modified</th><th>Size</th><th>Type</th></tr>";
+    std::string html = "<!DOCTYPE html><html><head><title>Index of $indexof$</title><link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Madimi+One&family=Manjari:wght@100;400;700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap' rel='stylesheet'><style>body{font-family: 'M PLUS 1p', sans-serif;font-weight: 400;font-style: normal;}table, tr, th, td {border-collapse: collapse;border: 0px solid rgb(186, 186, 186);padding:10px;font-size: 14px;letter-spacing: 1px;text-align: left;}</style></head><body><h1>Index of $indexof$</h1><hr><table style='width: 70%;'><tr><th>Name</th><th>Last Modified</th><th>Size</th><th>Type</th></tr>";
     html = Utils::replaceAll(html, "$indexof$", request->getRequestPath());
     dir = opendir(path.c_str());
+    if (!dir)
+        throw ResponseErrorException(*this, FORBIDDEN);
     while ((entry = readdir(dir)))
     {
         if (Utils::isDirectory(path + entry->d_name))
@@ -321,37 +312,49 @@ void Response::listDirectories(const std::string& path)
     statusCode = OK;
 }
 
+void Response::preparePOST()
+{
+    
+}
+
 void Response::prepareResponse()
 {
     /* Handle request Errors */
-    if (request->getStatus() >= 400)
+    try
     {
-        statusCode = request->getStatus();
-        generateResponseError();
-        prepareHeaders();
-        responseDone = true;
-        return;
+        if (request->getStatus() >= 400)
+            throw ResponseErrorException(*this, request->getStatus());
+        if (context->getHttpRedirection().size() > 0)
+        {
+            prepareRedirection(Utils::stringToInt(context->getHttpRedirection().at(0)), context->getHttpRedirection().at(1));
+            prepareBody();
+            prepareHeaders();
+            responseDone = true;
+            return;
+        }
+        if (request->getMethod() == "GET")
+        {
+            prepareGET();
+			// if ()
+            prepareBody();
+            prepareHeaders();
+        }
+        else if (request->getMethod() == "POST")
+        {
+            preparePOST();
+            prepareBody();
+            prepareHeaders();
+        }
+        else if (request->getMethod() == "DELETE")
+        {
+            /* Prepare DELETE */
+        }
+        else
+        {
+            
+        }
     }
-	if (request->getMethod() == "GET")
-    {
-        prepareGET();
-		if (1)
-			prepareCGI();
-        prepareGETBody();
-        prepareHeaders();
-    }
-	else if (request->getMethod() == "POST")
-    {
-        /* Prepare POST */
-    }
-	else if (request->getMethod() == "DELETE")
-    {
-        /* Prepare DELETE */
-    }
-    else
-    {
-        
-    }
+    catch (const ResponseErrorException& e) { }
 }
 
 void Response::resetResponse()
@@ -413,7 +416,7 @@ void Response::initReasonPhrases()
     reasonPhrases[402] = "Payment Required";
     reasonPhrases[403] = "Forbidden";
     reasonPhrases[404] = "Not Found";
-    reasonPhrases[405] = "Method Not Allowed";
+    reasonPhrases[405] = "Not Allowed";
     reasonPhrases[406] = "Not Acceptable";
     reasonPhrases[407] = "Proxy Authentication Required";
     reasonPhrases[408] = "Request Timeout";
@@ -433,7 +436,7 @@ void Response::initReasonPhrases()
     reasonPhrases[502] = "Bad Gateway";
     reasonPhrases[503] = "Service Unavailable";
     reasonPhrases[504] = "Gateway Time-out";
-    reasonPhrases[505] = "HTTP Version not supported";
+    reasonPhrases[505] = "HTTP Version Not Supported";
 }
 
 void Response::initMimeTypes()

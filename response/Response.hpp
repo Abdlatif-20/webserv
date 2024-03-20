@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/19 22:36:32 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/20 17:29:35 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,14 @@ class Response
 {
     enum Status
     {
-        FORBIDDEN = 403  
+        FORBIDDEN = 403,
+        INTERNAL_SERVER_ERROR = 500
     };
     private:
         Request *request;
         Context *context;
 
-        char buffer[1024];// modified
+        char buffer[1024];
         int fd;
 
         int statusCode;
@@ -41,12 +42,16 @@ class Response
 
         std::string generateHtmlErrorPage();
         bool checkErrorPage(const std::string& path);
+
         void generateResponseError();
         void prepareHeaders();
-        void prepareGETBody();
+        void prepareBody();
         void prepareCGI();
         void prepareGET();
-        void listDirectories(const std::string& path);
+        void prepareRedirection(int _status, const std::string& _location);
+        void autoIndex(const std::string& path);
+        
+        void preparePOST();
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;
@@ -76,4 +81,19 @@ class Response
         static void initMimeTypes();
         static void initReasonPhrases();
 		static void	setupEnv(char **_env);
+
+        class ResponseErrorException : public std::exception
+        {
+            public:
+                int status;
+                ResponseErrorException() { };
+                ResponseErrorException(Response& response, int _status)
+                {
+                    response.statusCode = _status;
+                    response.generateResponseError();
+                    response.prepareBody();
+                    response.prepareHeaders();
+                }
+                ~ResponseErrorException() throw() { };
+        };
 };

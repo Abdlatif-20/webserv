@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fillRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/17 01:32:11 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/20 17:26:59 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,13 @@ void	Request::fillRequestLine(const String& requestLine)
 		return(this->status = NotImplemented, requestIscomplete = true, void());
 	}
 	if (requestLineVector[1].front() != '/' || requestLineVector[2] != "HTTP/1.1")
+	{
+		String str = requestLineVector[2];
+		size_t pos = str.find("HTTP/");
+		if (pos != std::string::npos && *(str.end() - 1) != '/')
+			return (this->status = HTTPVersionNotSupported, requestIscomplete = true, void());
 		return (this->status = BadRequest, requestIscomplete = true, void());
+	}
 	requestLineMap["method"] = requestLineVector[0];
 	requestLineMap["path"] = requestLineVector[1];
 	this->requestLineDone = true;
