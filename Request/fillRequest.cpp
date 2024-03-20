@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/17 01:32:11 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/19 23:05:53 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 //function to fill the headers to the map
 void	Request::fillHeaders(Vector headers)
 {
-	// Utils::printVector(headers);
 	int checkHostIsFound = 0;
 	Vector::iterator it;
 	it = headers.begin();
@@ -68,7 +67,13 @@ void	Request::fillRequestLine(const String& requestLine)
 		return(this->status = NotImplemented, requestIscomplete = true, void());
 	}
 	if (requestLineVector[1].front() != '/' || requestLineVector[2] != "HTTP/1.1")
+	{
+		String str = requestLineVector[2];
+		size_t pos = str.find("HTTP/");
+		if (pos != std::string::npos && *(str.end() - 1) != '/')
+			return (this->status = HTTPVersionNotSupported, requestIscomplete = true, void());
 		return (this->status = BadRequest, requestIscomplete = true, void());
+	}
 	requestLineMap["method"] = requestLineVector[0];
 	requestLineMap["path"] = requestLineVector[1];
 	this->requestLineDone = true;

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/17 02:58:58 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/19 23:06:12 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -279,6 +279,7 @@ void	Request::parseRequest(const std::string& receivedRequest, Context* serverCT
 	std::srand(time(NULL));
 	if (!this->requestLineDone || !this->headersDone || !this->_requestIsWellFormed)
 	{
+		/* L body i9dar ikoun f GET wla delete 3la 7ssab CGI !!! */
 		if (takingRequests(receivedRequest))
 		{
 			if (detectHost > 1)

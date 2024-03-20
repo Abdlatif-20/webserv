@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   chunked.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 16:42:03 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/10 20:49:59 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/17 16:48:12 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	Request::parseChunkedBody()
 		preparLengthAndName(pos, length, file);
 	if (!remainingChunkLength)
 		return(bodyDone = true, file.close(), requestIscomplete = true, void());
-	else if (remainingChunkLength)
+	else
 	{
 		if (_body.size() < remainingChunkLength
 			&& _body.find("\r\n") == String::npos)

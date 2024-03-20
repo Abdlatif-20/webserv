@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 01:38:23 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/19 21:40:09 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,13 +22,14 @@ class Response
 {
     enum Status
     {
-        FORBIDDEN = 403  
+        FORBIDDEN = 403,
+        INTERNAL_SERVER_ERROR = 500
     };
     private:
         Request *request;
         Context *context;
 
-        char buffer[10240];// modified
+        char buffer[1024];
         int fd;
 
         int statusCode;
@@ -43,11 +44,15 @@ class Response
 
         std::string generateHtmlErrorPage();
         bool checkErrorPage(const std::string& path);
+
         void generateResponseError();
         void prepareHeaders();
-        void prepareGETBody();
+        void prepareBody();
         void prepareGET();
-        void listDirectories();
+        void prepareRedirection(int _status, const std::string& _location);
+        void autoIndex(const std::string& path);
+        
+        void preparePOST();
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;
@@ -71,4 +76,19 @@ class Response
 
         static void initReasonPhrases();
         static void initMimeTypes();
+
+        class ResponseErrorException : public std::exception
+        {
+            public:
+                int status;
+                ResponseErrorException() { };
+                ResponseErrorException(Response& response, int _status)
+                {
+                    response.statusCode = _status;
+                    response.generateResponseError();
+                    response.prepareBody();
+                    response.prepareHeaders();
+                }
+                ~ResponseErrorException() throw() { };
+        };
 };
