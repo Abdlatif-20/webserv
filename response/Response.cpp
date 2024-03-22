@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/20 17:42:32 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/21 17:00:24 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ Response::Response()
     fd = INT_MIN;
     isWorking = false;
     isRedirection = false;
+    hasCGI = false;
 }
 
 Response::Response(const Response &obj)
@@ -49,6 +50,7 @@ Response& Response::operator=(const Response& obj)
     isWorking = obj.isWorking;
     isRedirection = obj.isRedirection;
     location = obj.location;
+    hasCGI = obj.hasCGI;
     return *this;
 }
 
@@ -273,11 +275,41 @@ void Response::autoIndex(const std::string& path)
 
 void Response::preparePOST()
 {
+    std::string resource = context->getRoot() + request->getRequestPath();
     if (!context->getUploadStore().empty())
     {
         statusCode = Created;
         body = generateHtmlErrorPage();
         bodyPath.clear();
+    }
+    else
+    {
+        if (!Utils::checkIfPathExists(resource))
+            throw ResponseErrorException(*this, NotFound);
+        if (Utils::isDirectory(resource))
+        {
+            if (!Utils::stringEndsWith(resource, "/"))
+                prepareRedirection(MovedPermanently, request->getRequestPath() + "/");
+            else
+            {
+                try
+                {
+                    std::string index = context->getIndex(resource);
+                    if (index.empty() || !hasCGI)
+                        throw Utils::FilePermissionDenied();
+                    /* Request BODY goes to CGI !! */
+                }
+                catch (const std::exception& e)
+                {
+                    throw ResponseErrorException(*this, FORBIDDEN);
+                }
+            }
+        }
+        else
+        {
+            if (!hasCGI)
+                throw ResponseErrorException(*this, FORBIDDEN);
+        }
     }
 }
 
@@ -334,6 +366,7 @@ void Response::resetResponse()
     body.clear();
     bodyPath.clear();
     headers.clear();
+    hasCGI = false;
 }
 
 void Response::initReasonPhrases()
