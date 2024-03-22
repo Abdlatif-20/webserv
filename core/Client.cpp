@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/20 17:26:49 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/22 21:27:26 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ ssize_t Client::recvRequest(void)
 	len = recv(sockId, buff, 1023, 0);
 	if (len > 0)
 	{
-		request.parseRequest(std::string(buff, len), &serverCTX);
+		request.parseRequest(std::string(buff, len), serverCTX);
 		requestDone = request.isDone();
 		// last_update_time = std::time(NULL); to think about later
 	}
@@ -63,7 +63,7 @@ void	Client::sendResponse(void)
 	if (requestDone && !responseDone)
 	{
 		response.setRequest(&request);
-		response.setContext(request.getContext());
+		response.setLocationCTX(request.getLocationCtx());
 		response.prepareResponse();
 		if (!response.getHeadersSent())
 		{

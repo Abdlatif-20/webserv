@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/22 19:57:19 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/22 21:28:14 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ class Response
 {
     private:
         Request *request;
-        Context *context;
+        ServerContext serverCTX;
+        LocationContext locationCTX;
 
         char buffer[1024];
         int fd;
@@ -62,7 +63,8 @@ class Response
         ~Response();
         
         void setRequest(Request* request);
-        void setContext(Context* context);
+        void setServerCTX(const ServerContext& serverCTX);
+        void setLocationCTX(const LocationContext& locationCTX);
         void setHeadersSent(bool flag);
         static std::string getMimeType(const std::string& extension);
         const std::string& getBody() const;

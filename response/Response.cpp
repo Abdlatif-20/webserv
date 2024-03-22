@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/22 19:58:38 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/22 22:38:01 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ std::map<std::string, std::string> Response::mimeTypes;
 Response::Response()
 {
     request = NULL;
-    context = NULL;
     statusCode = 200;
     responseDone = false;
     headersSent = false;
@@ -41,7 +40,8 @@ Response& Response::operator=(const Response& obj)
     if (this == &obj)
         return *this;
     request = obj.request;
-    context = obj.context;
+    serverCTX = obj.serverCTX;
+    locationCTX = obj.locationCTX;
     statusCode = obj.statusCode;
     responseDone = obj.responseDone;
     headers = obj.headers;
@@ -67,9 +67,14 @@ void Response::setRequest(Request* request)
     this->request = request;
 }
 
-void Response::setContext(Context* context)
+void Response::setServerCTX(const ServerContext& serverCTX)
 {
-    this->context = context;
+    this->serverCTX = serverCTX;
+}
+
+void Response::setLocationCTX(const LocationContext& locationCTX)
+{
+    this->locationCTX= locationCTX;
 }
 
 void Response::setHeadersSent(bool flag)
@@ -133,7 +138,7 @@ bool Response::checkErrorPage(const std::string& path)
 
 void Response::generateResponseError()
 {
-    std::string errorPage = context->getErrorPage(Utils::intToString(statusCode));
+    std::string errorPage = locationCTX.getErrorPage(Utils::intToString(statusCode));
     if (errorPage.empty())
     {
         bodyPath.clear();
@@ -141,7 +146,7 @@ void Response::generateResponseError()
     }
     else
     {
-        std::string path = context->getRoot() + errorPage;
+        std::string path = locationCTX.getRoot() + errorPage;
         if (!checkErrorPage(path))
             return;
         bodyPath = path;
@@ -237,7 +242,7 @@ void Response::prepareGET()
 {
     if (isWorking)
         return;
-    std::string resource = context->getRoot() + request->getRequestPath();
+    std::string resource = locationCTX.getRoot() + request->getRequestPath();
     if (!Utils::checkIfPathExists(resource))
         throw ResponseErrorException(*this, NotFound);
     if (Utils::isDirectory(resource))
@@ -248,10 +253,10 @@ void Response::prepareGET()
         {
             try
             {
-                std::string index = context->getIndex(resource);
+                std::string index = locationCTX.getIndex(resource);
                 if (index.empty())
                 {
-                    if (context->getAutoIndex())
+                    if (locationCTX.getAutoIndex())
                         autoIndex(resource);
                     else
                         throw ResponseErrorException(*this, FORBIDDEN);
@@ -316,8 +321,8 @@ void Response::autoIndex(const std::string& path)
 
 void Response::preparePOST()
 {
-    std::string resource = context->getRoot() + request->getRequestPath();
-    if (!context->getUploadStore().empty())
+    std::string resource = locationCTX.getRoot() + request->getRequestPath();
+    if (!locationCTX.getUploadStore().empty())
     {
         statusCode = Created;
         body = generateHtmlErrorPage();
@@ -335,7 +340,7 @@ void Response::preparePOST()
             {
                 try
                 {
-                    std::string index = context->getIndex(resource);
+                    std::string index = locationCTX.getIndex(resource);
                     if (index.empty() || !hasCGI)
                         throw Utils::FilePermissionDenied();
                     /* Request BODY goes to CGI !! */
@@ -361,9 +366,9 @@ void Response::prepareResponse()
     {
         if (request->getStatus() >= 400)
             throw ResponseErrorException(*this, request->getStatus());
-        if (context->getHttpRedirection().size() > 0)
+        if (locationCTX.getHttpRedirection().size() > 0)
         {
-            prepareRedirection(Utils::stringToInt(context->getHttpRedirection().at(0)), context->getHttpRedirection().at(1));
+            prepareRedirection(Utils::stringToInt(locationCTX.getHttpRedirection().at(0)), locationCTX.getHttpRedirection().at(1));
             prepareBody();
             prepareHeaders();
             responseDone = true;
@@ -397,7 +402,6 @@ void Response::prepareResponse()
 void Response::resetResponse()
 {
     fd = INT_MIN;
-    context = NULL;
     request = NULL;
     statusCode = 200;
     headersSent = false;

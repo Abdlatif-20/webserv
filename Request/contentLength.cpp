@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/20 16:49:01 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/22 21:22:24 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void	Request::parseContentLength()
 		status = BadRequest;
 		requestIscomplete = true;
 	}
-	if (Utils::stringToInt(_headers["content-length"]) > context->getClientMaxBodySize())
+	if (Utils::stringToInt(_headers["content-length"]) > locationCTX.getClientMaxBodySize())
 	{
 		status = RequestEntityTooLarge;
 		requestIscomplete = true;

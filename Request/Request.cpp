@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/22 19:58:16 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/22 22:51:29 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ Request::Request()
 	this->_body.clear();
 	this->_params.clear();
 	this->headers.clear();
-	this->context = NULL;
 	this->requestData.clear();
 	this->boundaryName.clear();
 	this->_chunkedName.clear();
@@ -64,7 +63,8 @@ Request& Request::operator=(const Request& obj)
 		serv_begin = obj.serv_begin;
 		this->_params = obj._params;
 		this->headers = obj.headers;
-		this->context = obj.context;
+		this->serverCTX = obj.serverCTX;
+		this->locationCTX = obj.locationCTX;
 		this->bodyDone = obj.bodyDone;
 		this->foundUri = obj.foundUri;
 		this->multipart = obj.multipart;
@@ -73,7 +73,6 @@ Request& Request::operator=(const Request& obj)
 		this->detectHost = obj.detectHost;
 		this->requestLine = obj.requestLine;
 		this->headersDone = obj.headersDone;
-		this->locationCtx = obj.locationCtx;
 		this->requestData = obj.requestData;
 		this->receivecount = obj.receivecount;
 		this->_chunkedName = obj._chunkedName;
@@ -151,6 +150,16 @@ const String Request::getHeaderByName(const String& name) const
 	return ("");
 }
 
+const ServerContext& Request::getServerCTX(void) const
+{
+	return serverCTX;
+}
+
+const LocationContext& Request::getLocationCtx(void) const
+{
+	return locationCTX;
+}
+
 const bool& Request::getRequestLineDone() const
 {
 	return (requestLineDone);
@@ -189,11 +198,6 @@ const String Request::getHost() const
 	return ("");
 }
 
-Context* Request::getContext() const
-{
-	return context;
-}
-
 const std::string Request::getRequestPath() const
 {
 	try{
@@ -228,7 +232,6 @@ void	Request::resetRequest()
 	this->_body.clear();
 	this->_params.clear();
 	this->headers.clear();
-	this->context = NULL;
 	this->requestData.clear();
 	this->boundaryName.clear();
 	this->_chunkedName.clear();
@@ -251,8 +254,7 @@ void	Request::selectServerContext(const String& host)
 		name = std::find(hosts.begin(), hosts.end(), host);
 		if (name != hosts.end())
 		{
-			ServerContext& s = *dynamic_cast<ServerContext*>(context);
-			s = it->getServerCTX();
+			serverCTX = it->getServerCTX();
 			break;
 		}
 		it++;
@@ -270,12 +272,11 @@ void	Request::setServerCTXBegin(size_t i)
 }
 
 //main function to parse the request
-void	Request::parseRequest(const std::string& receivedRequest, Context* serverCTX)
+void	Request::parseRequest(const std::string& receivedRequest, ServerContext serverCTX)
 {
 	if (receivedRequest.empty())
 		return;
-	if (!context)
-		this->context = serverCTX;
+	this->serverCTX = serverCTX;
 	std::srand(time(NULL));
 	if (!this->requestLineDone || !this->headersDone || !this->_requestIsWellFormed)
 	{
