@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/21 15:48:34 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/22 19:57:19 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,6 @@
 #include "Request.hpp"
 #include "ServerContext.hpp"
 #include <dirent.h>
-
-// class Request;
 
 class Response
 {
@@ -44,6 +42,7 @@ class Response
         void generateResponseError();
         void prepareHeaders();
         void prepareBody();
+        void prepareCGI();
         void prepareGET();
         void prepareRedirection(int _status, const std::string& _location);
         void autoIndex(const std::string& path);
@@ -52,7 +51,11 @@ class Response
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;
+
     public:
+		static char	**env;
+		static std::string	PATH;
+
         Response();
         Response(const Response& obj);
         Response& operator=(const Response& obj);
@@ -70,8 +73,10 @@ class Response
         void prepareResponse();
         void resetResponse();
 
-        static void initReasonPhrases();
+
         static void initMimeTypes();
+        static void initReasonPhrases();
+		static void	setupEnv(char **_env);
 
         class ResponseErrorException : public std::exception
         {

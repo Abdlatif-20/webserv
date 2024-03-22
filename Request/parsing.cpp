@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/21 17:46:53 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/22 19:57:58 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,12 +146,14 @@ int	Request::parseRequestLine(const String& requestLine)
 		else
 		{
 			this->requestVector = Utils::splitRequest(requestLine, CRLF);
-			if (this->requestVector.size() != 1)
-			{
-				for (size_t i = 1; i < this->requestVector.size(); i++)
-					requestData += this->requestVector[i] + CRLF;
-			}
 			this->requestInProgress = true;
+		}
+		if (this->requestVector.size() == 0)
+			return (this->status = BadRequest, requestIscomplete = true, 0);
+		if (this->requestVector.size() != 1)
+		{
+			for (size_t i = 1; i < this->requestVector.size(); i++)
+				requestData += this->requestVector[i] + CRLF;
 		}
 		return (fillRequestLine(this->requestVector[0]), 1);
 	}
@@ -197,18 +199,19 @@ int	Request::takingRequests(String receivedRequest)
 	if (!this->requestLineDone)
 	{
 		if (parseRequestLine(receivedRequest) && requestData.empty())
-			return 1;
-		else if (!requestData.empty())
 		{
-			receivedRequest = receivedRequest.substr(receivedRequest.find("\r\n") + 2);
+			return 1;
+		}
+		if (!requestData.empty())
+		{
+			receivedRequest = requestData;
+			requestData.clear();
 		}
 	}
 	if (!headersDone)
 	{
 		if (checkDuplicate(receivedRequest))
-		{
 			return 1;
-		}
 	}
 	if (requestInProgress)
 		requestVector = Utils::splitRequest(requestData, CRLF);

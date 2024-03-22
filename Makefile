@@ -3,15 +3,15 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+         #
+#    By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/03/19 01:31:04 by mel-yous         ###   ########.fr        #
+#    Updated: 2024/03/20 17:49:05 by houmanso         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserv
-CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g #-fsanitize=address
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
 SRCS = $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
 OBJS = $(patsubst %.cpp,.obj/%.o,$(SRCS))
 INC  = $(wildcard *.hpp) $(wildcard */*.hpp)

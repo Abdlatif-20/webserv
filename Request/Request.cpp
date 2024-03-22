@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/21 17:31:30 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/22 19:58:16 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ Request::Request()
 	this->requestData.clear();
 	this->boundaryName.clear();
 	this->_chunkedName.clear();
+	this->requestVector.clear();
 	this->requestLineData.clear();
 }
 
@@ -305,4 +306,3 @@ void	Request::parseRequest(const std::string& receivedRequest, Context* serverCT
 			parseBody();
 	}
 }
-//requestData.empty() && 

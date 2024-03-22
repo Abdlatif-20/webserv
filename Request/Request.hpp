@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/20 02:47:58 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/22 21:01:03 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,10 @@ class Request
 		unsigned int	contentLength;
 		unsigned int	remainingChunkLength;
 		//config
-		Context			*context;
-		LocationContext	locationCtx;
+		ServerContext* serverCTX;
+		LocationContext* locationCTX;
+		// Context			*context;
+		// LocationContext	locationCtx;
 		//maps
 		Map	_headers;
 		Map	requestLine;
