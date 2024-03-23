@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/20 17:50:22 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/22 16:59:44 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ class Response
         bool isRedirection;
         std::string location;
 
+        std::vector<std::string> env;
+
         std::string generateHtmlErrorPage();
         bool checkErrorPage(const std::string& path);
 
@@ -52,7 +54,7 @@ class Response
         static std::map<std::string, std::string> mimeTypes;
 
     public:
-		static char	**env;
+		static char	**env_ptr;
 		static std::string	PATH;
 
         Response();
@@ -71,6 +73,8 @@ class Response
 
         void prepareResponse();
         void resetResponse();
+
+		void	copyEnv();
 
 
         static void initMimeTypes();

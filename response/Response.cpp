@@ -6,14 +6,14 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/20 17:50:12 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/22 18:34:27 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 
-char	**Response::env;
 std::string	Response::PATH;
+char	**Response::env_ptr;
 std::map<int, std::string> Response::reasonPhrases;
 std::map<std::string, std::string> Response::mimeTypes;
 
@@ -39,6 +39,7 @@ Response& Response::operator=(const Response& obj)
 {
     if (this == &obj)
         return *this;
+	env = obj.env;
     request = obj.request;
     context = obj.context;
     statusCode = obj.statusCode;
@@ -190,6 +191,8 @@ void Response::prepareBody()
     }
     body.clear();
     body.append(buffer, readedBytes);
+	if ((size_t) readedBytes < sizeof(buffer))
+		responseDone = true;
 }
 
 void Response::prepareCGI()
@@ -220,7 +223,7 @@ void Response::prepareCGI()
 			{
 				dup2(fd, 1);
 				close(fd);
-				execve(args[0], (char *const*)args, env);
+				execve(args[0], (char *const*)args, env_ptr);
 				exit(0);
 			}
 			wait(NULL);
@@ -322,6 +325,32 @@ void Response::preparePOST()
     }
 }
 
+void Response::copyEnv()
+{
+	std::string	req_path = request->getRequestPath();
+	// for (size_t i = 0; env_ptr[i]; i++)
+	// 	env.push_back(env_ptr[i]);
+	env.push_back("GATEWAY_INTERFACE=\"CGI/1.1\"");
+	// env.push_back("SERVER_NAME=\"WebServer\"");
+	env.push_back("SERVER_SOFTWARE=\"WebServer\"");
+	// env.push_back("SERVER_PROTOCOL=\"\"");
+	env.push_back("SERVER_PORT=");
+	env.back() += '"' + ((ServerContext*)request->getContext())->getPort() + '"';
+	env.push_back("REQUEST_METHOD=");
+	env.back() += '"' + request->getMethod() + '"';
+	env.push_back("PATH_INFO=");
+	env.back() += '"' + req_path + '"';
+	env.push_back("PATH_TRANSLATED=");
+	env.back() += '"' + context->getRoot() + req_path + '"';
+	env.push_back("SCRIPT_NAME=");
+	env.back() += '"' + bodyPath.substr(bodyPath.find_last_of('/') + 1) + '"';
+	env.push_back("DOCUMENT_ROOT=");
+	env.back() += '"' + bodyPath.substr(0, bodyPath.find_last_of('/')) + '"';
+	for (size_t i = 0; i < env.size(); i++)
+		std::cout << env[i] << std::endl;
+	std::cout << "==============================" << std::endl;
+}
+
 void Response::prepareResponse()
 {
     /* Handle request Errors */
@@ -331,7 +360,7 @@ void Response::prepareResponse()
             throw ResponseErrorException(*this, request->getStatus());
         if (context->getHttpRedirection().size() > 0)
         {
-            prepareRedirection(Utils::stringToInt(context->getHttpRedirection().at(0)), context->getHttpRedirection().at(1));
+            prepareRedirection(Utils::stringToInt(context->getHttpRedirection()[0]), context->getHttpRedirection()[1]);
             prepareBody();
             prepareHeaders();
             responseDone = true;
@@ -340,7 +369,9 @@ void Response::prepareResponse()
         if (request->getMethod() == "GET")
         {
             prepareGET();
-			// if ()
+			if (fd != INT_MIN)
+				copyEnv();
+				// prepareCGI();
             prepareBody();
             prepareHeaders();
         }
@@ -368,30 +399,31 @@ void Response::resetResponse()
     context = NULL;
     request = NULL;
     statusCode = 200;
+    isWorking = false;
     headersSent = false;
     responseDone = false;
-    isWorking = false;
     isRedirection = false;
-    location.clear();
+	env.clear();
     body.clear();
-    bodyPath.clear();
     headers.clear();
+    bodyPath.clear();
+    location.clear();
 }
 
 void Response::setupEnv(char **_env)
 {
 	std::string	var;
-	env = _env;
-	for (size_t i = 0; env && env[i]; i++)
+	env_ptr = _env;
+	for (size_t i = 0; env_ptr && env_ptr[i]; i++)
 	{
-		var = env[i];
+		var = env_ptr[i];
 		if (Utils::stringStartsWith(var, "PATH="))
 		{
 			PATH =  var.substr(5);
 			break;
 		}
 	}
-	if (!env || Response::PATH.empty())
+	if (!env_ptr || Response::PATH.empty())
 		throw Fail("needs PATH variable");
 }
 

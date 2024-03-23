@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/20 17:26:49 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/22 18:19:24 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,7 @@ void	Client::reset(void)
 	{
 		request.resetRequest();
 		response.resetResponse();
+		requestDone = false;
 	}
 }
 
