@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 15:16:11 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/17 11:32:32 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:56:47 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ const char *SyntaxErrorException::what() const throw()
 
 /* The `countDirectiveArgs` function is used to count the number of arguments for a directive in the
 server configuration file.*/
-static size_t countDirectiveArgs(const TokensVector& tokens, TokensVector::const_iterator& i)
+static size_t countDirectiveArgs(TokensVector& tokens, TokensVector::iterator& i)
 {
     size_t counter = 0;
     while (i != tokens.end() && i->getType() != SEMICOLON)
@@ -58,8 +58,7 @@ static size_t countDirectiveArgs(const TokensVector& tokens, TokensVector::const
 /* The `checkDirective` function is responsible for checking the syntax of a directive in the server
 configuration file. It takes a directive `d`, a vector of tokens `tokens`, and an iterator `i` as
 input. */
-static void checkDirective(t_directive d, const TokensVector& tokens,
-    TokensVector::const_iterator& i)
+static void checkDirective(t_directive d, TokensVector& tokens, TokensVector::iterator& i)
 {
     size_t currLineIndex = i->getLineIndex();
     size_t count = countDirectiveArgs(tokens, ++i);
@@ -77,7 +76,7 @@ static void checkDirective(t_directive d, const TokensVector& tokens,
             if (count < 2)
                 throw SyntaxErrorException("invalid number of args at line: ", currLineIndex);
             break;
-        case RETURN:
+        case RETURN: case CGI_ASSIGN:
             if (count != 2)
                 throw SyntaxErrorException("invalid number of args at line: ", currLineIndex);
             break;
@@ -92,8 +91,7 @@ static void checkDirective(t_directive d, const TokensVector& tokens,
 
 /* The `checkLocation` function is responsible for checking the syntax of a location block in the
 server configuration file. It takes a vector of tokens and an iterator as input. */
-static void checkLocation(const TokensVector& tokens,
-    TokensVector::const_iterator& i)
+static void checkLocation(TokensVector& tokens, TokensVector::iterator& i)
 {
     size_t currLineIndex = i->getLineIndex();
     t_directive d;
@@ -120,7 +118,7 @@ static void checkLocation(const TokensVector& tokens,
 
 /* The `checkServer` function is responsible for checking the syntax of a server block in the server
 configuration file. It takes a vector of tokens and an iterator as input. */
-static void checkServer(const TokensVector& tokens, TokensVector::const_iterator& i)
+static void checkServer(TokensVector& tokens, TokensVector::iterator& i)
 {
     size_t currLineIndex;
     t_directive d;
@@ -154,10 +152,10 @@ error.
 * @param tokens tokens vector
 * @return Nothing
 */
-void checkSyntax(const TokensVector& tokens)
+void checkSyntax(TokensVector& tokens)
 {
-    TokensVector::const_iterator i = tokens.cbegin();
-    while (i != tokens.cend())
+    TokensVector::iterator i = tokens.begin();
+    while (i != tokens.end())
     {
         if (i->getType() == WORD && i->getContent() == "server")
             checkServer(tokens, i);

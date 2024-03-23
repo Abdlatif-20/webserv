@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 10:40:09 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/29 11:01:47 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:54:12 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,23 +45,23 @@ void ServerContext::addLocation(LocationContext location)
 
 /* The `const LocationsVector& ServerContext::getLocations() const` function in the `ServerContext`
 class is a getter method that returns a constant reference to the `locations` vector within the `ServerContext` object.*/
-const LocationsVector& ServerContext::getLocations() const
+LocationsVector& ServerContext::getLocations()
 {
     return locations;
 }
 
-const LocationContext ServerContext::matchLocation(const std::string& prefix) const
+LocationContext ServerContext::matchLocation(const std::string& prefix)
 {
-    LocationsVector::const_iterator it = locations.cbegin();
-    while (it != locations.cend())
+    LocationsVector::iterator it = locations.begin();
+    while (it != locations.end())
     {
         if (it->getPrefix() == prefix)
             return *it;
         it++;
     }
-    it = locations.cbegin();
+    it = locations.begin();
     LocationContext result;
-    while (it != locations.cend())
+    while (it != locations.end())
     {
         if (Utils::stringStartsWith(prefix, it->getPrefix())
             && it->getPrefix().length() > result.getPrefix().length())
@@ -71,15 +71,15 @@ const LocationContext ServerContext::matchLocation(const std::string& prefix) co
     return result;
 }
 
-std::string ServerContext::getListen() const
+std::string ServerContext::getListen()
 {
-    DirectivesMap::const_iterator it = directives.find("listen");
-    if (it != directives.cend())
-        return *it->second.cbegin();
+    DirectivesMap::iterator it = directives.find("listen");
+    if (it != directives.end())
+        return *it->second.begin();
     return "8080";
 }
 
-std::string ServerContext::getHost() const
+std::string ServerContext::getHost()
 {
     std::string str = getListen();
     size_t i = str.find(':');
@@ -88,7 +88,7 @@ std::string ServerContext::getHost() const
     return "0.0.0.0";
 }
 
-std::string ServerContext::getPort() const
+std::string ServerContext::getPort()
 {
     std::string str = getListen();
     size_t i = str.find(':');
@@ -100,10 +100,10 @@ std::string ServerContext::getPort() const
 /* The `StringVector ServerContext::getServerName() const` function in the `ServerContext` class is a
 getter method that retrieves the value associated with the "server_name" directive from the
 `directives` map within the `ServerContext` object. */
-StringVector ServerContext::getServerName() const
+StringVector ServerContext::getServerName()
 {
-    DirectivesMap::const_iterator it = directives.find("server_name");
-    if (it != directives.cend())
+    DirectivesMap::iterator it = directives.find("server_name");
+    if (it != directives.end())
         return it->second;
     StringVector vec;
     vec.push_back("localhost");

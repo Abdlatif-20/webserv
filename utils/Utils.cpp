@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 19:51:49 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/23 19:31:34 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,12 @@ std::string Utils::strTrim(const std::string& str, char c)
 
 t_directive Utils::getDirectiveFromTokenName(const std::string& tokenName)
 {
-	std::string tokens[11] = 
+	std::string tokens[12] = 
 	{
 		"root", "index", "auto_index", "error_page", "client_max_body_size",
-		"allowed_methods", "listen", "server_name", "return", "location", "upload_store"
+		"allowed_methods", "listen", "server_name", "return", "location", "upload_store", "cgi_assign"
 	};
-	for (int i = 0; i < 11; i++)
+	for (int i = 0; i < 12; i++)
 		if (tokenName == tokens[i])
 			return static_cast<t_directive>(i);
 	return UNKNOWN;
@@ -155,6 +155,8 @@ std::string Utils::getTokenNameFromDirective(t_directive d)
 			return "location";
 		case UPLOAD_STORE:
 			return "upload_store";
+		case CGI_ASSIGN:
+			return "cgi_assign";
 		default:
 			break;
 	}

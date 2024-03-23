@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/18 02:24:05 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:40:25 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ class Context
     protected:
         DirectivesMap directives;
         std::vector<StringVector> errorPages;
+        std::map<std::string, std::string> cgi;
     public:
         Context();
         Context(const Context& obj);
@@ -33,16 +34,18 @@ class Context
         void addDirective(Directive _directive);
         void appendDirective(Directive _directive);
         void addErrorPage(StringVector error_page);
+        void addCGI(std::pair<std::string, std::string>_pair);
 
         /*Useful getters for request*/
-        const DirectivesMap& getDirectives() const;
-        const std::vector<StringVector>& getErrorPages() const;
-        std::string getRoot() const;
-        std::string getIndex(const std::string& path) const;
-        bool getAutoIndex() const;
-        int getClientMaxBodySize() const;
-        StringVector getAllowedMethods() const;
-        std::string getUploadStore() const;
-        std::string getErrorPage(const std::string& status) const;
-        StringVector getHttpRedirection() const;
+        DirectivesMap& getDirectives();
+        std::vector<StringVector>& getErrorPages();
+        std::string getRoot();
+        std::string getIndex(const std::string& path);
+        bool getAutoIndex();
+        int getClientMaxBodySize();
+        StringVector getAllowedMethods();
+        std::string getUploadStore();
+        std::string getErrorPage(const std::string& status);
+        StringVector getHttpRedirection();
+        std::map<std::string, std::string> getCGI();
 };

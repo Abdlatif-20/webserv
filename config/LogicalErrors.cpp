@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/16 15:14:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/09 10:25:22 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:52:10 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,29 +62,29 @@ static void checkListen(const std::string& str)
     isValidPort(port);
 }
 
-static void checkAutoIndex(const Context& ctx)
+static void checkAutoIndex(Context& ctx)
 {
-    DirectivesMap::const_iterator it = ctx.getDirectives().find("auto_index");
-    if (it != ctx.getDirectives().cend() && !(*it->second.cbegin() == "on"
-        || *it->second.cbegin() == "off" || *it->second.cbegin() == "ON"
-        || *it->second.cbegin() == "OFF"))
+    DirectivesMap::iterator it = ctx.getDirectives().find("auto_index");
+    if (it != ctx.getDirectives().end() && !(*it->second.begin() == "on"
+        || *it->second.begin() == "off" || *it->second.begin() == "ON"
+        || *it->second.begin() == "OFF"))
         throw LogicalErrorException("invalid value for `auto_index` directive");
 }
 
-static void checkMaxClientBodySize(const Context& ctx)
+static void checkMaxClientBodySize(Context& ctx)
 {
-    DirectivesMap::const_iterator it = ctx.getDirectives().find("client_max_body_size");
-    if (it != ctx.getDirectives().cend() && !isNumber(*it->second.cbegin()))
+    DirectivesMap::iterator it = ctx.getDirectives().find("client_max_body_size");
+    if (it != ctx.getDirectives().end() && !isNumber(*it->second.begin()))
         throw LogicalErrorException("invalid value for `client_max_body_size` directive");
 }
 
-static void checkAllowedMethods(const Context& ctx)
+static void checkAllowedMethods(Context& ctx)
 {
-    DirectivesMap::const_iterator it = ctx.getDirectives().find("allowed_methods");
-    if (it != ctx.getDirectives().cend())
+    DirectivesMap::iterator it = ctx.getDirectives().find("allowed_methods");
+    if (it != ctx.getDirectives().end())
     {
-        StringVector::const_iterator vec_it = it->second.cbegin();
-        while (vec_it != it->second.cend())
+        StringVector::iterator vec_it = it->second.begin();
+        while (vec_it != it->second.end())
         {
             if (*vec_it != "GET" && *vec_it != "POST" && *vec_it != "DELETE"
                 && *vec_it != "get" && *vec_it != "post" && *vec_it != "delete")
@@ -94,41 +94,41 @@ static void checkAllowedMethods(const Context& ctx)
     }
 }
 
-static void checkErrorPages(const Context& ctx)
+static void checkErrorPages(Context& ctx)
 {
     if (ctx.getErrorPages().size() > 0)
     {
-        std::vector<StringVector>::const_iterator it = ctx.getErrorPages().cbegin();
-        while (it != ctx.getErrorPages().cend())
+        std::vector<StringVector>::iterator it = ctx.getErrorPages().begin();
+        while (it != ctx.getErrorPages().end())
         {
-            StringVector::const_iterator vec_it = it->cbegin();
-            while (vec_it != it->cend() && isNumber(*vec_it))
+            StringVector::iterator vec_it = it->begin();
+            while (vec_it != it->end() && isNumber(*vec_it))
             {
                 int statu = std::atoi(vec_it->c_str());
                 if (statu < 400 || statu > 507)
                     throw LogicalErrorException("invalid value status code `error_page` directive");
                 vec_it++;
             }
-            if (vec_it != it->cend() && ++vec_it != it->cend())
+            if (vec_it != it->end() && ++vec_it != it->end())
                 throw LogicalErrorException("invalid value for `error_page` directive");
             it++;
         }
     }
 }
 
-static void checkReturn(const Context& ctx)
+static void checkReturn(Context& ctx)
 {
-    DirectivesMap::const_iterator it = ctx.getDirectives().find("return");
-    if (it != ctx.getDirectives().cend())
+    DirectivesMap::iterator it = ctx.getDirectives().find("return");
+    if (it != ctx.getDirectives().end())
     {
-        StringVector::const_iterator vec_it = it->second.cbegin();
+        StringVector::iterator vec_it = it->second.begin();
         int code = std::atoi((*vec_it).c_str());
         if (!isNumber(*vec_it) || code < 300 || code > 307)
             throw LogicalErrorException("invalid value for `return` directive");
     }
 }
 
-static void checkHttpDirectives(const Context& ctx)
+static void checkHttpDirectives(Context& ctx)
 {
     checkAutoIndex(ctx);
     checkMaxClientBodySize(ctx);
@@ -137,13 +137,13 @@ static void checkHttpDirectives(const Context& ctx)
     checkReturn(ctx);
 }
 
-void checkLogicalErrors(const ServersVector& servers)
+void checkLogicalErrors(ServersVector& servers)
 {
-    ServersVector::const_iterator serv_iter = servers.cbegin();
-    while (serv_iter != servers.cend())
+    ServersVector::iterator serv_iter = servers.begin();
+    while (serv_iter != servers.end())
     {
-        LocationsVector::const_iterator loc_vector = serv_iter->getLocations().cbegin();
-        while (loc_vector != serv_iter->getLocations().cend())
+        LocationsVector::iterator loc_vector = serv_iter->getLocations().begin();
+        while (loc_vector != serv_iter->getLocations().end())
             checkHttpDirectives(*(loc_vector++));
         checkListen(serv_iter->getListen());
         checkHttpDirectives(*serv_iter);

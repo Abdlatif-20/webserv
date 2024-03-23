@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 15:16:10 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/14 11:13:01 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:54:56 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,4 +28,4 @@ class SyntaxErrorException : public std::exception
         ~SyntaxErrorException() throw();
 };
 
-void checkSyntax(const TokensVector& tokenList);
+void checkSyntax(TokensVector& tokenList);

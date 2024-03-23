@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/20 17:05:17 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:57:16 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,10 +62,15 @@ void Context::addErrorPage(StringVector error_page)
     errorPages.push_back(error_page);
 }
 
+void Context::addCGI(std::pair<std::string, std::string>_pair)
+{
+    cgi[_pair.first] = _pair.second;
+}
+
 /* The `getDirectives()` function in the `Context` class is a const
 member function that returns a constant reference to the `directives` member variable of the
 `Context` class.*/
-const DirectivesMap& Context::getDirectives() const
+DirectivesMap& Context::getDirectives()
 {
     return directives;
 }
@@ -73,7 +78,7 @@ const DirectivesMap& Context::getDirectives() const
 /* The `getErrorPages()` function in the `Context`
 class is a const member function that returns a constant reference to the `errorPages` member
 variable of the `Context` class.*/
-const std::vector<StringVector>& Context::getErrorPages() const
+std::vector<StringVector>& Context::getErrorPages()
 {
     return errorPages;
 }
@@ -84,26 +89,26 @@ variable. It first looks for the "root" directive in the `directives` map and re
 associated with it. If the "root" directive is not found, it returns a default value of
 "assets/www". This function is used to get the root directory path specified in the configuration
 for the server. */
-std::string Context::getRoot() const
+std::string Context::getRoot()
 {
-    DirectivesMap::const_iterator it = directives.find("root");
+    DirectivesMap::iterator it = directives.find("root");
     if (it != directives.end())
-        return *it->second.cbegin() + "/";
+        return *it->second.begin() + "/";
     return "assets/www/";
 }
 
 /* The `std::string Context::getIndex() const` function in the `Context` class is a const member
 function that retrieves the index file path specified in the configuration for the server.*/
-std::string Context::getIndex(const std::string& path) const
+std::string Context::getIndex(const std::string& path)
 {
-    DirectivesMap::const_iterator it = directives.find("index");
+    DirectivesMap::iterator it = directives.find("index");
     std::string indexPath = "";
-    StringVector::const_iterator vec_iter;
+    StringVector::iterator vec_iter;
 
-    if (it != directives.cend())
+    if (it != directives.end())
     {
-        vec_iter = it->second.cbegin();
-        while (vec_iter != it->second.cend())
+        vec_iter = it->second.begin();
+        while (vec_iter != it->second.end())
         {
             indexPath = path + (*vec_iter);
             if (Utils::checkIfPathExists(indexPath) && Utils::isReadableFile(indexPath))
@@ -126,10 +131,10 @@ variable. It checks if the "auto_index" directive is present in the directives m
 is set to "on". If the directive is found and set to "on", the function returns `true`, indicating
 that auto-indexing is enabled. If the directive is not found or set to any other value, the function
 returns `false`, indicating that auto-indexing is not enabled. */
-bool Context::getAutoIndex() const
+bool Context::getAutoIndex()
 {
-    DirectivesMap::const_iterator it = directives.find("auto_index");
-    if (it != directives.cend() && *it->second.cbegin() == "on")
+    DirectivesMap::iterator it = directives.find("auto_index");
+    if (it != directives.end() && *it->second.begin() == "on")
         return true;
     return false;
 }
@@ -140,11 +145,11 @@ function that retrieves the value associated with the "client_max_body_size" dir
 directives map and if it is, it converts the value to an integer using `std::atoi` and returns it.
 If the directive is not found, it returns a default value of 1. This function is used to get the
 maximum allowed size of the client request body specified in the server configuration. */
-int Context::getClientMaxBodySize() const
+int Context::getClientMaxBodySize()
 {
-    DirectivesMap::const_iterator it = directives.find("client_max_body_size");
-    if (it != directives.cend())
-        return std::atoi((*it->second.cbegin()).c_str());
+    DirectivesMap::iterator it = directives.find("client_max_body_size");
+    if (it != directives.end())
+        return std::atoi((*it->second.begin()).c_str());
     return 10000000;
 }
 
@@ -152,14 +157,14 @@ int Context::getClientMaxBodySize() const
 member function that retrieves the value associated with the "allowed_methods" directive from the
 `directives` member variable. It returns a vector of strings containing the allowed HTTP methods
 specified in the server configuration. */
-StringVector Context::getAllowedMethods() const
+StringVector Context::getAllowedMethods()
 {
-    DirectivesMap::const_iterator it = directives.find("allowed_methods");
+    DirectivesMap::iterator it = directives.find("allowed_methods");
     StringVector vec;
-    if (it != directives.cend())
+    if (it != directives.end())
     {
-        StringVector::const_iterator vec_it = it->second.cbegin();
-        while (vec_it != it->second.cend())
+        StringVector::iterator vec_it = it->second.begin();
+        while (vec_it != it->second.end())
         {
             if (*vec_it == "GET" || *vec_it == "POST" || *vec_it == "DELETE")
                 vec.push_back(*vec_it);
@@ -178,13 +183,13 @@ StringVector Context::getAllowedMethods() const
 /* The `std::string Context::getUploadStore() const` function in the `Context` class is a const member
 function that retrieves the value associated with the "upload_store" directive from the `directives`
 member variable. */
-std::string Context::getUploadStore() const
+std::string Context::getUploadStore()
 {
     std::string path;
-    DirectivesMap::const_iterator it = directives.find("upload_store");
-    if (it != directives.cend())
+    DirectivesMap::iterator it = directives.find("upload_store");
+    if (it != directives.end())
     {
-        path = getRoot() + *it->second.cbegin();
+        path = getRoot() + *it->second.begin();
         if (!Utils::checkIfPathExists(path))
             throw Utils::FileNotFoundException();
         else if (!Utils::isReadableFile(path) || !Utils::isDirectory(path))
@@ -198,17 +203,17 @@ std::string Context::getUploadStore() const
 /* The `std::string Context::getErrorPage(const std::string& status) const` function in the `Context`
 class is a const member function that retrieves the error page associated with a specific HTTP
 status code. */
-std::string Context::getErrorPage(const std::string& status) const
+std::string Context::getErrorPage(const std::string& status)
 {
-    std::vector<StringVector>::const_iterator it = errorPages.cbegin();
+    std::vector<StringVector>::iterator it = errorPages.begin();
     StringVector vec;
-    while (it != errorPages.cend())
+    while (it != errorPages.end())
     {
         vec = *it;
-        StringVector::const_iterator vec_it = std::find(vec.cbegin(), vec.cend(), status);
-        if (vec_it != vec.cend())
+        StringVector::iterator vec_it = std::find(vec.begin(), vec.end(), status);
+        if (vec_it != vec.end())
         {
-            while (vec_it != (vec.cend() - 1))
+            while (vec_it != (vec.end() - 1))
                 vec_it++;
             return *vec_it;
         }
@@ -217,10 +222,15 @@ std::string Context::getErrorPage(const std::string& status) const
     return "";
 }
 
-StringVector Context::getHttpRedirection() const
+StringVector Context::getHttpRedirection()
 {
-    DirectivesMap::const_iterator it = directives.find("return");
-    if (it != directives.cend())
+    DirectivesMap::iterator it = directives.find("return");
+    if (it != directives.end())
         return it->second;
     return StringVector(0);
+}
+
+std::map<std::string, std::string> Context::getCGI()
+{
+    return cgi;
 }

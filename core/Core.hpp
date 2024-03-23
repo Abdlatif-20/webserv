@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:21:50 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/16 00:07:07 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:58:03 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ class Core
 
 		Core(void);
 		Core(const Core& cpy);
-		Core(const Config& conf);
+		Core(Config& conf);
 
 		void	run(void);
 		void	traceEvents(void);
