@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/20 17:49:50 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/22 21:22:04 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	Request::setUploadingPath()
 {
 	try
 	{
-		this->_path = context->getUploadStore();
+		this->_path = locationCTX.getUploadStore();
 	}
 	catch (std::exception& e)
 	{
@@ -35,7 +35,7 @@ void	Request::parseTransferEncoding()
 
 void	Request::isMethodAllowedInLocation()
 {
-	Vector allowedMethods = locationCtx.getAllowedMethods();
+	Vector allowedMethods = locationCTX.getAllowedMethods();
 	if (std::find(allowedMethods.begin(), allowedMethods.end(), requestLine["method"]) == allowedMethods.end())
 		return (this->status = MethodNotAllowed, requestIscomplete = true, void());
 	_requestIsWellFormed = true;
@@ -73,12 +73,10 @@ void	Request::findUri()
 {
 	/* cast from context to SERVERCTX */
 	std::string uri = requestLine["path"];
-	ServerContext* serverCtx = dynamic_cast<ServerContext*>(context);
-	LocationContext locationCtx = serverCtx->matchLocation(uri);
+	LocationContext locationCtx = serverCTX.matchLocation(uri);
 	if (locationCtx.getPrefix() != "")
 	{
-		this->locationCtx = locationCtx;
-		this->context = &this->locationCtx;
+		this->locationCTX = locationCtx;
 		foundUri = true;
 		return;
 	}

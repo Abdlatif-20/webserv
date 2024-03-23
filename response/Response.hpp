@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/22 16:59:44 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/23 12:47:01 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ class Response
 {
     private:
         Request *request;
-        Context *context;
+        ServerContext serverCTX;
+        LocationContext locationCTX;
 
         char buffer[1024];
         int fd;
@@ -34,6 +35,7 @@ class Response
         bool isWorking;
         bool isRedirection;
         std::string location;
+        bool hasCGI;
 
         std::vector<std::string> env;
 
@@ -63,7 +65,8 @@ class Response
         ~Response();
         
         void setRequest(Request* request);
-        void setContext(Context* context);
+        void setServerCTX(const ServerContext& serverCTX);
+        void setLocationCTX(const LocationContext& locationCTX);
         void setHeadersSent(bool flag);
         static std::string getMimeType(const std::string& extension);
         const std::string& getBody() const;

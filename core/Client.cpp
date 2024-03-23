@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/22 18:19:24 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/23 13:20:15 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ ssize_t Client::recvRequest(void)
 	len = recv(sockId, buff, 1023, 0);
 	if (len > 0)
 	{
-		request.parseRequest(std::string(buff, len), &serverCTX);
+		request.parseRequest(std::string(buff, len), serverCTX);
 		requestDone = request.isDone();
 		// last_update_time = std::time(NULL); to think about later
 	}
@@ -64,7 +64,7 @@ void	Client::sendResponse(void)
 	if (requestDone && !responseDone)
 	{
 		response.setRequest(&request);
-		response.setContext(request.getContext());
+		response.setLocationCTX(request.getLocationCtx());
 		response.prepareResponse();
 		if (!response.getHeadersSent())
 		{

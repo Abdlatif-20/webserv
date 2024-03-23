@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/20 02:47:58 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/22 21:20:44 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,10 @@ class Request
 		unsigned int	contentLength;
 		unsigned int	remainingChunkLength;
 		//config
-		Context			*context;
-		LocationContext	locationCtx;
+		ServerContext serverCTX;
+		LocationContext locationCTX;
+		// Context			*context;
+		// LocationContext	locationCtx;
 		//maps
 		Map	_headers;
 		Map	requestLine;
@@ -119,7 +121,7 @@ class Request
 		void	selectServerContext(const String& host);
 		void	setServerCTXEnd(size_t i);
 		void	setServerCTXBegin(size_t i);
-		void	parseRequest(const std::string& receivedRequest, Context* serverCTX);
+		void	parseRequest(const std::string& receivedRequest, ServerContext serverCTX);
 
 	/* *************************** getters ************************************ */
 		bool					isDone(void) const;
@@ -128,13 +130,13 @@ class Request
 		void					setStatus(int status);
 		const String 			getMethod(void) const;
 		const int&				getStatus(void) const;
-		Context*				getContext(void) const;
 		const Map& 				getHeaders(void) const;
 		const bool& 			getBodyDone(void) const;
 		const bool& 			getFoundUri(void) const;
 		const bool& 			getHeadersDone(void) const;
 		const Map& 				getRequestLine(void) const;
 		const std::string		getRequestPath(void) const;
+		const ServerContext&	getServerCTX(void) const;
 		const LocationContext&	getLocationCtx(void) const;
 		bool					hostIsDetected(void) const;
 		const bool& 			getRequestLineDone(void) const;

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/22 18:34:27 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/23 13:21:09 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ std::map<std::string, std::string> Response::mimeTypes;
 Response::Response()
 {
     request = NULL;
-    context = NULL;
     statusCode = 200;
     responseDone = false;
     headersSent = false;
@@ -28,6 +27,7 @@ Response::Response()
     fd = INT_MIN;
     isWorking = false;
     isRedirection = false;
+    hasCGI = false;
 }
 
 Response::Response(const Response &obj)
@@ -41,7 +41,8 @@ Response& Response::operator=(const Response& obj)
         return *this;
 	env = obj.env;
     request = obj.request;
-    context = obj.context;
+    serverCTX = obj.serverCTX;
+    locationCTX = obj.locationCTX;
     statusCode = obj.statusCode;
     responseDone = obj.responseDone;
     headers = obj.headers;
@@ -52,6 +53,7 @@ Response& Response::operator=(const Response& obj)
     isWorking = obj.isWorking;
     isRedirection = obj.isRedirection;
     location = obj.location;
+    hasCGI = obj.hasCGI;
     return *this;
 }
 
@@ -66,9 +68,14 @@ void Response::setRequest(Request* request)
     this->request = request;
 }
 
-void Response::setContext(Context* context)
+void Response::setServerCTX(const ServerContext& serverCTX)
 {
-    this->context = context;
+    this->serverCTX = serverCTX;
+}
+
+void Response::setLocationCTX(const LocationContext& locationCTX)
+{
+    this->locationCTX= locationCTX;
 }
 
 void Response::setHeadersSent(bool flag)
@@ -132,7 +139,7 @@ bool Response::checkErrorPage(const std::string& path)
 
 void Response::generateResponseError()
 {
-    std::string errorPage = context->getErrorPage(Utils::intToString(statusCode));
+    std::string errorPage = locationCTX.getErrorPage(Utils::intToString(statusCode));
     if (errorPage.empty())
     {
         bodyPath.clear();
@@ -140,7 +147,7 @@ void Response::generateResponseError()
     }
     else
     {
-        std::string path = context->getRoot() + errorPage;
+        std::string path = locationCTX.getRoot() + errorPage;
         if (!checkErrorPage(path))
             return;
         bodyPath = path;
@@ -238,7 +245,7 @@ void Response::prepareGET()
 {
     if (isWorking)
         return;
-    std::string resource = context->getRoot() + request->getRequestPath();
+    std::string resource = locationCTX.getRoot() + request->getRequestPath();
     if (!Utils::checkIfPathExists(resource))
         throw ResponseErrorException(*this, NotFound);
     if (Utils::isDirectory(resource))
@@ -249,10 +256,10 @@ void Response::prepareGET()
         {
             try
             {
-                std::string index = context->getIndex(resource);
+                std::string index = locationCTX.getIndex(resource);
                 if (index.empty())
                 {
-                    if (context->getAutoIndex())
+                    if (locationCTX.getAutoIndex())
                         autoIndex(resource);
                     else
                         throw ResponseErrorException(*this, FORBIDDEN);
@@ -317,11 +324,41 @@ void Response::autoIndex(const std::string& path)
 
 void Response::preparePOST()
 {
-    if (!context->getUploadStore().empty())
+    std::string resource = locationCTX.getRoot() + request->getRequestPath();
+    if (!locationCTX.getUploadStore().empty())
     {
         statusCode = Created;
         body = generateHtmlErrorPage();
         bodyPath.clear();
+    }
+    else
+    {
+        if (!Utils::checkIfPathExists(resource))
+            throw ResponseErrorException(*this, NotFound);
+        if (Utils::isDirectory(resource))
+        {
+            if (!Utils::stringEndsWith(resource, "/"))
+                prepareRedirection(MovedPermanently, request->getRequestPath() + "/");
+            else
+            {
+                try
+                {
+                    std::string index = locationCTX.getIndex(resource);
+                    if (index.empty() || !hasCGI)
+                        throw Utils::FilePermissionDenied();
+                    /* Request BODY goes to CGI !! */
+                }
+                catch (const std::exception& e)
+                {
+                    throw ResponseErrorException(*this, FORBIDDEN);
+                }
+            }
+        }
+        else
+        {
+            if (!hasCGI)
+                throw ResponseErrorException(*this, FORBIDDEN);
+        }
     }
 }
 
@@ -335,13 +372,13 @@ void Response::copyEnv()
 	env.push_back("SERVER_SOFTWARE=\"WebServer\"");
 	// env.push_back("SERVER_PROTOCOL=\"\"");
 	env.push_back("SERVER_PORT=");
-	env.back() += '"' + ((ServerContext*)request->getContext())->getPort() + '"';
+	env.back() += '"' + serverCTX.getPort() + '"';
 	env.push_back("REQUEST_METHOD=");
 	env.back() += '"' + request->getMethod() + '"';
 	env.push_back("PATH_INFO=");
 	env.back() += '"' + req_path + '"';
 	env.push_back("PATH_TRANSLATED=");
-	env.back() += '"' + context->getRoot() + req_path + '"';
+	env.back() += '"' + locationCTX.getRoot() + req_path + '"';
 	env.push_back("SCRIPT_NAME=");
 	env.back() += '"' + bodyPath.substr(bodyPath.find_last_of('/') + 1) + '"';
 	env.push_back("DOCUMENT_ROOT=");
@@ -358,9 +395,9 @@ void Response::prepareResponse()
     {
         if (request->getStatus() >= 400)
             throw ResponseErrorException(*this, request->getStatus());
-        if (context->getHttpRedirection().size() > 0)
+        if (locationCTX.getHttpRedirection().size() > 0)
         {
-            prepareRedirection(Utils::stringToInt(context->getHttpRedirection()[0]), context->getHttpRedirection()[1]);
+            prepareRedirection(Utils::stringToInt(locationCTX.getHttpRedirection()[0]), locationCTX.getHttpRedirection()[1]);
             prepareBody();
             prepareHeaders();
             responseDone = true;
@@ -396,7 +433,6 @@ void Response::prepareResponse()
 void Response::resetResponse()
 {
     fd = INT_MIN;
-    context = NULL;
     request = NULL;
     statusCode = 200;
     isWorking = false;
@@ -408,6 +444,7 @@ void Response::resetResponse()
     headers.clear();
     bodyPath.clear();
     location.clear();
+    hasCGI = false;
 }
 
 void Response::setupEnv(char **_env)
