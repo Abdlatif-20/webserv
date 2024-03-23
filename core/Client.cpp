@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/22 21:27:26 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 01:42:59 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,10 +67,11 @@ void	Client::sendResponse(void)
 		response.prepareResponse();
 		if (!response.getHeadersSent())
 		{
-			len = send(sockId, response.getHeaders().c_str(), response.getHeaders().size(), 0);
+			std::string headers = response.headersToString();
+			len = send(sockId, headers.c_str(), headers.size(), 0);
 			response.setHeadersSent(true);
 		}
-		len = send(sockId, response.getBody().c_str(), response.getBody().size(), 0);// when fail?
+		len = send(sockId, response.getBody().c_str(), response.getBody().size(), 0);// when fail? we should remove the client and continue :)
 		responseDone = response.responseIsDone();
 		last_update_time = std::time(NULL);
 	}

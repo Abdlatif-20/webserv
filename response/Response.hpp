@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/22 21:28:14 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 01:38:14 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@ class Response
         int fd;
 
         int statusCode;
-        std::string headers;
+        std::string statusLine;
+        std::map<std::string, std::string> headers;
         std::string body;
         std::string bodyPath;
         bool headersSent;
@@ -68,12 +69,14 @@ class Response
         void setHeadersSent(bool flag);
         static std::string getMimeType(const std::string& extension);
         const std::string& getBody() const;
-        const std::string& getHeaders() const;
+        const std::map<std::string, std::string>& getHeaders() const;
+        const std::string& getHeaderByName(const std::string& name);
         bool getHeadersSent() const;
         bool responseIsDone() const;
 
         void prepareResponse();
         void resetResponse();
+        std::string headersToString();
 
 
         static void initMimeTypes();

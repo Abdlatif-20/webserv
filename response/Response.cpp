@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/22 22:38:01 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 01:41:13 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,9 +95,14 @@ const std::string& Response::getBody() const
     return body;
 }
 
-const std::string& Response::getHeaders() const
+const std::map<std::string, std::string>& Response::getHeaders() const
 {
     return headers;
+}
+
+const std::string& Response::getHeaderByName(const std::string& name)
+{
+    return headers[name];
 }
 
 bool Response::getHeadersSent() const
@@ -112,9 +117,8 @@ bool Response::responseIsDone() const
 
 std::string Response::generateHtmlErrorPage()
 {
-    return "<!DOCTYPE html><html><head><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=M+PLUS+1p&display=swap' rel='stylesheet'><style>body{font-family: 'M PLUS 1p', sans-serif;font-weight: 400;font-size:13px;font-style: normal;text-align: center;}</style></head><body><h2>"
-        + Utils::intToString(statusCode) + " - "
-        + reasonPhrases[statusCode] + "</h2><hr><h4>WebServer 1.0</h4></body></html>";
+    return HTML_RESPONSE_PAGE + Utils::intToString(statusCode) + " - "
+        + reasonPhrases[statusCode]+ "</h2><hr><h4>WebServer 1.0</h4></body></html>";
 }
 
 bool Response::checkErrorPage(const std::string& path)
@@ -157,16 +161,25 @@ void Response::prepareHeaders()
 {
     if (headersSent)
         return;
-    headers += std::string(HTTP_VERSION) + SPACE + Utils::intToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
-    headers += "Connection: " + request->getHeaderByName("connection") + CRLF;
-    headers += "Server: " + std::string(SERVER) + " (" + OS_MAC + ")" + CRLF;
-    headers += "Date: " + Utils::getCurrentTime() + CRLF;
-    headers += "Content-Length: " + (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))) + CRLF;
-    headers += std::string("Accept-Ranges: bytes") + CRLF;
-    headers += "Content-Type: " + (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath))) + CRLF;
+    statusLine = std::string(HTTP_VERSION) + SPACE + Utils::intToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
+    headers["Connection"] = request->getHeaderByName("connection");
+    headers["Server"] = std::string(SERVER) + " (" + OS_MAC + ")";
+    headers["Date"] = Utils::getCurrentTime();
+    headers["Content-Length"] = (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath)));
+    headers["Accept-Ranges"] = "bytes";
+    headers["Content-Type"] = (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath)));
     if (isRedirection)
-        headers += "Location: " + location + CRLF;
-    headers += CRLF;
+        headers["Location"] = location;
+
+    // headers += "Connection: " + request->getHeaderByName("connection") + CRLF;
+    // headers += "Server: " + std::string(SERVER) + " (" + OS_MAC + ")" + CRLF;
+    // headers += "Date: " + Utils::getCurrentTime() + CRLF;
+    // headers += "Content-Length: " + (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))) + CRLF;
+    // headers += std::string("Accept-Ranges: bytes") + CRLF;
+    // headers += "Content-Type: " + (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath))) + CRLF;
+    // if (isRedirection)
+    //     headers += "Location: " + location + CRLF;
+    // headers += CRLF;
 }
 
 void Response::prepareBody()
@@ -296,8 +309,7 @@ void Response::autoIndex(const std::string& path)
 {
     struct dirent *entry;
     DIR *dir;
-    std::string html = "<!DOCTYPE html><html><head><title>Index of $indexof$</title><link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Madimi+One&family=Manjari:wght@100;400;700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap' rel='stylesheet'><style>body{font-family: 'M PLUS 1p', sans-serif;font-weight: 400;font-style: normal;}table, tr, th, td {border-collapse: collapse;border: 0px solid rgb(186, 186, 186);padding:10px;font-size: 14px;letter-spacing: 1px;text-align: left;}</style></head><body><h1>Index of $indexof$</h1><hr><table style='width: 70%;'><tr><th>Name</th><th>Last Modified</th><th>Size</th><th>Type</th></tr>";
-    html = Utils::replaceAll(html, "$indexof$", request->getRequestPath());
+    std::string html = Utils::replaceAll(AUTO_INDEX_TEMPLATE, "$indexof$", request->getRequestPath());
     dir = opendir(path.c_str());
     if (!dir)
         throw ResponseErrorException(*this, FORBIDDEN);
@@ -321,7 +333,6 @@ void Response::autoIndex(const std::string& path)
 
 void Response::preparePOST()
 {
-    std::string resource = locationCTX.getRoot() + request->getRequestPath();
     if (!locationCTX.getUploadStore().empty())
     {
         statusCode = Created;
@@ -330,6 +341,7 @@ void Response::preparePOST()
     }
     else
     {
+        std::string resource = locationCTX.getRoot() + request->getRequestPath();
         if (!Utils::checkIfPathExists(resource))
             throw ResponseErrorException(*this, NotFound);
         if (Utils::isDirectory(resource))
@@ -361,7 +373,6 @@ void Response::preparePOST()
 
 void Response::prepareResponse()
 {
-    /* Handle request Errors */
     try
     {
         if (request->getStatus() >= 400)
@@ -377,7 +388,6 @@ void Response::prepareResponse()
         if (request->getMethod() == "GET")
         {
             prepareGET();
-			// if ()
             prepareBody();
             prepareHeaders();
         }
@@ -413,6 +423,19 @@ void Response::resetResponse()
     bodyPath.clear();
     headers.clear();
     hasCGI = false;
+}
+
+std::string Response::headersToString()
+{
+    std::map<std::string, std::string>::iterator it = headers.begin();
+    std::string headers_str = statusLine;
+    while (it != headers.end())
+    {
+        headers_str += (it->first + ": ") + it->second + CRLF;
+        it++;
+    }
+    headers_str += CRLF;
+    return headers_str;
 }
 
 void Response::setupEnv(char **_env)
