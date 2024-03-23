@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/22 22:51:29 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 13:44:28 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,6 +148,11 @@ const String Request::getHeaderByName(const String& name) const
 			return ("keep-alive");
 	}
 	return ("");
+}
+
+String Request::getProtocol(void)
+{
+	return requestLine["protocol"];
 }
 
 const ServerContext& Request::getServerCTX(void) const

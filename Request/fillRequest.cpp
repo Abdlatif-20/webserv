@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/20 17:26:59 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/23 13:42:03 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ void	Request::fillRequestLine(const String& requestLine)
 	}
 	requestLineMap["method"] = requestLineVector[0];
 	requestLineMap["path"] = requestLineVector[1];
+	requestLineMap["protocol"] = requestLineVector[2];
 	this->requestLineDone = true;
 	this->requestLine = requestLineMap;	
 	fillParams();

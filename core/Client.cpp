@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/23 13:20:15 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/23 13:29:58 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ void	Client::sendResponse(void)
 	if (requestDone && !responseDone)
 	{
 		response.setRequest(&request);
+		response.setServerCTX(request.getServerCTX());
 		response.setLocationCTX(request.getLocationCtx());
 		response.prepareResponse();
 		if (!response.getHeadersSent())

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/23 13:21:09 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/23 13:49:53 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -370,7 +370,8 @@ void Response::copyEnv()
 	env.push_back("GATEWAY_INTERFACE=\"CGI/1.1\"");
 	// env.push_back("SERVER_NAME=\"WebServer\"");
 	env.push_back("SERVER_SOFTWARE=\"WebServer\"");
-	// env.push_back("SERVER_PROTOCOL=\"\"");
+	env.push_back("SERVER_PROTOCOL=");
+	env.back() += '"' + request->getProtocol() + '"';
 	env.push_back("SERVER_PORT=");
 	env.back() += '"' + serverCTX.getPort() + '"';
 	env.push_back("REQUEST_METHOD=");
@@ -383,6 +384,8 @@ void Response::copyEnv()
 	env.back() += '"' + bodyPath.substr(bodyPath.find_last_of('/') + 1) + '"';
 	env.push_back("DOCUMENT_ROOT=");
 	env.back() += '"' + bodyPath.substr(0, bodyPath.find_last_of('/')) + '"';
+	env.push_back("QUERY_STRING=");
+	// env.back() += '"' + request->get + '"';
 	for (size_t i = 0; i < env.size(); i++)
 		std::cout << env[i] << std::endl;
 	std::cout << "==============================" << std::endl;
