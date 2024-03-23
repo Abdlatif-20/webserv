@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/19 23:06:12 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/23 14:51:59 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,9 @@ Request::Request()
 	this->isComplete = false;
 	this->headersDone = false;
 	this->requestLineDone = false;
+	this->remainingChunkLength = 0;
 	this->requestIscomplete = false;
 	this->requestInProgress = false;
-	this->remainingChunkLength = 0;
 	this->_requestIsWellFormed = false;
 	this->requestLineInProgress = false;
 	this->_path.clear();
@@ -290,7 +290,8 @@ void	Request::parseRequest(const std::string& receivedRequest, Context* serverCT
 			return;
 		}
 	}
-	if (this->requestLine["method"] == "POST" && !this->bodyDone && this->_requestIsWellFormed && this->status == 200 && foundUri)
+	if (this->requestLine["method"] == "POST" && !this->bodyDone
+		&& this->_requestIsWellFormed && this->status == 200 && foundUri)
 	{
 		setUploadingPath();
 		if (this->receivecount > 1)
