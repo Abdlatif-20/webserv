@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/23 13:43:54 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:59:43 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,10 +73,10 @@ class Request
 		Vector	files;
 		//strings
 		String	_path;
-		String	_params;
 		String	_body;
 		String	headers;
 		String	requestData;
+		String	queryString;
 		String	requestLineData;
 		String	boundaryName;
 		String	_chunkedName;
@@ -134,6 +134,7 @@ class Request
 		const bool& 			getBodyDone(void) const;
 		const bool& 			getFoundUri(void) const;
 		const bool& 			getHeadersDone(void) const;
+		const String 			getQueryString(void) const;
 		const Map& 				getRequestLine(void) const;
 		const std::string		getRequestPath(void) const;
 		const ServerContext&	getServerCTX(void) const;

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/23 12:47:01 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:35:20 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include "Request.hpp"
 #include "ServerContext.hpp"
 #include <dirent.h>
+#include <map>
 
 class Response
 {
@@ -38,6 +39,7 @@ class Response
         bool hasCGI;
 
         std::vector<std::string> env;
+        std::map<std::string, std::string> headersMap;
 
         std::string generateHtmlErrorPage();
         bool checkErrorPage(const std::string& path);

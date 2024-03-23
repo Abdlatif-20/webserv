@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/23 13:44:28 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/23 21:00:03 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ Request::Request()
 	this->requestLineInProgress = false;
 	this->_path.clear();
 	this->_body.clear();
-	this->_params.clear();
+	this->queryString.clear();
 	this->headers.clear();
 	this->requestData.clear();
 	this->boundaryName.clear();
@@ -61,7 +61,7 @@ Request& Request::operator=(const Request& obj)
 		serv_end = obj.serv_end;
 		this->status = obj.status;
 		serv_begin = obj.serv_begin;
-		this->_params = obj._params;
+		this->queryString = obj.queryString;
 		this->headers = obj.headers;
 		this->serverCTX = obj.serverCTX;
 		this->locationCTX = obj.locationCTX;
@@ -133,6 +133,11 @@ const bool& Request::getBodyDone() const
 const bool& Request::getHeadersDone() const
 {
 	return (headersDone);
+}
+
+const String Request::getQueryString(void) const
+{
+	return queryString;
 }
 
 const String Request::getHeaderByName(const String& name) const
@@ -235,7 +240,7 @@ void	Request::resetRequest()
 	this->requestLineInProgress = false;
 	this->_path.clear();
 	this->_body.clear();
-	this->_params.clear();
+	this->queryString.clear();
 	this->headers.clear();
 	this->requestData.clear();
 	this->boundaryName.clear();

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/23 13:49:53 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/23 21:37:48 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,7 +206,7 @@ void Response::prepareCGI()
 {
 	std::stringstream ss(PATH);
 	std::string	line;
-	std::string	tt[2] = {".php", "php"};
+	std::string	tt[2] = {"php", "php"}; 
 
 	while(std::getline(ss, line,':'))
 	{
@@ -365,10 +365,8 @@ void Response::preparePOST()
 void Response::copyEnv()
 {
 	std::string	req_path = request->getRequestPath();
-	// for (size_t i = 0; env_ptr[i]; i++)
-	// 	env.push_back(env_ptr[i]);
 	env.push_back("GATEWAY_INTERFACE=\"CGI/1.1\"");
-	// env.push_back("SERVER_NAME=\"WebServer\"");
+	// env.push_back("SERVER_NAME=");
 	env.push_back("SERVER_SOFTWARE=\"WebServer\"");
 	env.push_back("SERVER_PROTOCOL=");
 	env.back() += '"' + request->getProtocol() + '"';
@@ -385,7 +383,18 @@ void Response::copyEnv()
 	env.push_back("DOCUMENT_ROOT=");
 	env.back() += '"' + bodyPath.substr(0, bodyPath.find_last_of('/')) + '"';
 	env.push_back("QUERY_STRING=");
-	// env.back() += '"' + request->get + '"';
+	env.back() += '"' + request->getQueryString() + '"';
+	env.push_back("REMOTE_HOST=");
+	env.push_back("REMOTE_ADDR=");
+	env.push_back("AUTH_TYPE=");
+	env.push_back("REMOTE_USER=");
+	env.push_back("REMOTE_IDENT=");
+	env.push_back("CONTENT_TYPE=");
+	env.back() += '"' + request->getHeaderByName("CONTENT-TYPE") + '"';
+	env.push_back("CONTENT_LENGTH=");
+	env.back() += '"' + request->getHeaderByName("CONTENT-LENGTH") + '"';
+	env.push_back("HTTP_ACCEPT=");
+	// env.back() += '"' + request->getHeaderByName("CONTENT-LENGTH") + '"';
 	for (size_t i = 0; i < env.size(); i++)
 		std::cout << env[i] << std::endl;
 	std::cout << "==============================" << std::endl;
@@ -409,9 +418,9 @@ void Response::prepareResponse()
         if (request->getMethod() == "GET")
         {
             prepareGET();
-			if (fd != INT_MIN)
-				copyEnv();
-				// prepareCGI();
+			// if (fd != INT_MIN)
+			// 	copyEnv();
+			// 	// prepareCGI();
             prepareBody();
             prepareHeaders();
         }
