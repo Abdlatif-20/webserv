@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/23 20:59:43 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/24 00:21:31 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,6 @@ class Request
 		const bool& 			getBodyDone(void) const;
 		const bool& 			getFoundUri(void) const;
 		const bool& 			getHeadersDone(void) const;
-		const String 			getQueryString(void) const;
 		const Map& 				getRequestLine(void) const;
 		const std::string		getRequestPath(void) const;
 		const ServerContext&	getServerCTX(void) const;
@@ -145,4 +144,5 @@ class Request
 		const String 			getHeaderByName(const String& name) const;
 
 		String			getProtocol(void);
+		String 			getQueryString(void);
 };

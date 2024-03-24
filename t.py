@@ -7,7 +7,7 @@ def	conn(host, port, i):
 		fd = socket(AF_INET, SOCK_STREAM)
 		fd.connect((host, port))
 		fd.setblocking(False)
-		fd.send("GET /test.php?llll=a?jgsdh=50 HTTP/1.1\r\n".encode())
+		fd.send("GET /../../../../ HTTP/1.1\r\n".encode())
 		fd.send("host:sss\r\n".encode())
 		fd.send("CONTENT-LENGTH: 85\r\n".encode())
 		fd.send("connection:closed\r\n".encode())

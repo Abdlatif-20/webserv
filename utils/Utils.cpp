@@ -6,13 +6,28 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/17 19:51:49 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/24 19:41:08 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
 
-std::string Utils::strTrim(const std::string& str, char c)
+std::string Utils::envName(std::string str)
+{
+	std::string::iterator	it;
+
+	it = str.begin();
+	while (it != str.end())
+	{
+		*it = std::toupper(*it);
+		if (*it == '-')
+			*it = '_';
+		it++;
+	}
+	return ("HTTP_" + str);
+}
+
+std::string Utils::strTrim(const std::string &str, char c)
 {
 	if (str.empty())
 		return str;

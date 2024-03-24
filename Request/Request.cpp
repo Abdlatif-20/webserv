@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/23 21:00:03 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/24 00:21:49 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ const bool& Request::getHeadersDone() const
 	return (headersDone);
 }
 
-const String Request::getQueryString(void) const
+String Request::getQueryString(void)
 {
 	return queryString;
 }

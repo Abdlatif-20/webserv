@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/23 21:37:48 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/24 21:05:05 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,11 +206,11 @@ void Response::prepareCGI()
 {
 	std::stringstream ss(PATH);
 	std::string	line;
-	std::string	tt[2] = {"php", "php"}; 
+	std::string	tt[2] = {".pl", "perl"}; 
 
 	while(std::getline(ss, line,':'))
 	{
-		line+="/php";
+		line+=tt[1];
 		if (!access(line.c_str(), F_OK | X_OK))
 		{
 			std::cout << line << std::endl;
@@ -238,7 +238,6 @@ void Response::prepareCGI()
 			break;
 		}
 	}
-	responseDone = true;
 }
 
 void Response::prepareGET()
@@ -384,17 +383,24 @@ void Response::copyEnv()
 	env.back() += '"' + bodyPath.substr(0, bodyPath.find_last_of('/')) + '"';
 	env.push_back("QUERY_STRING=");
 	env.back() += '"' + request->getQueryString() + '"';
-	env.push_back("REMOTE_HOST=");
-	env.push_back("REMOTE_ADDR=");
-	env.push_back("AUTH_TYPE=");
-	env.push_back("REMOTE_USER=");
-	env.push_back("REMOTE_IDENT=");
-	env.push_back("CONTENT_TYPE=");
+	// env.push_back("REMOTE_HOST=");
+	// env.push_back("REMOTE_ADDR=");
+	// env.push_back("AUTH_TYPE=");
+	// env.push_back("REMOTE_USER=");
+	// env.push_back("REMOTE_IDENT=");
+	// env.push_back("CONTENT_TYPE=");
 	env.back() += '"' + request->getHeaderByName("CONTENT-TYPE") + '"';
 	env.push_back("CONTENT_LENGTH=");
 	env.back() += '"' + request->getHeaderByName("CONTENT-LENGTH") + '"';
-	env.push_back("HTTP_ACCEPT=");
-	// env.back() += '"' + request->getHeaderByName("CONTENT-LENGTH") + '"';
+	Map m = request->getHeaders();
+	std::cout << "==============================" << std::endl;
+	for (Map::iterator it = m.begin(); it != m.end(); it++)
+	{
+		std::string first = it->first;
+		Utils::toLower(first);
+		if (first != "content-length" && first != "content-type")
+			env.push_back(Utils::envName(it->first) + "=\"" + it->second + '"');
+	}
 	for (size_t i = 0; i < env.size(); i++)
 		std::cout << env[i] << std::endl;
 	std::cout << "==============================" << std::endl;
@@ -418,9 +424,11 @@ void Response::prepareResponse()
         if (request->getMethod() == "GET")
         {
             prepareGET();
-			// if (fd != INT_MIN)
-			// 	copyEnv();
-			// 	// prepareCGI();
+			if (fd != INT_MIN)
+			{
+				copyEnv();
+				prepareCGI();
+			}
             prepareBody();
             prepareHeaders();
         }
