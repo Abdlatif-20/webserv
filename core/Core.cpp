@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Core.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/16 00:01:20 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:43:37 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,7 @@ void	Core::traceEvents(void)
 		}
 		if (!checklist.size())
 			continue ;
+		// the requests header failing  (sending response  without waiting the empty line)
 		hooks = poll(checklist.data(), checklist.size(), 0);
 		for (i = 0; i < checklist.size(); i++)
 		{
@@ -110,7 +111,8 @@ void	Core::traceEvents(void)
 				clients[checklist[i].fd].recvRequest();
 			if ((checklist[i].revents & POLLOUT) && clients[checklist[i].fd].isRequestDone())
 				clients[checklist[i].fd].sendResponse();
-			if (checklist[i].revents & POLLHUP || (clients[checklist[i].fd].isResponseDone()))// && !clients[checklist[i].fd].isALive()))
+			if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].timeout()
+				|| (clients[checklist[i].fd].isResponseDone() && !clients[checklist[i].fd].isALive()))
 			{
 				clients.erase(checklist[i].fd);
 				checklist.erase(checklist.begin() + i--);

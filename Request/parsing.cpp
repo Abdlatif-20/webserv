@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/17 03:20:35 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:47:00 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,15 @@
 //function to set the path to the upload store
 void	Request::setUploadingPath()
 {
-	this->_path = context->getUploadStore();
-	this->_path += "/";
-	if (!directoryExists(this->_path.c_str()))
-		mkdir(this->_path.c_str(), 0777);
+	try
+	{
+		this->_path = locationCTX.getUploadStore();
+	}
+	catch (std::exception& e)
+	{
+		status = InternalServerError;
+		requestIscomplete = true;
+	}
 }
 
 //function to Check if transfer encoding is chunked Or not
@@ -30,7 +35,7 @@ void	Request::parseTransferEncoding()
 
 void	Request::isMethodAllowedInLocation()
 {
-	Vector allowedMethods = locationCtx.getAllowedMethods();
+	Vector allowedMethods = locationCTX.getAllowedMethods();
 	if (std::find(allowedMethods.begin(), allowedMethods.end(), requestLine["method"]) == allowedMethods.end())
 		return (this->status = MethodNotAllowed, requestIscomplete = true, void());
 	_requestIsWellFormed = true;
@@ -68,12 +73,10 @@ void	Request::findUri()
 {
 	/* cast from context to SERVERCTX */
 	std::string uri = requestLine["path"];
-	ServerContext* serverCtx = dynamic_cast<ServerContext*>(context);
-	LocationContext locationCtx = serverCtx->matchLocation(uri);
+	LocationContext locationCtx = serverCTX.matchLocation(uri);
 	if (locationCtx.getPrefix() != "")
 	{
-		this->locationCtx = locationCtx;
-		this->context = &this->locationCtx;
+		this->locationCTX = locationCtx;
 		foundUri = true;
 		return;
 	}
@@ -88,7 +91,11 @@ void	Request::separateRequest(String receivedRequest)
 	if (pos != String::npos)
 	{
 		this->headers = receivedRequest.substr(0, pos + 4);
+		// std::cout <<"-----------------HEADERS------------------\n";
+		// write(1, receivedRequest.c_str(), receivedRequest.size());
 		this->_body = receivedRequest.substr(pos + 4);
+		// std::cout <<"-----------------BODY------------------\n";
+		// write(1, _body.c_str(), _body.size());
 	}
 	else
 	{

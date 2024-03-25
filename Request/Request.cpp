@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/23 14:51:59 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:31:23 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,11 @@ Request::Request()
 	this->multipart = false;
 	this->_setLength = false;
 	this->isComplete = false;
+	this->remainingChunk = 0;
 	this->headersDone = false;
 	this->requestLineDone = false;
 	this->remainingChunkLength = 0;
+	this->_chunkedComplete = false;
 	this->requestIscomplete = false;
 	this->requestInProgress = false;
 	this->_requestIsWellFormed = false;
@@ -40,7 +42,6 @@ Request::Request()
 	this->_body.clear();
 	this->_params.clear();
 	this->headers.clear();
-	this->context = NULL;
 	this->requestData.clear();
 	this->boundaryName.clear();
 	this->_chunkedName.clear();
@@ -64,7 +65,8 @@ Request& Request::operator=(const Request& obj)
 		serv_begin = obj.serv_begin;
 		this->_params = obj._params;
 		this->headers = obj.headers;
-		this->context = obj.context;
+		this->serverCTX = obj.serverCTX;
+		this->locationCTX = obj.locationCTX;
 		this->bodyDone = obj.bodyDone;
 		this->foundUri = obj.foundUri;
 		this->multipart = obj.multipart;
@@ -73,7 +75,6 @@ Request& Request::operator=(const Request& obj)
 		this->detectHost = obj.detectHost;
 		this->requestLine = obj.requestLine;
 		this->headersDone = obj.headersDone;
-		this->locationCtx = obj.locationCtx;
 		this->requestData = obj.requestData;
 		this->receivecount = obj.receivecount;
 		this->_chunkedName = obj._chunkedName;
@@ -81,11 +82,14 @@ Request& Request::operator=(const Request& obj)
 		this->boundaryName = obj.boundaryName;
 		this->contentLength = obj.contentLength;
 		this->requestVector = obj.requestVector;
+		this->remainingChunk = obj.remainingChunk;
 		this->requestLineDone = obj.requestLineDone;
+		this->_chunkedComplete = obj._chunkedComplete;
 		this->requestIscomplete = obj.requestIscomplete;
 		this->requestInProgress = obj.requestInProgress;
 		this->_requestIsWellFormed = obj._requestIsWellFormed;
 		this->remainingChunkLength = obj.remainingChunkLength;
+		this->requestLineInProgress = obj.requestLineInProgress;
 	}
 	return (*this);
 }
@@ -151,6 +155,16 @@ const String Request::getHeaderByName(const String& name) const
 	return ("");
 }
 
+const ServerContext& Request::getServerCTX(void) const
+{
+	return serverCTX;
+}
+
+const LocationContext& Request::getLocationCtx(void) const
+{
+	return locationCTX;
+}
+
 const bool& Request::getRequestLineDone() const
 {
 	return (requestLineDone);
@@ -189,11 +203,6 @@ const String Request::getHost() const
 	return ("");
 }
 
-Context* Request::getContext() const
-{
-	return context;
-}
-
 const std::string Request::getRequestPath() const
 {
 	try{
@@ -215,20 +224,21 @@ void	Request::resetRequest()
 	this->sizeBoundary = 0;
 	this->contentLength = 0;
 	this->multipart = false;
+	this->remainingChunk = 0;
 	this->_setLength = false;
 	this->isComplete = false;
 	this->headersDone = false;
-	this->requestIscomplete = false;
 	this->requestLineDone = false;
-	this->requestInProgress = false;
 	this->remainingChunkLength = 0;
+	this->_chunkedComplete = false;
+	this->requestIscomplete = false;
+	this->requestInProgress = false;
 	this->_requestIsWellFormed = false;
 	this->requestLineInProgress = false;
 	this->_path.clear();
 	this->_body.clear();
 	this->_params.clear();
 	this->headers.clear();
-	this->context = NULL;
 	this->requestData.clear();
 	this->boundaryName.clear();
 	this->_chunkedName.clear();
@@ -251,8 +261,7 @@ void	Request::selectServerContext(const String& host)
 		name = std::find(hosts.begin(), hosts.end(), host);
 		if (name != hosts.end())
 		{
-			ServerContext& s = *dynamic_cast<ServerContext*>(context);
-			s = it->getServerCTX();
+			serverCTX = it->getServerCTX();
 			break;
 		}
 		it++;
@@ -270,12 +279,12 @@ void	Request::setServerCTXBegin(size_t i)
 }
 
 //main function to parse the request
-void	Request::parseRequest(const std::string& receivedRequest, Context* serverCTX)
+void	Request::parseRequest(const std::string& receivedRequest, ServerContext serverCTX)
 {
+	// write(1, receivedRequest.c_str(), receivedRequest.size());
 	if (receivedRequest.empty())
 		return;
-	if (!context)
-		this->context = serverCTX;
+	this->serverCTX = serverCTX;
 	std::srand(time(NULL));
 	if (!this->requestLineDone || !this->headersDone || !this->_requestIsWellFormed)
 	{
@@ -294,6 +303,8 @@ void	Request::parseRequest(const std::string& receivedRequest, Context* serverCT
 		&& this->_requestIsWellFormed && this->status == 200 && foundUri)
 	{
 		setUploadingPath();
+		if (status != 200)
+			return;
 		if (this->receivecount > 1)
 		{
 			if (receivedRequest.front() == CR && this->requestInProgress)

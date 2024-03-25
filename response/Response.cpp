@@ -6,19 +6,20 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/20 18:14:49 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:20:22 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 
+char	**Response::env;
+std::string	Response::PATH;
 std::map<int, std::string> Response::reasonPhrases;
 std::map<std::string, std::string> Response::mimeTypes;
 
 Response::Response()
 {
     request = NULL;
-    context = NULL;
     statusCode = 200;
     responseDone = false;
     headersSent = false;
@@ -26,6 +27,7 @@ Response::Response()
     fd = INT_MIN;
     isWorking = false;
     isRedirection = false;
+    hasCGI = false;
 }
 
 Response::Response(const Response &obj)
@@ -38,7 +40,8 @@ Response& Response::operator=(const Response& obj)
     if (this == &obj)
         return *this;
     request = obj.request;
-    context = obj.context;
+    serverCTX = obj.serverCTX;
+    locationCTX = obj.locationCTX;
     statusCode = obj.statusCode;
     responseDone = obj.responseDone;
     headers = obj.headers;
@@ -49,6 +52,7 @@ Response& Response::operator=(const Response& obj)
     isWorking = obj.isWorking;
     isRedirection = obj.isRedirection;
     location = obj.location;
+    hasCGI = obj.hasCGI;
     return *this;
 }
 
@@ -63,9 +67,14 @@ void Response::setRequest(Request* request)
     this->request = request;
 }
 
-void Response::setContext(Context* context)
+void Response::setServerCTX(const ServerContext& serverCTX)
 {
-    this->context = context;
+    this->serverCTX = serverCTX;
+}
+
+void Response::setLocationCTX(const LocationContext& locationCTX)
+{
+    this->locationCTX= locationCTX;
 }
 
 void Response::setHeadersSent(bool flag)
@@ -86,9 +95,14 @@ const std::string& Response::getBody() const
     return body;
 }
 
-const std::string& Response::getHeaders() const
+const std::map<std::string, std::string>& Response::getHeaders() const
 {
     return headers;
+}
+
+const std::string& Response::getHeaderByName(const std::string& name)
+{
+    return headers[name];
 }
 
 bool Response::getHeadersSent() const
@@ -103,9 +117,8 @@ bool Response::responseIsDone() const
 
 std::string Response::generateHtmlErrorPage()
 {
-    return "<!DOCTYPE html><html><head><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=M+PLUS+1p&display=swap' rel='stylesheet'><style>body{font-family: 'M PLUS 1p', sans-serif;font-weight: 400;font-size:13px;font-style: normal;text-align: center;}</style></head><body><h2>Error "
-        + Utils::intToString(statusCode) + " - "
-        + reasonPhrases[statusCode] + "</h2><hr><h4>WebServer 1.0</h4></body></html>";
+    return HTML_RESPONSE_PAGE + Utils::intToString(statusCode) + " - "
+        + reasonPhrases[statusCode]+ "</h2><hr><h4>WebServer 1.0</h4></body></html>";
 }
 
 bool Response::checkErrorPage(const std::string& path)
@@ -129,7 +142,7 @@ bool Response::checkErrorPage(const std::string& path)
 
 void Response::generateResponseError()
 {
-    std::string errorPage = context->getErrorPage(Utils::intToString(statusCode));
+    std::string errorPage = locationCTX.getErrorPage(Utils::intToString(statusCode));
     if (errorPage.empty())
     {
         bodyPath.clear();
@@ -137,7 +150,7 @@ void Response::generateResponseError()
     }
     else
     {
-        std::string path = context->getRoot() + errorPage;
+        std::string path = locationCTX.getRoot() + errorPage;
         if (!checkErrorPage(path))
             return;
         bodyPath = path;
@@ -148,16 +161,25 @@ void Response::prepareHeaders()
 {
     if (headersSent)
         return;
-    headers += std::string(HTTP_VERSION) + SPACE + Utils::intToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
-    headers += "Connection: " + request->getHeaderByName("connection") + CRLF;
-    headers += "Server: " + std::string(SERVER)  + CRLF;
-    headers += "Date: " + Utils::getCurrentTime() + CRLF;
-    headers += "Content-Length: " + (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))) + CRLF;
-    headers += std::string("Accept-Ranges: bytes") + CRLF;
-    headers += "Content-Type: " + (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath))) + CRLF;
+    statusLine = std::string(HTTP_VERSION) + SPACE + Utils::intToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
+    headers["Connection"] = request->getHeaderByName("connection");
+    headers["Server"] = std::string(SERVER) + " (" + OS_MAC + ")";
+    headers["Date"] = Utils::getCurrentTime();
+    headers["Content-Length"] = (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath)));
+    headers["Accept-Ranges"] = "bytes";
+    headers["Content-Type"] = (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath)));
     if (isRedirection)
-        headers += "Location: " + location + CRLF;
-    headers += CRLF;
+        headers["Location"] = location;
+
+    // headers += "Connection: " + request->getHeaderByName("connection") + CRLF;
+    // headers += "Server: " + std::string(SERVER) + " (" + OS_MAC + ")" + CRLF;
+    // headers += "Date: " + Utils::getCurrentTime() + CRLF;
+    // headers += "Content-Length: " + (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))) + CRLF;
+    // headers += std::string("Accept-Ranges: bytes") + CRLF;
+    // headers += "Content-Type: " + (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath))) + CRLF;
+    // if (isRedirection)
+    //     headers += "Location: " + location + CRLF;
+    // headers += CRLF;
 }
 
 void Response::prepareBody()
@@ -170,7 +192,7 @@ void Response::prepareBody()
     if (fd == INT_MIN)
         fd = open(bodyPath.c_str(), O_RDONLY);
     if (fd == -1)
-        throw ResponseErrorException(*this, INTERNAL_SERVER_ERROR);
+        throw ResponseErrorException(*this, InternalServerError);
     std::memset(buffer, 0, sizeof(buffer));
     ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
     if (readedBytes == -1)
@@ -190,11 +212,50 @@ void Response::prepareBody()
     body.append(buffer, readedBytes);
 }
 
+void Response::prepareCGI()
+{
+	std::stringstream ss(PATH);
+	std::string	line;
+	std::string	tt[2] = {".php", "php"};
+
+	while(std::getline(ss, line,':'))
+	{
+		line+="/php";
+		if (!access(line.c_str(), F_OK | X_OK))
+		{
+			std::cout << line << std::endl;
+			std::cout << bodyPath << std::endl;
+			const char *args[3] = {line.c_str(), bodyPath.c_str(), NULL};
+			std::string name = "/tmp/output_" ;
+			name += Utils::intToString(std::rand());
+			name += ".html";
+			std::cout << name << std::endl;
+			int fd = open(name.c_str(), O_TRUNC|O_CREAT|O_RDWR, 0664);
+			if (fd < 0)
+			{
+				std::cerr << "FAILED\n";
+			}
+			int pid = fork();
+			if (!pid)
+			{
+				dup2(fd, 1);
+				close(fd);
+				execve(args[0], (char *const*)args, env);
+				exit(0);
+			}
+			wait(NULL);
+			bodyPath = name;
+			break;
+		}
+	}
+	responseDone = true;
+}
+
 void Response::prepareGET()
 {
     if (isWorking)
         return;
-    std::string resource = context->getRoot() + request->getRequestPath();
+    std::string resource = locationCTX.getRoot() + request->getRequestPath();
     if (!Utils::checkIfPathExists(resource))
         throw ResponseErrorException(*this, NotFound);
     if (Utils::isDirectory(resource))
@@ -205,10 +266,10 @@ void Response::prepareGET()
         {
             try
             {
-                std::string index = context->getIndex(resource);
+                std::string index = locationCTX.getIndex(resource);
                 if (index.empty())
                 {
-                    if (context->getAutoIndex())
+                    if (locationCTX.getAutoIndex())
                         autoIndex(resource);
                     else
                         throw ResponseErrorException(*this, FORBIDDEN);
@@ -248,11 +309,12 @@ void Response::autoIndex(const std::string& path)
 {
     struct dirent *entry;
     DIR *dir;
-    std::string html = "<!DOCTYPE html><html><head><title>Index of $indexof$</title><link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'><link rel='preconnect' href='https://fonts.googleapis.com'><link rel='preconnect' href='https://fonts.gstatic.com' crossorigin><link href='https://fonts.googleapis.com/css2?family=Madimi+One&family=Manjari:wght@100;400;700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap' rel='stylesheet'><style>body{font-family: 'M PLUS 1p', sans-serif;font-weight: 400;font-style: normal;}table, tr, th, td {border-collapse: collapse;border: 0px solid rgb(186, 186, 186);padding:10px;font-size: 14px;letter-spacing: 1px;text-align: left;}</style></head><body><h1>Index of $indexof$</h1><hr><table style='width: 70%;'><tr><th>Name</th><th>Last Modified</th><th>Size</th><th>Type</th></tr>";
-    html = Utils::replaceAll(html, "$indexof$", request->getRequestPath());
+    std::string html = Utils::replaceAll(AUTO_INDEX_TEMPLATE, "$indexof$", request->getRequestPath());
     dir = opendir(path.c_str());
     if (!dir)
+    {
         throw ResponseErrorException(*this, FORBIDDEN);
+    }
     while ((entry = readdir(dir)))
     {
         if (Utils::isDirectory(path + entry->d_name))
@@ -273,19 +335,53 @@ void Response::autoIndex(const std::string& path)
 
 void Response::preparePOST()
 {
-    
+    if (!locationCTX.getUploadStore().empty())
+    {
+        statusCode = Created;
+        body = generateHtmlErrorPage();
+        bodyPath.clear();
+    }
+    else
+    {
+        std::string resource = locationCTX.getRoot() + request->getRequestPath();
+        if (!Utils::checkIfPathExists(resource))
+            throw ResponseErrorException(*this, NotFound);
+        if (Utils::isDirectory(resource))
+        {
+            if (!Utils::stringEndsWith(resource, "/"))
+                prepareRedirection(MovedPermanently, request->getRequestPath() + "/");
+            else
+            {
+                try
+                {
+                    std::string index = locationCTX.getIndex(resource);
+                    if (index.empty() || !hasCGI)
+                        throw Utils::FilePermissionDenied();
+                    /* Request BODY goes to CGI !! */
+                }
+                catch (const std::exception& e)
+                {
+                    throw ResponseErrorException(*this, FORBIDDEN);
+                }
+            }
+        }
+        else
+        {
+            if (!hasCGI)
+                throw ResponseErrorException(*this, FORBIDDEN);
+        }
+    }
 }
 
 void Response::prepareResponse()
 {
-    /* Handle request Errors */
     try
     {
         if (request->getStatus() >= 400)
             throw ResponseErrorException(*this, request->getStatus());
-        if (context->getHttpRedirection().size() > 0)
+        if (locationCTX.getHttpRedirection().size() > 0)
         {
-            prepareRedirection(Utils::stringToInt(context->getHttpRedirection().at(0)), context->getHttpRedirection().at(1));
+            prepareRedirection(Utils::stringToInt(locationCTX.getHttpRedirection().at(0)), locationCTX.getHttpRedirection().at(1));
             prepareBody();
             prepareHeaders();
             responseDone = true;
@@ -318,7 +414,6 @@ void Response::prepareResponse()
 void Response::resetResponse()
 {
     fd = INT_MIN;
-    context = NULL;
     request = NULL;
     statusCode = 200;
     headersSent = false;
@@ -329,6 +424,37 @@ void Response::resetResponse()
     body.clear();
     bodyPath.clear();
     headers.clear();
+    hasCGI = false;
+}
+
+std::string Response::headersToString()
+{
+    std::map<std::string, std::string>::iterator it = headers.begin();
+    std::string headers_str = statusLine;
+    while (it != headers.end())
+    {
+        headers_str += (it->first + ": ") + it->second + CRLF;
+        it++;
+    }
+    headers_str += CRLF;
+    return headers_str;
+}
+
+void Response::setupEnv(char **_env)
+{
+	std::string	var;
+	env = _env;
+	for (size_t i = 0; env && env[i]; i++)
+	{
+		var = env[i];
+		if (Utils::stringStartsWith(var, "PATH="))
+		{
+			PATH =  var.substr(5);
+			break;
+		}
+	}
+	if (!env || Response::PATH.empty())
+		throw Fail("needs PATH variable");
 }
 
 void Response::initReasonPhrases()

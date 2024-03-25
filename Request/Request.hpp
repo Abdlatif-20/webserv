@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/18 18:19:15 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:45:54 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,20 +22,6 @@
 #include "Server.hpp"
 #include <fcntl.h>
 #include <sys/stat.h> // For mkdir
-
-enum Errors
-{
-	OK = 200,
-	NotFound = 404,
-	BadRequest = 400,
-	NotImplemented = 501,
-	LengthRequired = 411,
-	MovedPermanently = 301,
-	MethodNotAllowed = 405,
-	RequestURITooLong = 414,
-	RequestEntityTooLarge = 413,
-	HTTPVersionNotSupported = 505
-};
 
 #define CR '\r'
 #define CRLF "\r\n"
@@ -67,16 +53,20 @@ class Request
 		bool	requestIscomplete;
 		bool	requestLineInProgress;
 		bool	_requestIsWellFormed;
+		bool	_chunkedComplete;
 		// serverctxs range
 		size_t	serv_end;
 		size_t	serv_begin;
 		//unsigned int
 		unsigned int	sizeBoundary;
 		unsigned int	contentLength;
-		unsigned int	remainingChunkLength;
+		int				remainingChunkLength;
+		unsigned int	remainingChunk;
 		//config
-		Context			*context;
-		LocationContext	locationCtx;
+		ServerContext serverCTX;
+		LocationContext locationCTX;
+		// Context			*context;
+		// LocationContext	locationCtx;
 		//maps
 		Map	_headers;
 		Map	requestLine;
@@ -110,7 +100,6 @@ class Request
 			void			fillHeaders(Vector headers);
 			String			prepareFileName(String line);
 			unsigned int	convertToDecimal(String hex);
-			bool			directoryExists(const char *path);
 			String& 		isExist(Map& headers, String key);
 			void			separateRequest(String receivedRequest);
 			void			fillRequestLine(const String& requestLine);
@@ -134,7 +123,7 @@ class Request
 		void	selectServerContext(const String& host);
 		void	setServerCTXEnd(size_t i);
 		void	setServerCTXBegin(size_t i);
-		void	parseRequest(const std::string& receivedRequest, Context* serverCTX);
+		void	parseRequest(const std::string& receivedRequest, ServerContext serverCTX);
 
 	/* *************************** getters ************************************ */
 		bool					isDone(void) const;
@@ -143,13 +132,13 @@ class Request
 		void					setStatus(int status);
 		const String 			getMethod(void) const;
 		const int&				getStatus(void) const;
-		Context*				getContext(void) const;
 		const Map& 				getHeaders(void) const;
 		const bool& 			getBodyDone(void) const;
 		const bool& 			getFoundUri(void) const;
 		const bool& 			getHeadersDone(void) const;
 		const Map& 				getRequestLine(void) const;
 		const std::string		getRequestPath(void) const;
+		const ServerContext&	getServerCTX(void) const;
 		const LocationContext&	getLocationCtx(void) const;
 		bool					hostIsDetected(void) const;
 		const bool& 			getRequestLineDone(void) const;

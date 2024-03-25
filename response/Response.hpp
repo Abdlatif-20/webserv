@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/19 21:40:09 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 01:38:14 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,24 +16,19 @@
 #include "ServerContext.hpp"
 #include <dirent.h>
 
-// class Request;
-
 class Response
 {
-    enum Status
-    {
-        FORBIDDEN = 403,
-        INTERNAL_SERVER_ERROR = 500
-    };
     private:
         Request *request;
-        Context *context;
+        ServerContext serverCTX;
+        LocationContext locationCTX;
 
         char buffer[1024];
         int fd;
 
         int statusCode;
-        std::string headers;
+        std::string statusLine;
+        std::map<std::string, std::string> headers;
         std::string body;
         std::string bodyPath;
         bool headersSent;
@@ -41,6 +36,7 @@ class Response
         bool isWorking;
         bool isRedirection;
         std::string location;
+        bool hasCGI;
 
         std::string generateHtmlErrorPage();
         bool checkErrorPage(const std::string& path);
@@ -48,6 +44,7 @@ class Response
         void generateResponseError();
         void prepareHeaders();
         void prepareBody();
+        void prepareCGI();
         void prepareGET();
         void prepareRedirection(int _status, const std::string& _location);
         void autoIndex(const std::string& path);
@@ -56,26 +53,35 @@ class Response
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;
+
     public:
+		static char	**env;
+		static std::string	PATH;
+
         Response();
         Response(const Response& obj);
         Response& operator=(const Response& obj);
         ~Response();
         
         void setRequest(Request* request);
-        void setContext(Context* context);
+        void setServerCTX(const ServerContext& serverCTX);
+        void setLocationCTX(const LocationContext& locationCTX);
         void setHeadersSent(bool flag);
         static std::string getMimeType(const std::string& extension);
         const std::string& getBody() const;
-        const std::string& getHeaders() const;
+        const std::map<std::string, std::string>& getHeaders() const;
+        const std::string& getHeaderByName(const std::string& name);
         bool getHeadersSent() const;
         bool responseIsDone() const;
 
         void prepareResponse();
         void resetResponse();
+        std::string headersToString();
 
-        static void initReasonPhrases();
+
         static void initMimeTypes();
+        static void initReasonPhrases();
+		static void	setupEnv(char **_env);
 
         class ResponseErrorException : public std::exception
         {
