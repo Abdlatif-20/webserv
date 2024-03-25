@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 02:45:54 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:50:20 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 #define CR '\r'
 #define CRLF "\r\n"
 #define ALLOWED_CHARACTERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJ\
-							KLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=%"
+							KLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=% "
 
 typedef std::vector<std::string> Vector;
 typedef std::map<std::string, std::string> Map;

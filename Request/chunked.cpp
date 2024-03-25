@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 16:42:03 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 02:31:43 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/25 03:32:09 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,6 @@
 	// }
 void	Request::parseChunkedBody()
 {
-	// std::ofstream file2;
-	// if (!file2.is_open())
-	// 	file2.open("chunkedLog", std::ios::app);
-	// file2.write(_body.c_str(), _body.size());
-	write(1, _body.c_str(), _body.size());
 	String length;
 	static std::ofstream file;
 	size_t pos = 0;
@@ -44,24 +39,21 @@ void	Request::parseChunkedBody()
 		return(bodyDone = true, file.close(), requestIscomplete = true, void());
 	else if (remainingChunkLength)
 	{
-		if (_body.size() < (size_t)remainingChunkLength
-			&& _body.find("\r\n") == String::npos)
+		if (_body.size() < (size_t)remainingChunkLength)
 		{
 			file.write(_body.c_str(), _body.size());
 			remainingChunkLength -= _body.size();
 		}
 		else
 		{
-			String beflength = "";
-			pos = _body.find("\r\n");
-			if (pos != String::npos)
+			if (remainingChunkLength > 0)
 			{
-				beflength = _body.substr(0, pos);
-				file.write(_body.c_str(), pos);
-				_body = _body.substr(pos + 2);
-				_setLength = false;
-				Request::parseChunkedBody();
+				file.write(_body.c_str(), remainingChunkLength);
+				_body = _body.substr(remainingChunkLength + 2);
 			}
+			remainingChunkLength = 0;
+			_setLength = false;
+			parseChunkedBody();
 		}
 	}
 	receivecount++;

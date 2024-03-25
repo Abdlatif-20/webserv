@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/23 14:55:17 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:49:24 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,9 @@ void	Request::fillRequestLine(const String& requestLine)
 				return(this->status = MethodNotAllowed, requestIscomplete = true, void());
 		return(this->status = NotImplemented, requestIscomplete = true, void());
 	}
-	if (requestLineVector[1].front() != '/' || requestLineVector[2] != "HTTP/1.1")
+	if (requestLineVector[1].front() != '/')
+		return (this->status = BadRequest, requestIscomplete = true, void());
+	if (requestLineVector[2] != "HTTP/1.1")
 	{
 		String str = requestLineVector[2];
 		size_t pos = str.find("HTTP/");

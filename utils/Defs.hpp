@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 14:36:15 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/25 02:35:46 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:50:35 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ typedef enum e_directive
     RETURN,
     LOCATION,
     UPLOAD_STORE,
+    CGI_ASSIGN,
     UNKNOWN
 } t_directive;
 

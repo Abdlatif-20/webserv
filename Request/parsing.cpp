@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 02:47:00 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:58:21 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,8 @@ void	Request::requestIsWellFormed()
 		return;
 	if (this->requestLine["path"].size() > 2048)
 		return (this->status = RequestURITooLong, requestIscomplete = true, void());
-	if (this->requestLine["path"].find_first_not_of(ALLOWED_CHARACTERS) != String::npos)
-		return (this->status = BadRequest, requestIscomplete = true, void());
+	// if (this->requestLine["path"].find_first_not_of(ALLOWED_CHARACTERS) != String::npos)
+	// 	return (this->status = BadRequest, requestIscomplete = true, void());
 	if (this->requestLine["method"] == "POST")
 	{
 		if (_headers.find("content-type") != _headers.end()
@@ -94,7 +94,6 @@ void	Request::separateRequest(String receivedRequest)
 		// std::cout <<"-----------------HEADERS------------------\n";
 		// write(1, receivedRequest.c_str(), receivedRequest.size());
 		this->_body = receivedRequest.substr(pos + 4);
-		// std::cout <<"-----------------BODY------------------\n";
 		// write(1, _body.c_str(), _body.size());
 	}
 	else
@@ -104,10 +103,33 @@ void	Request::separateRequest(String receivedRequest)
 	}
 }
 
+bool	uriEscapedRoot(const std::string& path)
+{
+	StringVector spl_vec = Utils::split(path, '/');
+	StringVector::iterator it = spl_vec.begin();
+	int a = 0;
+	while (it != spl_vec.end())
+	{
+		if (*it != ".." && *it != ".")
+			a++;
+		else if (*it == "..")
+			a--;
+		if (a < 0)
+			return true;
+		it++;
+	}
+	return false;
+}
+
 void	Request::parseUri()
 {
-	if (this->requestLine["path"].find("%") != String::npos)
-		Utils::decodeUri(this->requestLine["path"]);
+	if (requestLine["path"].find("%") != String::npos)
+		requestLine["path"] = Utils::urlDecoding(requestLine["path"]);
+	if (uriEscapedRoot(requestLine["path"]))
+	{
+		status = BadRequest;
+		requestIscomplete = true;
+	}
 }
 
 //function to parse the Body of the request if method is POST
@@ -201,9 +223,7 @@ int	Request::takingRequests(String receivedRequest)
 	if (!this->requestLineDone)
 	{
 		if (parseRequestLine(receivedRequest) && requestData.empty())
-		{
 			return 1;
-		}
 		if (!requestData.empty())
 		{
 			receivedRequest = requestData;

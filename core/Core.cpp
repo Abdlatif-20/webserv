@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/25 02:43:37 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:49:11 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ Core::Core(const Core &cpy)
 	*this = cpy;
 }
 
-Core::Core(const Config &conf)
+Core::Core(Config &conf)
 {
 	ServersVector::iterator	it;
 

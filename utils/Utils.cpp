@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/23 14:55:47 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:50:47 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,12 @@ std::string Utils::strTrim(const std::string& str, char c)
 
 t_directive Utils::getDirectiveFromTokenName(const std::string& tokenName)
 {
-	std::string tokens[11] = 
+	std::string tokens[12] = 
 	{
 		"root", "index", "auto_index", "error_page", "client_max_body_size",
-		"allowed_methods", "listen", "server_name", "return", "location", "upload_store"
+		"allowed_methods", "listen", "server_name", "return", "location", "upload_store", "cgi_assign"
 	};
-	for (int i = 0; i < 11; i++)
+	for (int i = 0; i < 12; i++)
 		if (tokenName == tokens[i])
 			return static_cast<t_directive>(i);
 	return UNKNOWN;
@@ -155,28 +155,30 @@ std::string Utils::getTokenNameFromDirective(t_directive d)
 			return "location";
 		case UPLOAD_STORE:
 			return "upload_store";
+		case CGI_ASSIGN:
+			return "cgi_assign";
 		default:
 			break;
 	}
 	return "unknown";
 }
 
-void	Utils::decodeUri(std::string& uri)
+std::string	Utils::urlDecoding(const std::string& uri)
 {
-	std::string decoded;
-	for (size_t i = 0; i < uri.size(); i++)
+	std::string decodedStr;
+	std::string hex;
+	for (size_t i = 0; i < uri.length(); i++)
 	{
-		if (uri[i] == '%' && i + 2 < uri.size())
+		if (uri[i] == '%')
 		{
-			std::string hex = uri.substr(i + 1, 2);
-			char c = (char)std::strtol(hex.c_str(), 0, 16);
-			decoded += c;
+			hex = uri.substr(i + 1, 2);
+			decodedStr += (char)hexToInt(hex);
 			i += 2;
 		}
 		else
-			decoded += uri[i];
+			decodedStr += uri[i];
 	}
-	uri = decoded;
+	return decodedStr;
 }
 
 bool Utils::stringStartsWith(const std::string& str, const std::string& prefix)
@@ -270,4 +272,41 @@ std::string Utils::get_last_modified_date(const std::string& path)
 	tm *lastTm = localtime(&last_modified);
 	std::strftime(buffer, 128, "%Y-%m-%d %H:%M:%S", lastTm);
 	return buffer;
+}
+
+std::string Utils::intToHex(int i)
+{
+	std::stringstream ss;
+	ss << std::hex << i;
+	return ss.str();
+}
+
+unsigned int Utils::hexToInt(const std::string& hex)
+{
+	if (hex.empty())
+		return (0);
+	unsigned int decimalNumber;
+
+	std::stringstream ss;
+	ss << std::hex << hex;
+	ss >> decimalNumber;
+	return decimalNumber;
+}
+
+std::string Utils::urlEncoding(const std::string& str)
+{
+	std::string encodedStr;
+	std::string hex;
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		if (isascii(str[i]) && !std::isalnum(str[i]) && str[i] != '-'
+			&& str[i] != '_' && str[i] != '.' && str[i] != '~')
+		{
+			hex = intToHex((int)str[i]);
+			hex.length() == 1 ? encodedStr += "%0" + hex : encodedStr += "%" + hex;
+		}
+		else
+			encodedStr += str[i];
+	}
+	return encodedStr;
 }
