@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 00:47:11 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:30:41 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,8 @@ void	Request::requestIsWellFormed()
 		return;
 	if (this->requestLine["path"].size() > 2048)
 		return (this->status = RequestURITooLong, requestIscomplete = true, void());
-	if (this->requestLine["path"].find_first_not_of(ALLOWED_CHARACTERS) != String::npos)
-		return (this->status = BadRequest, requestIscomplete = true, void());
+	// if (this->requestLine["path"].find_first_not_of(ALLOWED_CHARACTERS) != String::npos)
+	// 	return (this->status = BadRequest, requestIscomplete = true, void());
 	if (this->requestLine["method"] == "POST")
 	{
 		if (_headers.find("content-type") != _headers.end()

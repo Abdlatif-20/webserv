@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/25 00:14:29 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:28:01 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -299,7 +299,7 @@ std::string Utils::urlEncoding(const std::string& str)
 	std::string hex;
 	for (size_t i = 0; i < str.length(); i++)
 	{
-		if (!std::isalnum(str[i]) && str[i] != '-'
+		if (isascii(str[i]) && !std::isalnum(str[i]) && str[i] != '-'
 			&& str[i] != '_' && str[i] != '.' && str[i] != '~')
 		{
 			hex = intToHex((int)str[i]);
