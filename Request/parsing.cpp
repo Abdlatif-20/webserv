@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 00:41:29 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 00:47:11 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,6 @@ void	Request::parseUri()
 		requestLine["path"] = Utils::urlDecoding(requestLine["path"]);
 	if (uriEscapedRoot(requestLine["path"]))
 	{
-		std::cout << "bad\n";
 		status = BadRequest;
 		requestIscomplete = true;
 	}
