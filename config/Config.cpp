@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/08 12:21:39 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:44:13 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,8 @@ void Config::parseLocation(TokensVector::iterator& tok_iter, ServerContext& serv
             parseDirective(tok_iter, locationCtx);
             tok_iter++;
         }
-        DirectivesMap::const_iterator it = serverCtx.getDirectives().cbegin();
-        while (it != serverCtx.getDirectives().cend())
+        DirectivesMap::iterator it = serverCtx.getDirectives().begin();
+        while (it != serverCtx.getDirectives().end())
         {
             if (it->first != "listen" && it->first != "server_name"
                 && locationCtx.getDirectives().count(it->first) == 0)
@@ -131,9 +131,14 @@ void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context
         else
             ctx.addDirective(Directive(key, value));
     }
-    else if (d == ERROR_PAGE)
+    else if (d == ERROR_PAGE || d == CGI_ASSIGN)
     {
         tok_iter++;
+        if (d == CGI_ASSIGN)
+        {
+            ctx.addCGI(std::pair<std::string, std::string>(tok_iter->getContent(), (tok_iter++)->getContent()));
+            return;
+        }
         while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)
             value.push_back((tok_iter++)->getContent());
         ctx.addErrorPage(std::vector<std::string>(value));
@@ -206,14 +211,7 @@ void Config::setupDefaultLocation()
 
 /* The `const ServersVector& Config::getServers() const` function is a getter method in the `Config`
 class that returns a constant reference to the vector of servers (`ServersVector`). */
-const ServersVector& Config::getServers() const
+ServersVector& Config::getServers()
 {
     return servers;
-}
-
-ServersVector::const_iterator Config::getServerByHost(const std::string& host) const
-{
-    (void)host;
-    ServersVector::const_iterator serv_iter = servers.cbegin();
-    return serv_iter;
 }

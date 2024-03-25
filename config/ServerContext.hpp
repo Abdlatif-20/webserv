@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 10:40:11 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/29 11:02:44 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:52:37 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,10 @@ class ServerContext : public Context
         ~ServerContext();
 
         void addLocation(LocationContext location);
-        const LocationsVector& getLocations() const;
-        const LocationContext matchLocation(const std::string& prefix) const;
-        std::string getListen() const;
-        std::string getHost() const;
-        std::string getPort() const;
-        StringVector getServerName() const;
+        LocationsVector& getLocations();
+        LocationContext matchLocation(const std::string& prefix);
+        std::string getListen();
+        std::string getHost();
+        std::string getPort();
+        StringVector getServerName();
 };

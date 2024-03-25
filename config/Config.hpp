@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:08 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/08 12:40:58 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/23 20:43:06 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,5 @@ class Config
         Config& operator=(const Config& obj);
         ~Config();
 
-        const ServersVector& getServers() const;
-        ServersVector::const_iterator getServerByHost(const std::string& host) const;
+        ServersVector& getServers();
 };
