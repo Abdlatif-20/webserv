@@ -6,27 +6,12 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 16:42:03 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 03:32:09 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/25 04:03:42 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-// if (!_chunkedComplete)
-	// {
-	// 	if (!fd)
-	// 		fd = open("/tmp/chunked", O_CREAT | O_RDWR | O_APPEND, 0666);
-	// 	if (fd == -1)
-	// 	{
-	// 		std::cerr << "Error: " << strerror(errno) << std::endl;
-	// 		return;
-	// 	}
-	// 	write(fd, _body.c_str(), _body.size());
-	// 	if (_body.find("0\r\n\r\n") != String::npos)
-	// 	{
-	// 		_chunkedComplete = true;
-	// 	}
-	// }
 void	Request::parseChunkedBody()
 {
 	String length;
