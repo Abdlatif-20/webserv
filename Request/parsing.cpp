@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/22 21:22:04 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 00:14:52 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ void	Request::separateRequest(String receivedRequest)
 void	Request::parseUri()
 {
 	if (this->requestLine["path"].find("%") != String::npos)
-		Utils::decodeUri(this->requestLine["path"]);
+		this->requestLine["path"] = Utils::urlDecoding(this->requestLine["path"]);
 }
 
 //function to parse the Body of the request if method is POST

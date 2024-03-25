@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/23 01:41:13 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 00:17:00 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -255,7 +255,7 @@ void Response::prepareGET()
 {
     if (isWorking)
         return;
-    std::string resource = locationCTX.getRoot() + request->getRequestPath();
+    std::string resource = locationCTX.getRoot() + Utils::urlDecoding(request->getRequestPath());
     if (!Utils::checkIfPathExists(resource))
         throw ResponseErrorException(*this, NotFound);
     if (Utils::isDirectory(resource))
@@ -319,7 +319,7 @@ void Response::autoIndex(const std::string& path)
             html += "<tr><td><i class='glyphicon glyphicon-folder-close'></i>";
         else
             html += "<tr><td><i class='glyphicon glyphicon-file'></i>";
-        html+= "<a style='text-decoration:none'; href='" + std::string(entry->d_name) + "'> " + entry->d_name + "</td>";
+        html+= "<a style='text-decoration:none'; href='" + Utils::urlEncoding(std::string(entry->d_name)) + "'> " + entry->d_name + "</td>";
         html += "<td>" + Utils::get_last_modified_date(path + entry->d_name) + "</td>";
         html += "<td>" + (Utils::getFileSize(path + entry->d_name) == -1 ? "--" : Utils::longlongToString(Utils::getFileSize(path + entry->d_name))) + "</td>";
         html += "<td>" + (Utils::isDirectory(path + entry->d_name) ? "Directory" : Utils::getFileExtension(path + entry->d_name)) + "</td>";
@@ -341,7 +341,7 @@ void Response::preparePOST()
     }
     else
     {
-        std::string resource = locationCTX.getRoot() + request->getRequestPath();
+        std::string resource = locationCTX.getRoot() + Utils::urlDecoding(request->getRequestPath());
         if (!Utils::checkIfPathExists(resource))
             throw ResponseErrorException(*this, NotFound);
         if (Utils::isDirectory(resource))

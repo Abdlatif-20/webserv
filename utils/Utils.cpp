@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/23 19:31:34 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 00:14:29 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,22 +163,22 @@ std::string Utils::getTokenNameFromDirective(t_directive d)
 	return "unknown";
 }
 
-void	Utils::decodeUri(std::string& uri)
+std::string	Utils::urlDecoding(const std::string& uri)
 {
-	std::string decoded;
-	for (size_t i = 0; i < uri.size(); i++)
+	std::string decodedStr;
+	std::string hex;
+	for (size_t i = 0; i < uri.length(); i++)
 	{
-		if (uri[i] == '%' && i + 2 < uri.size())
+		if (uri[i] == '%')
 		{
-			std::string hex = uri.substr(i + 1, 2);
-			char c = (char)std::strtol(hex.c_str(), 0, 16);
-			decoded += c;
+			hex = uri.substr(i + 1, 2);
+			decodedStr += (char)hexToInt(hex);
 			i += 2;
 		}
 		else
-			decoded += uri[i];
+			decodedStr += uri[i];
 	}
-	uri = decoded;
+	return decodedStr;
 }
 
 bool Utils::stringStartsWith(const std::string& str, const std::string& prefix)
@@ -272,4 +272,41 @@ std::string Utils::get_last_modified_date(const std::string& path)
 	tm *lastTm = localtime(&last_modified);
 	std::strftime(buffer, 128, "%Y-%m-%d %H:%M:%S", lastTm);
 	return buffer;
+}
+
+std::string Utils::intToHex(int i)
+{
+	std::stringstream ss;
+	ss << std::hex << i;
+	return ss.str();
+}
+
+unsigned int Utils::hexToInt(const std::string& hex)
+{
+	if (hex.empty())
+		return (0);
+	unsigned int decimalNumber;
+
+	std::stringstream ss;
+	ss << std::hex << hex;
+	ss >> decimalNumber;
+	return decimalNumber;
+}
+
+std::string Utils::urlEncoding(const std::string& str)
+{
+	std::string encodedStr;
+	std::string hex;
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		if (!std::isalnum(str[i]) && str[i] != '-'
+			&& str[i] != '_' && str[i] != '.' && str[i] != '~')
+		{
+			hex = intToHex((int)str[i]);
+			hex.length() == 1 ? encodedStr += "%0" + hex : encodedStr += "%" + hex;
+		}
+		else
+			encodedStr += str[i];
+	}
+	return encodedStr;
 }

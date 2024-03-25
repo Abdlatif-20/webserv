@@ -3,15 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/19 17:47:38 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/25 00:14:35 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include <iomanip>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -48,7 +49,7 @@ namespace Utils
 	std::string getTokenNameFromDirective(t_directive d);
 	std::string getDefaultErrorPage(const std::string& status);
 	int stringToInt(const std::string& str);
-	void	decodeUri(std::string& uri);
+	std::string	urlDecoding(const std::string& uri);
 	bool		stringStartsWith(const std::string& str, const std::string& prefix);
 	bool stringEndsWith(const std::string& str, const std::string& suffix);
 	std::string getCurrentTime();
@@ -60,6 +61,9 @@ namespace Utils
 	std::string longlongToString(long long number);
 	std::string replaceAll(std::string str, const std::string& s1, const std::string& s2);
 	std::string get_last_modified_date(const std::string& path);
+	std::string intToHex(int i);
+	unsigned int hexToInt(const std::string& hex);
+	std::string urlEncoding(const std::string& str);
 	class FileNotFoundException : public std::exception {};
 	class FilePermissionDenied : public std::exception {};
 	class PathIsDirectory : public std::exception {};
