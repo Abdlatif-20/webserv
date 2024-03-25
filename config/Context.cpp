@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Context.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/23 20:57:16 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 16:20:49 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ Context& Context::operator=(const Context& obj)
 {
     if (this == &obj)
         return *this;
+	cgi = obj.cgi;
     directives = obj.directives;
     errorPages = obj.errorPages;
     return *this;

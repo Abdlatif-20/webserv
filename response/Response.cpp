@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/25 12:27:52 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/25 18:33:11 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,20 +205,38 @@ void Response::prepareBody()
 		responseDone = true;
 }
 
+void g(int s)
+{
+	if (s == SIGSEGV)
+		std::cout << "segv"  << std::endl;
+}
+
 void Response::prepareCGI()
 {
-	std::stringstream ss(PATH);
+	size_t	idx;
+	std::string	ext;
 	std::string	line;
-	std::string	tt[2] = {".pl", "perl"}; 
+	std::vector<char*> ee;
+	std::stringstream ss(PATH);
+	Map cgi = locationCTX.getCGI();
 
+	signal(SIGSEGV, g);
+	idx = bodyPath.find_last_of(".");
+	ext = bodyPath.substr(idx);
+	if (idx == std::string::npos || cgi[ext].empty())
+		return ;
+	for (size_t i = 0; i < env.size(); i++)
+		ee.push_back((char *)env[i].c_str());
+	ee.push_back(NULL);
 	while(std::getline(ss, line,':'))
 	{
-		line+=tt[1];
+		line+= "/" + cgi[ext];
 		if (!access(line.c_str(), F_OK | X_OK))
 		{
 			std::cout << line << std::endl;
 			std::cout << bodyPath << std::endl;
-			const char *args[3] = {line.c_str(), bodyPath.c_str(), NULL};
+			
+			char *args[3] = {(char *)line.c_str(), (char *)bodyPath.c_str(), NULL};
 			std::string name = "/tmp/output_" ;
 			name += Utils::intToString(std::rand());
 			name += ".html";
@@ -233,7 +251,7 @@ void Response::prepareCGI()
 			{
 				dup2(fd, 1);
 				close(fd);
-				execve(args[0], (char *const*)args, env_ptr);
+				execve(line.c_str(), args, ee.data());
 				exit(0);
 			}
 			wait(NULL);
@@ -267,6 +285,7 @@ void Response::prepareGET()
                         throw ResponseErrorException(*this, FORBIDDEN);
                     return;
                 }
+				// cgi
                 bodyPath = resource + index;
                 statusCode = OK;
             }
@@ -284,6 +303,7 @@ void Response::prepareGET()
     {
         if (!Utils::isReadableFile(resource))
             throw ResponseErrorException(*this, FORBIDDEN);
+		// cgi
         bodyPath = resource;
         statusCode = OK;
     }
@@ -366,34 +386,37 @@ void Response::preparePOST()
 void Response::copyEnv()
 {
 	std::string	req_path = request->getRequestPath();
-	env.push_back("GATEWAY_INTERFACE=\"CGI/1.1\"");
+	env.push_back("GATEWAY_INTERFACE=CGI/1.1");
 	// env.push_back("SERVER_NAME=");
-	env.push_back("SERVER_SOFTWARE=\"WebServer\"");
+	env.push_back("SERVER_SOFTWARE=WebServer");
 	env.push_back("SERVER_PROTOCOL=");
-	env.back() += '"' + request->getProtocol() + '"';
+	env.back() += request->getProtocol();
 	env.push_back("SERVER_PORT=");
-	env.back() += '"' + serverCTX.getPort() + '"';
+	env.back() += serverCTX.getPort();
 	env.push_back("REQUEST_METHOD=");
-	env.back() += '"' + request->getMethod() + '"';
+	env.back() += request->getMethod();
 	env.push_back("PATH_INFO=");
-	env.back() += '"' + req_path + '"';
-	env.push_back("PATH_TRANSLATED=");
-	env.back() += '"' + locationCTX.getRoot() + req_path + '"';
-	env.push_back("SCRIPT_NAME=");
-	env.back() += '"' + bodyPath.substr(bodyPath.find_last_of('/') + 1) + '"';
-	env.push_back("DOCUMENT_ROOT=");
-	env.back() += '"' + bodyPath.substr(0, bodyPath.find_last_of('/')) + '"';
-	env.push_back("QUERY_STRING=");
-	env.back() += '"' + request->getQueryString() + '"';
+	env.back() += req_path;
+	// env.push_back("PATH_TRANSLATED=");
+	// env.back() += locationCTX.getRoot() + req_path;
+	// env.push_back("SCRIPT_NAME=");
+	// env.back() += bodyPath;//.substr(bodyPath.find_last_of('/') + 1);
+	// env.push_back("DOCUMENT_ROOT=");
+	// env.back() += bodyPath.substr(0, bodyPath.find_last_of('/'));
+	// env.push_back("QUERY_STRING=");
+	// env.back() += request->getQueryString();
 	// env.push_back("REMOTE_HOST=");
 	// env.push_back("REMOTE_ADDR=");
 	// env.push_back("AUTH_TYPE=");
 	// env.push_back("REMOTE_USER=");
 	// env.push_back("REMOTE_IDENT=");
-	// env.push_back("CONTENT_TYPE=");
-	env.back() += '"' + request->getHeaderByName("CONTENT-TYPE") + '"';
+	env.push_back("CONTENT_TYPE=");
+	env.back() += request->getHeaderByName("CONTENT-TYPE");
 	env.push_back("CONTENT_LENGTH=");
-	env.back() += '"' + request->getHeaderByName("CONTENT-LENGTH") + '"';
+	env.back() += request->getHeaderByName("CONTENT-LENGTH");
+	env.push_back("PATH=");
+	env.back() += PATH;
+	env.push_back("REDIRECT_STATUS=CGI");
 	Map m = request->getHeaders();
 	std::cout << "==============================" << std::endl;
 	for (Map::iterator it = m.begin(); it != m.end(); it++)
@@ -401,7 +424,7 @@ void Response::copyEnv()
 		std::string first = it->first;
 		Utils::toLower(first);
 		if (first != "content-length" && first != "content-type")
-			env.push_back(Utils::envName(it->first) + "=\"" + it->second + '"');
+			env.push_back(Utils::envName(it->first) + "=" + it->second);
 	}
 	for (size_t i = 0; i < env.size(); i++)
 		std::cout << env[i] << std::endl;
@@ -425,7 +448,7 @@ void Response::prepareResponse()
         if (request->getMethod() == "GET")
         {
             prepareGET();
-			if (fd != INT_MIN)
+			if (fd == INT_MIN)
 			{
 				copyEnv();
 				prepareCGI();

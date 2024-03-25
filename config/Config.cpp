@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/23 20:44:13 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 16:22:52 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,7 +136,7 @@ void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context
         tok_iter++;
         if (d == CGI_ASSIGN)
         {
-            ctx.addCGI(std::pair<std::string, std::string>(tok_iter->getContent(), (tok_iter++)->getContent()));
+            ctx.addCGI(std::pair<std::string, std::string>(tok_iter->getContent(), (++tok_iter)->getContent()));
             return;
         }
         while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)
