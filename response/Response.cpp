@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/25 02:41:13 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 17:08:41 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -197,6 +197,7 @@ void Response::prepareBody()
     ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
     if (readedBytes == -1)
     {
+        std::cout << ">>>>>" << std::endl;
         close(fd);
         statusCode = OK;
         responseDone = true;

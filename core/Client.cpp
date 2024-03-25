@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/23 01:42:59 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 17:19:19 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ bool	Client::isALive(void) const
 	std::string	value;
 
 	value = request.getHeaderByName("connection");
-	if (value == "closed")
+	if (value == "closed" || value == "close")
 		return (false);
 	return (true);
 }
