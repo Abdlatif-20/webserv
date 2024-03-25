@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 00:14:52 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 00:41:29 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,10 +100,34 @@ void	Request::separateRequest(String receivedRequest)
 	}
 }
 
+bool	uriEscapedRoot(const std::string& path)
+{
+	StringVector spl_vec = Utils::split(path, '/');
+	StringVector::iterator it = spl_vec.begin();
+	int a = 0;
+	while (it != spl_vec.end())
+	{
+		if (*it != ".." && *it != ".")
+			a++;
+		else if (*it == "..")
+			a--;
+		if (a < 0)
+			return true;
+		it++;
+	}
+	return false;
+}
+
 void	Request::parseUri()
 {
-	if (this->requestLine["path"].find("%") != String::npos)
-		this->requestLine["path"] = Utils::urlDecoding(this->requestLine["path"]);
+	if (requestLine["path"].find("%") != String::npos)
+		requestLine["path"] = Utils::urlDecoding(requestLine["path"]);
+	if (uriEscapedRoot(requestLine["path"]))
+	{
+		std::cout << "bad\n";
+		status = BadRequest;
+		requestIscomplete = true;
+	}
 }
 
 //function to parse the Body of the request if method is POST
@@ -197,9 +221,7 @@ int	Request::takingRequests(String receivedRequest)
 	if (!this->requestLineDone)
 	{
 		if (parseRequestLine(receivedRequest) && requestData.empty())
-		{
 			return 1;
-		}
 		if (!requestData.empty())
 		{
 			receivedRequest = requestData;
