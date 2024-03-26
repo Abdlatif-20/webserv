@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 14:36:15 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/25 02:18:09 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/26 00:23:51 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ enum StatusCodes
     FORBIDDEN = 403,
 	BadRequest = 400,
 	LengthRequired = 411,
+    PartialContent = 206,
 	NotImplemented = 501,
 	MovedPermanently = 301,
 	MethodNotAllowed = 405,

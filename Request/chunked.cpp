@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   chunked.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 16:42:03 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/21 17:30:40 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 04:03:42 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,26 +22,23 @@ void	Request::parseChunkedBody()
 		preparLengthAndName(pos, length, file);
 	if (!remainingChunkLength)
 		return(bodyDone = true, file.close(), requestIscomplete = true, void());
-	else
+	else if (remainingChunkLength)
 	{
-		if (_body.size() < remainingChunkLength
-			&& _body.find("\r\n") == String::npos)
+		if (_body.size() < (size_t)remainingChunkLength)
 		{
 			file.write(_body.c_str(), _body.size());
 			remainingChunkLength -= _body.size();
 		}
 		else
 		{
-			String beflength = "";
-			pos = _body.find("\r\n");
-			if (pos != String::npos)
+			if (remainingChunkLength > 0)
 			{
-				beflength = _body.substr(0, pos);
-				file.write(_body.c_str(), pos);
-				_body = _body.substr(pos + 2);
-				_setLength = false;
-				Request::parseChunkedBody();
+				file.write(_body.c_str(), remainingChunkLength);
+				_body = _body.substr(remainingChunkLength + 2);
 			}
+			remainingChunkLength = 0;
+			_setLength = false;
+			parseChunkedBody();
 		}
 	}
 	receivecount++;

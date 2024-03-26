@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/24 21:21:59 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:50:20 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,13 +53,15 @@ class Request
 		bool	requestIscomplete;
 		bool	requestLineInProgress;
 		bool	_requestIsWellFormed;
+		bool	_chunkedComplete;
 		// serverctxs range
 		size_t	serv_end;
 		size_t	serv_begin;
 		//unsigned int
 		unsigned int	sizeBoundary;
 		unsigned int	contentLength;
-		unsigned int	remainingChunkLength;
+		int				remainingChunkLength;
+		unsigned int	remainingChunk;
 		//config
 		ServerContext serverCTX;
 		LocationContext locationCTX;

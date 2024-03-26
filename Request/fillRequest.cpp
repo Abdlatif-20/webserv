@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fillRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 00:43:27 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:49:24 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 //function to fill the headers to the map
 void	Request::fillHeaders(Vector headers)
 {
-	// Utils::printVector(headers);
 	int checkHostIsFound = 0;
 	Vector::iterator it;
 	it = headers.begin();
