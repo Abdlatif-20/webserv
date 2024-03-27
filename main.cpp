@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 17:13:36 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/27 18:27:06 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ int main(int argc, char **argv, char  ** __unused env)
 	std::string configPath = "webserv.conf";
 	try
 	{
-		// CGI::setupEnv(env);
+		CGI::setupEnv(env);
 		if (argc == 2)
 			configPath = argv[1];
 		else if (argc > 2)
