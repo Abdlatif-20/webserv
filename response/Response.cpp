@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 16:10:13 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/27 16:16:43 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,10 @@ Response::Response()
     isWorking = false;
     isRedirection = false;
     hasCGI = false;
+    isPartialContent = false;
+    startOffset = 0;
+    endOffset = 0;
+    alreadySeeked = false;
 }
 
 Response::Response(const Response &obj)
@@ -54,6 +58,10 @@ Response& Response::operator=(const Response& obj)
     isRedirection = obj.isRedirection;
     location = obj.location;
     hasCGI = obj.hasCGI;
+    isPartialContent = obj.isPartialContent;
+    startOffset = obj.startOffset;
+    endOffset = obj.endOffset;
+    alreadySeeked = obj.alreadySeeked;
     return *this;
 }
 
@@ -171,6 +179,20 @@ void Response::prepareHeaders()
     headers["Content-Type"] = (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath)));
     if (isRedirection)
         headers["Location"] = location;
+    if (isPartialContent)
+    {
+        headers["Content-Length"] = Utils::longlongToString((endOffset - startOffset) + 1);
+        headers["Content-Range"] = "bytes " + Utils::longlongToString(startOffset) + "-" + Utils::longlongToString(endOffset) + "/" + Utils::longlongToString(Utils::getFileSize(bodyPath));
+    }
+    // headers += "Connection: " + request->getHeaderByName("connection") + CRLF;
+    // headers += "Server: " + std::string(SERVER) + " (" + OS_MAC + ")" + CRLF;
+    // headers += "Date: " + Utils::getCurrentTime() + CRLF;
+    // headers += "Content-Length: " + (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))) + CRLF;
+    // headers += std::string("Accept-Ranges: bytes") + CRLF;
+    // headers += "Content-Type: " + (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath))) + CRLF;
+    // if (isRedirection)
+    //     headers += "Location: " + location + CRLF;
+    // headers += CRLF;
 }
 
 void Response::prepareBody()
@@ -185,6 +207,11 @@ void Response::prepareBody()
     if (fd == -1)
         throw ResponseErrorException(*this, InternalServerError);
     std::memset(buffer, 0, sizeof(buffer));
+    if (!alreadySeeked)
+    {
+        lseek(fd, startOffset, SEEK_SET);
+        alreadySeeked = true;
+    }
     ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
     if (readedBytes == -1)
     {
@@ -305,6 +332,33 @@ void Response::prepareGET()
             throw ResponseErrorException(*this, FORBIDDEN);
 		// cgi
         bodyPath = resource;
+        std::string rangeHeader = request->getHeaderByName("Range");
+        if (!rangeHeader.empty())
+        {
+            size_t i = rangeHeader.find('=');
+            if (i != std::string::npos)
+            {
+                std::string unit = rangeHeader.substr(0, i);
+                if (unit == "bytes" || unit == "Bytes")
+                {
+                    isPartialContent = true;
+                    std::string range = rangeHeader.substr(i + 1, rangeHeader.length());
+                    i = range.find('-');
+                    if (i != std::string::npos)
+                    {
+                        startOffset = std::atoll(range.substr(0, i).c_str());
+                        endOffset = std::atoll(range.substr(i + 1, range.length()).c_str());
+                        if (endOffset == 0)
+                            endOffset = Utils::getFileSize(bodyPath);
+                        endOffset--;
+                    }
+                    statusCode = PartialContent;
+                    isWorking = true;
+                    return;
+                }
+            }
+            std::cout << "Start_Offset = " << startOffset << "  " << "End_Offset = " << endOffset << std::endl;
+        }
         statusCode = OK;
     }
     isWorking = true;
@@ -324,7 +378,9 @@ void Response::autoIndex(const std::string& path)
     std::string html = Utils::replaceAll(AUTO_INDEX_TEMPLATE, "$indexof$", request->getRequestPath());
     dir = opendir(path.c_str());
     if (!dir)
+    {
         throw ResponseErrorException(*this, FORBIDDEN);
+    }
     while ((entry = readdir(dir)))
     {
         if (Utils::isDirectory(path + entry->d_name))
@@ -478,6 +534,10 @@ void Response::resetResponse()
     bodyPath.clear();
     location.clear();
     hasCGI = false;
+    isPartialContent = false;
+    startOffset = 0;
+    endOffset = 0;
+    alreadySeeked = false;
 }
 
 std::string Response::headersToString()

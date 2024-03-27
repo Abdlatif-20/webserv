@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 16:10:28 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/27 16:16:51 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,10 @@ class Response
 
         char buffer[1024];
         int fd;
+        bool isPartialContent;
+        ssize_t startOffset;
+        ssize_t endOffset;
+        bool alreadySeeked;
 
         int statusCode;
         std::string statusLine;

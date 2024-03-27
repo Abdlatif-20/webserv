@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/25 12:26:14 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/27 16:14:57 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ ssize_t Client::recvRequest(void)
 	{
 		request.parseRequest(std::string(buff, len), serverCTX);
 		requestDone = request.isDone();
-		// last_update_time = std::time(NULL); to think about later
+		last_update_time = std::time(NULL); // to think about later
 	}
 	else
 		requestDone = true;;
@@ -72,7 +72,7 @@ void	Client::sendResponse(void)
 			len = send(sockId, headers.c_str(), headers.size(), 0);
 			response.setHeadersSent(true);
 		}
-		len = send(sockId, response.getBody().c_str(), response.getBody().size(), 0);// when fail? we should remove the client and continue :)
+		len = send(sockId, response.getBody().c_str(), response.getBody().size(), 0);// when fail? we should remove the client and continue :) // ok
 		responseDone = response.responseIsDone();
 		last_update_time = std::time(NULL);
 	}
@@ -89,7 +89,7 @@ bool	Client::isALive(void) const
 	std::string	value;
 
 	value = request.getHeaderByName("connection");
-	if (value == "closed")
+	if (value == "closed" || value == "close")
 		return (false);
 	return (true);
 }

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/19 22:34:46 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/27 16:18:18 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,12 +15,12 @@
 #include "Config.hpp"
 #include "Core.hpp"
 
-int main(int argc, char **argv, char  **env)
+int main(int argc, char **argv, char  ** __unused env)
 {
 	std::string configPath = "webserv.conf";
 	try
 	{
-		Response::setupEnv(env);
+		// Response::setupEnv(env);
 		if (argc == 2)
 			configPath = argv[1];
 		else if (argc > 2)

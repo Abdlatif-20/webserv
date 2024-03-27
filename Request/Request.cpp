@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 12:26:43 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/27 16:15:50 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,13 @@ Request::Request()
 	this->multipart = false;
 	this->_setLength = false;
 	this->isComplete = false;
+	this->remainingChunk = 0;
 	this->headersDone = false;
 	this->requestLineDone = false;
+	this->remainingChunkLength = 0;
+	this->_chunkedComplete = false;
 	this->requestIscomplete = false;
 	this->requestInProgress = false;
-	this->remainingChunkLength = 0;
 	this->_requestIsWellFormed = false;
 	this->requestLineInProgress = false;
 	this->_path.clear();
@@ -80,11 +82,14 @@ Request& Request::operator=(const Request& obj)
 		this->boundaryName = obj.boundaryName;
 		this->contentLength = obj.contentLength;
 		this->requestVector = obj.requestVector;
+		this->remainingChunk = obj.remainingChunk;
 		this->requestLineDone = obj.requestLineDone;
+		this->_chunkedComplete = obj._chunkedComplete;
 		this->requestIscomplete = obj.requestIscomplete;
 		this->requestInProgress = obj.requestInProgress;
 		this->_requestIsWellFormed = obj._requestIsWellFormed;
 		this->remainingChunkLength = obj.remainingChunkLength;
+		this->requestLineInProgress = obj.requestLineInProgress;
 	}
 	return (*this);
 }
@@ -151,6 +156,8 @@ const String Request::getHeaderByName(const String& name) const
 	{
 		if (name == "connection")
 			return ("keep-alive");
+		else
+			return "";
 	}
 	return ("");
 }
@@ -229,13 +236,15 @@ void	Request::resetRequest()
 	this->sizeBoundary = 0;
 	this->contentLength = 0;
 	this->multipart = false;
+	this->remainingChunk = 0;
 	this->_setLength = false;
 	this->isComplete = false;
 	this->headersDone = false;
-	this->requestIscomplete = false;
 	this->requestLineDone = false;
-	this->requestInProgress = false;
 	this->remainingChunkLength = 0;
+	this->_chunkedComplete = false;
+	this->requestIscomplete = false;
+	this->requestInProgress = false;
 	this->_requestIsWellFormed = false;
 	this->requestLineInProgress = false;
 	this->_path.clear();

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 12:26:24 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/27 16:15:25 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 //function to fill the headers to the map
 void	Request::fillHeaders(Vector headers)
 {
-	// Utils::printVector(headers);
 	int checkHostIsFound = 0;
 	Vector::iterator it;
 	it = headers.begin();

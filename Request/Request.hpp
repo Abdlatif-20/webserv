@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 12:26:51 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/27 16:15:59 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,13 +53,15 @@ class Request
 		bool	requestIscomplete;
 		bool	requestLineInProgress;
 		bool	_requestIsWellFormed;
+		bool	_chunkedComplete;
 		// serverctxs range
 		size_t	serv_end;
 		size_t	serv_begin;
 		//unsigned int
 		unsigned int	sizeBoundary;
 		unsigned int	contentLength;
-		unsigned int	remainingChunkLength;
+		int				remainingChunkLength;
+		unsigned int	remainingChunk;
 		//config
 		ServerContext serverCTX;
 		LocationContext locationCTX;

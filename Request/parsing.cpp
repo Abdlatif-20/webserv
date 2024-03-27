@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 02:30:41 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/25 02:58:21 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,10 @@ void	Request::separateRequest(String receivedRequest)
 	if (pos != String::npos)
 	{
 		this->headers = receivedRequest.substr(0, pos + 4);
+		// std::cout <<"-----------------HEADERS------------------\n";
+		// write(1, receivedRequest.c_str(), receivedRequest.size());
 		this->_body = receivedRequest.substr(pos + 4);
+		// write(1, _body.c_str(), _body.size());
 	}
 	else
 	{
