@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:40:48 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 02:49:18 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/26 02:26:19 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,13 @@ unsigned int Request::convertToDecimal(String hex)
 // function to prepare the length and the name of the file
 void	Request::preparLengthAndName(size_t pos, String& length, std::ofstream& file)
 {
+	if (!_body.size())
+		return;
 	if (!_setLength && (pos = _body.find("\r\n")) != String::npos)
 	{
 		length = _body.substr(0, pos);
+		if (length.empty())
+			return;
 		remainingChunkLength = convertToDecimal(length);
 		_body = _body.substr(pos + 2);
 		_setLength = true;
