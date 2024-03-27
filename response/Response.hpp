@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/25 12:28:23 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/27 16:10:28 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ class Response
         void generateResponseError();
         void prepareHeaders();
         void prepareBody();
-        void prepareCGI();
+        // void prepareCGI();
         void prepareGET();
         void prepareRedirection(int _status, const std::string& _location);
         void autoIndex(const std::string& path);
@@ -81,12 +81,12 @@ class Response
         void resetResponse();
         std::string headersToString();
 
-		void	copyEnv();
+		// void	copyEnv();
 
 
         static void initMimeTypes();
         static void initReasonPhrases();
-		static void	setupEnv(char **_env);
+		// static void	setupEnv(char **_env);
 
         class ResponseErrorException : public std::exception
         {

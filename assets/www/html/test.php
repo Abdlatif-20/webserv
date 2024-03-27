@@ -1,4 +1,5 @@
 <?php
+// header("Status: 200");
 echo "GATEWAY_INTERFACE : ".getenv("GATEWAY_INTERFACE")."</br>";
 echo "SERVER_NAME : ".getenv("SERVER_NAME")."</br>";
 echo "SERVER_SOFTWARE : ".getenv("SERVER_SOFTWARE")."</br>";
@@ -21,6 +22,7 @@ echo "HTTP_FROM : ".getenv("HTTP_FROM")."</br>";
 echo "HTTP_ACCEPT : ".getenv("HTTP_ACCEPT")."</br>";
 echo "HTTP_USER_AGENT : ".getenv("HTTP_USER_AGENT")."</br>";
 echo "HTTP_REFERER : ".getenv("HTTP_REFERER")."</br>";
-phpinfo()
-
+echo "STATUS : ".getenv("STATUS")."</br>";
+// phpinfo()
+echo "hello"
 ?>
