@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 01:49:26 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/27 15:47:16 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ Response::Response()
     responseDone = false;
     headersSent = false;
     std::memset(buffer, 0, sizeof(buffer));
-    fd = INT_MIN;
     isWorking = false;
     isRedirection = false;
     hasCGI = false;
@@ -54,7 +53,6 @@ Response& Response::operator=(const Response& obj)
     headersSent = obj.headersSent;
     bodyPath = obj.bodyPath;
     std::memcpy(buffer, obj.buffer, sizeof(buffer));
-    fd = obj.fd;
     isWorking = obj.isWorking;
     isRedirection = obj.isRedirection;
     location = obj.location;
@@ -70,8 +68,7 @@ Response& Response::operator=(const Response& obj)
 
 Response::~Response()
 {
-	close(fd);
-	fd = INT_MIN;
+    ifs.close();
 }
 
 void Response::setRequest(Request* request)
@@ -206,7 +203,7 @@ void Response::prepareBody()
         return;
     }
     if (!ifs.is_open())
-        ifs.open(bodyPath, std::ios::in);
+        ifs.open(bodyPath);
     if (!ifs.good())
         throw ResponseErrorException(InternalServerError);
     std::memset(buffer, 0, sizeof(buffer));
@@ -214,35 +211,30 @@ void Response::prepareBody()
     {
         if (!alreadySeeked)
         {
-            ifs.seekg(startOffset, std::ios::beg);
+            ifs.seekg(startOffset, ifs.beg);
             alreadySeeked = true;
         }
         size_t contentLength = endOffset - startOffset;
         if (contentLength <= sizeof(buffer))
             readSize = contentLength;
     }
-    ifs.read(buffer, readSize);
-    if (ifs.eof())
-    {
-        
-    }
+    ssize_t readedBytes = myRead(ifs, buffer, readSize);
     if (readedBytes == -1)
     {
-        close(fd);
+        ifs.close();
         statusCode = OK;
         responseDone = true;
-        return;
     }
-    if (readedBytes == 0 || (isRanged && sendedBytes >= endOffset - startOffset))
+    if (!readedBytes || (isRanged && sendedBytes >= endOffset - startOffset))
     {
         body.clear();
-        close(fd);
+        ifs.close();
         responseDone = true;
         return;
     }
     body.clear();
-    body.append(buffer, readedBytes);
-    sendedBytes += readSize;
+    body.append(buffer, readSize);
+    sendedBytes += readedBytes;
 }
 
 void Response::prepareCGI()
@@ -478,7 +470,6 @@ void Response::prepareResponse()
 
 void Response::resetResponse()
 {
-    fd = INT_MIN;
     request = NULL;
     statusCode = 200;
     headersSent = false;
@@ -496,7 +487,6 @@ void Response::resetResponse()
     alreadySeeked = false;
     sendedBytes = 0;
     readSize = sizeof(buffer);
-    ifs.clear();
     ifs.close();
 }
 

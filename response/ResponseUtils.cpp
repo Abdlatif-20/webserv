@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:38:30 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 01:25:39 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/27 15:38:03 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,4 +57,15 @@ ssize_t getEndOffset(const std::string& range)
         return std::atoll(endOffset.c_str());
     }
     return -1;
+}
+
+ssize_t myRead(std::ifstream& ifs, char* buff, size_t sz)
+{
+    size_t i = 0;
+    char c;
+    while (i < sz && ifs.get(c))
+        buff[i++] = c;
+    if (ifs.fail())
+        return -1;
+    return i;
 }

@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/25 22:39:24 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/27 16:02:31 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ ssize_t Client::recvRequest(void)
 	{
 		request.parseRequest(std::string(buff, len), serverCTX);
 		requestDone = request.isDone();
-		// last_update_time = std::time(NULL); to think about later
+		last_update_time = std::time(NULL); //to think about later
 	}
 	else
 		requestDone = true;;
