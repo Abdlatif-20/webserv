@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 14:36:15 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/26 00:23:51 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/26 15:24:13 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,5 +86,6 @@ enum StatusCodes
 	RequestURITooLong = 414,
 	RequestEntityTooLarge = 413,
     InternalServerError = 500,
-	HTTPVersionNotSupported = 505
+	HTTPVersionNotSupported = 505,
+    RequestedRangeNotSatisfiable = 416
 };
