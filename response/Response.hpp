@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 03:04:15 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/27 16:07:54 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ class Response
         void prepareRedirection(int _status, const std::string& _location);
         void autoIndex(const std::string& path);
 
-        void handleRange();
+        void prepareRanged();
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;

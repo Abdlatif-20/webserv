@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 15:47:16 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/27 17:21:40 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -320,7 +320,7 @@ void Response::prepareGET()
         bodyPath = resource;
         statusCode = OK;
     }
-    handleRange();
+    prepareRanged();
     isWorking = true;
 }
 
@@ -359,7 +359,7 @@ void Response::autoIndex(const std::string& path)
     statusCode = OK;
 }
 
-void Response::handleRange()
+void Response::prepareRanged()
 {
     std::string rangeHeader = request->getHeaderByName("Range");
     if (!rangeHeader.empty())
@@ -378,8 +378,6 @@ void Response::handleRange()
             if (startOffset >= contentLength || endOffset < startOffset)
                 throw ResponseErrorException(RequestedRangeNotSatisfiable);
             statusCode = PartialContent;
-            isWorking = true;
-            std::cout << "Start Offset [" << startOffset << "]  End Offset [" << endOffset << "]" << std::endl;
         }
     }
 }
@@ -461,6 +459,7 @@ void Response::prepareResponse()
     }
     catch (const ResponseErrorException& e)
     {
+        isRanged = false;
         statusCode = e.status;
         generateResponseError();
         prepareBody();
