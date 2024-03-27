@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/26 05:26:44 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/27 16:00:50 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,10 @@ Request::Request()
 	this->requestData.clear();
 	this->boundaryName.clear();
 	this->_chunkedName.clear();
+	this->_pathTmpFile.clear();
 	this->requestVector.clear();
 	this->requestLineData.clear();
+	bzero(this->buffer, BUFFER_SIZE);
 }
 
 Request::Request(const Request& obj)
@@ -90,6 +92,9 @@ Request& Request::operator=(const Request& obj)
 		this->_requestIsWellFormed = obj._requestIsWellFormed;
 		this->remainingChunkLength = obj.remainingChunkLength;
 		this->requestLineInProgress = obj.requestLineInProgress;
+		this->requestLineData = obj.requestLineData;
+		this->tmpFile = obj.tmpFile;
+		this->_pathTmpFile = obj._pathTmpFile;
 	}
 	return (*this);
 }
@@ -239,13 +244,17 @@ void	Request::resetRequest()
 	this->_body.clear();
 	this->_params.clear();
 	this->headers.clear();
+	this->headers.clear();
 	this->requestData.clear();
 	this->boundaryName.clear();
 	this->_chunkedName.clear();
 	this->requestLine.clear();
-	this->headers.clear();
 	this->requestData.clear();
+	this->_pathTmpFile.clear();
 	this->requestVector.clear();
+	this->requestLineData.clear();
+	bzero(this->buffer, BUFFER_SIZE);
+	
 }
 
 void	Request::selectServerContext(const String& host)
