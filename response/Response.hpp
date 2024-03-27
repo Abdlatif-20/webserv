@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 16:16:51 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/27 16:48:29 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include "Request.hpp"
 #include "ServerContext.hpp"
+#include "ResponseUtils.hpp"
 #include <dirent.h>
 #include <map>
 
@@ -25,11 +26,15 @@ class Response
         LocationContext locationCTX;
 
         char buffer[1024];
-        int fd;
-        bool isPartialContent;
+        std::ifstream ifs;
+
+        /*Attributes for handling Ranged Request*/
+        bool isRanged;
         ssize_t startOffset;
         ssize_t endOffset;
         bool alreadySeeked;
+        ssize_t sendedBytes;
+        size_t readSize;
 
         int statusCode;
         std::string statusLine;
@@ -53,10 +58,11 @@ class Response
         void prepareBody();
         // void prepareCGI();
         void prepareGET();
+        void preparePOST();
         void prepareRedirection(int _status, const std::string& _location);
         void autoIndex(const std::string& path);
-        
-        void preparePOST();
+
+        void handleRange();
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;
@@ -90,20 +96,5 @@ class Response
 
         static void initMimeTypes();
         static void initReasonPhrases();
-		// static void	setupEnv(char **_env);
-
-        class ResponseErrorException : public std::exception
-        {
-            public:
-                int status;
-                ResponseErrorException() { };
-                ResponseErrorException(Response& response, int _status)
-                {
-                    response.statusCode = _status;
-                    response.generateResponseError();
-                    response.prepareBody();
-                    response.prepareHeaders();
-                }
-                ~ResponseErrorException() throw() { };
-        };
+		static void	setupEnv(char **_env);
 };
