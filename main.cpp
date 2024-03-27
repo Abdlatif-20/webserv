@@ -6,14 +6,14 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 16:49:26 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/27 17:13:36 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 #include "Utils.hpp"
 #include "Config.hpp"
-// #include "CGI.hpp"
+#include "CGI.hpp"
 #include "Core.hpp"
 
 int main(int argc, char **argv, char  ** __unused env)
