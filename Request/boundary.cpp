@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 06:10:36 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 07:16:12 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,16 @@ void Request::parseContentType()
 // function to parse the boundary and write the actual file
 void Request::parseBoundary()
 {
-	createBoundaryTmpFile();
+	if (!multipart)
+		createBoundaryTmpFile();
+	else
+	{
+		this->_pathTmpFile = _chunkedName;
+		_BoundaryComplete = true;
+	}
 	if (!this->_BoundaryComplete)
 		return(receivecount++, void());
-	if (sizeBoundary != contentLength)
+	if (sizeBoundary != contentLength && !multipart)
 		return (status = BadRequest, requestIscomplete = true,
 			std::remove(_pathTmpFile.c_str()), void());
 	int fd = open(this->_pathTmpFile.c_str(), O_RDONLY);

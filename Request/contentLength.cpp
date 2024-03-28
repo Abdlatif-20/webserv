@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   contentLength.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/22 21:22:24 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/28 06:54:19 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 void	Request::parseContentLength()
 {
 	if (_headers["content-length"].find_first_not_of("0123456789") != std::string::npos)
-	{ 
+	{
 		status = BadRequest;
 		requestIscomplete = true;
 	}

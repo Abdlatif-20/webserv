@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 00:43:14 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/28 07:15:59 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,6 @@ void	Request::requestIsWellFormed()
 		return;
 	if (this->requestLine["path"].size() > 2048)
 		return (this->status = RequestURITooLong, requestIscomplete = true, void());
-	// if (this->requestLine["path"].find_first_not_of(ALLOWED_CHARACTERS) != String::npos)
-	// 	return (this->status = BadRequest, requestIscomplete = true, void());
 	if (this->requestLine["method"] == "POST")
 	{
 		if (_headers.find("content-type") != _headers.end()
@@ -142,7 +140,13 @@ void	Request::parseBody()
 			parseBoundary();
 	else if (this->requestLine["method"] == "POST"
 		&& _headers.find("content-type") != _headers.end() && _headers.find("transfer-encoding") != _headers.end())
-			return (this->status = NotImplemented, requestIscomplete = true, void());
+		{
+			multipart = true;
+			parseChunkedBody();
+			if (requestIscomplete)
+				parseBoundary();
+			multipart = false;
+		}
 	else if (this->requestLine["method"] == "POST"
 			&& _headers.find("content-length") != _headers.end())
 				ContentLength();
