@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/28 23:05:43 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/28 23:08:02 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -237,7 +237,7 @@ std::map<std::string, std::string> Context::getCGI()
 
 bool Context::hasCGI()
 {
-    return cgi.empty();
+    return !cgi.empty();
 }
 
 unsigned int Context::getCGI_timeout()
