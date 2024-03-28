@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/27 16:00:50 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 01:36:13 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,6 +156,8 @@ const String Request::getHeaderByName(const String& name) const
 	{
 		if (name == "connection")
 			return ("keep-alive");
+		else
+			return "";
 	}
 	return ("");
 }

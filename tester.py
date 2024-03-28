@@ -1,3 +1,4 @@
+#!/usr/local/bin/python3
 from random import randbytes
 from sys import *
 from socket import *
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     if len(argv) != 5:
         exit(1)
     send(argv[1],int(argv[2]), argv[3], int(argv[4]), int(int(argv[4]) / 4))
-    p = "./chunked_" + input()
+    p = "/Users/mel-yous/goinfre/upload/chunked_" + input()
     f1 = open(argv[3], "r")
     f2 = open(p, "r")
     if f1.read() != f2.read():
