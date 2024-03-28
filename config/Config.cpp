@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 20:03:24 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/28 23:31:27 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context
         tok_iter++;
         if (d == CGI_ASSIGN)
         {
-            ctx.addCGI(std::pair<std::string, std::string>(tok_iter->getContent(), (tok_iter++)->getContent()));
+            ctx.addCGI(std::pair<std::string, std::string>(tok_iter->getContent(), (++tok_iter)->getContent()));
             return;
         }
         while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)

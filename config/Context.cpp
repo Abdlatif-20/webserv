@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/28 23:08:02 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/28 23:32:19 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ Context& Context::operator=(const Context& obj)
         return *this;
     directives = obj.directives;
     errorPages = obj.errorPages;
+    cgi = obj.cgi;
     return *this;
 }
 

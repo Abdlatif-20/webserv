@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/28 17:08:22 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/28 23:33:29 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ Response::Response()
     std::memset(buffer, 0, sizeof(buffer));
     isWorking = false;
     isRedirection = false;
-    hasCGI = false;
     isRanged = false;
     startOffset = 0;
     endOffset = 0;
@@ -56,7 +55,6 @@ Response& Response::operator=(const Response& obj)
     isWorking = obj.isWorking;
     isRedirection = obj.isRedirection;
     location = obj.location;
-    hasCGI = obj.hasCGI;
     isRanged = obj.isRanged;
     startOffset = obj.startOffset;
     endOffset = obj.endOffset;
@@ -386,10 +384,7 @@ void Response::preparePOST()
     {
         std::string resource = locationCTX.getRoot() + Utils::urlDecoding(request->getRequestPath());
         if (!Utils::checkIfPathExists(resource))
-        {
-            std::cout << "HREE\n";
             throw ResponseErrorException(NotFound);
-        }
         if (Utils::isDirectory(resource))
         {
             if (!Utils::stringEndsWith(resource, "/"))
@@ -399,7 +394,7 @@ void Response::preparePOST()
                 try
                 {
                     std::string index = locationCTX.getIndex(resource);
-                    if (index.empty() || !hasCGI)
+                    if (index.empty() || !locationCTX.hasCGI())
                         throw Utils::FilePermissionDenied();
                     /* Request BODY goes to CGI !! */
                 }
@@ -411,10 +406,18 @@ void Response::preparePOST()
         }
         else
         {
-            if (!hasCGI)
+            if (!locationCTX.hasCGI())
                 throw ResponseErrorException(FORBIDDEN);
         }
     }
+}
+
+void Response::prepareDELETE()
+{
+    std::cout << locationCTX.hasCGI() << std::endl;
+    if (!locationCTX.hasCGI())
+        throw ResponseErrorException(MethodNotAllowed);
+    /*CGI job*/
 }
 
 void Response::prepareResponse()
@@ -432,25 +435,15 @@ void Response::prepareResponse()
             return;
         }
         if (request->getMethod() == "GET")
-        {
             prepareGET();
-            prepareBody();
-            prepareHeaders();
-        }
         else if (request->getMethod() == "POST")
-        {
             preparePOST();
-            prepareBody();
-            prepareHeaders();
-        }
         else if (request->getMethod() == "DELETE")
-        {
-            /* Prepare DELETE */
-        }
+            prepareDELETE();
         else
-        {
-            
-        }
+            throw ResponseErrorException(NotImplemented);
+        prepareBody();
+        prepareHeaders();
     }
     catch (const ResponseErrorException& e)
     {
@@ -474,7 +467,6 @@ void Response::resetResponse()
     body.clear();
     bodyPath.clear();
     headers.clear();
-    hasCGI = false;
     isRanged = false;
     startOffset = 0;
     endOffset = 0;
