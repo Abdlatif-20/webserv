@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:12:18 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 06:38:52 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 08:01:17 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,12 @@ String& Request::isExist(Map& headers, String key)
 	if (headers.find(key) != headers.end())
 		return headers[key];
 	return headers[key] = "";
+}
+
+void	Request::removeFiles()
+{
+	for (size_t i = 0; i < tmpFiles.size(); i++)
+		std::remove(tmpFiles[i].c_str());
 }
 
 // function to prepare the filename and return it
@@ -71,6 +77,7 @@ void Request::createBoundaryTmpFile()
 			else
 				_pathTmpFile = "/goinfre/boundary_" + Utils::intToString(rand() % 1000);
 		}
+		tmpFiles.push_back(_pathTmpFile);
 	}
 	write(tmpFile, _body.c_str(), _body.size());
 	this->sizeBoundary += _body.size();

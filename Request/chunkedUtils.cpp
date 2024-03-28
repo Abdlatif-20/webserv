@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:40:48 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 07:06:48 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 07:58:58 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ void Request::createChunkedTmpFile()
 			else
 				_pathTmpFile = "/goinfre/chunked_" + Utils::intToString(rand() % 1000);
 		}
+		tmpFiles.push_back(_pathTmpFile);
 	}
 	write(tmpFile, _body.c_str(), _body.size());
 	std::string chunkEnd = _body.substr(_body.size() - 5, 5);

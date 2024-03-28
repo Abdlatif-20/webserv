@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 06:47:35 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 08:01:28 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,7 @@ class Request
 		Map	requestLine;
 		//vector
 		Vector	requestVector;
+		Vector	tmpFiles;
 		//strings
 		String	_path;
 		String	_pathTmpFile;
@@ -93,6 +94,7 @@ class Request
 			void			parseBody();
 			void			fillParams();
 			int				preparName();
+			void			removeFiles();
 			void			parseBoundary();
 			void			ContentLength();
 			void			parseChunkedBody();

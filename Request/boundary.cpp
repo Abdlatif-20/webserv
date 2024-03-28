@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 07:16:12 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 08:02:09 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,6 @@ void Request::parseBoundary()
 			boundaryName.clear();
 			requestIscomplete = true;
 			_body.clear();
-			std::remove(_pathTmpFile.c_str());
 			break;
 		}
 		else if (_body.find(startBoundary) != String::npos)
@@ -99,6 +98,6 @@ void Request::parseBoundary()
 			continue;
 		}
 		write(file, _body.c_str(), _body.size());
-		_body.clear();
 	}
+	removeFiles();
 }
