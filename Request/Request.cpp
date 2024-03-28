@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 02:38:30 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 07:34:31 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -325,11 +325,12 @@ void	Request::parseRequest(const std::string& receivedRequest, ServerContext ser
 		{
 			if (receivedRequest.front() == CR && this->requestInProgress)
 				return;
-			// printf("%lu\n", receivedRequest.size());
 			this->_body = receivedRequest;
-			// printf("%lu\n", _body.size());
 		}
 		if (!this->_body.empty())
 			parseBody();
+		if (receivecount == 1)
+			receivecount++;
+		
 	}
 }
