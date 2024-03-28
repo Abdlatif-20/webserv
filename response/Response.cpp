@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 17:21:40 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/27 22:35:23 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,15 +184,6 @@ void Response::prepareHeaders()
         headers["Content-Length"] = Utils::longlongToString((endOffset - startOffset) + 1);
         headers["Content-Range"] = "bytes " + Utils::longlongToString(startOffset) + "-" + Utils::longlongToString(endOffset) + "/" + Utils::longlongToString(Utils::getFileSize(bodyPath));
     }
-    // headers += "Connection: " + request->getHeaderByName("connection") + CRLF;
-    // headers += "Server: " + std::string(SERVER) + " (" + OS_MAC + ")" + CRLF;
-    // headers += "Date: " + Utils::getCurrentTime() + CRLF;
-    // headers += "Content-Length: " + (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))) + CRLF;
-    // headers += std::string("Accept-Ranges: bytes") + CRLF;
-    // headers += "Content-Type: " + (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath))) + CRLF;
-    // if (isRedirection)
-    //     headers += "Location: " + location + CRLF;
-    // headers += CRLF;
 }
 
 void Response::prepareBody()
@@ -338,9 +329,7 @@ void Response::autoIndex(const std::string& path)
     std::string html = Utils::replaceAll(AUTO_INDEX_TEMPLATE, "$indexof$", request->getRequestPath());
     dir = opendir(path.c_str());
     if (!dir)
-    {
         throw ResponseErrorException(FORBIDDEN);
-    }
     while ((entry = readdir(dir)))
     {
         if (Utils::isDirectory(path + entry->d_name))
@@ -353,6 +342,7 @@ void Response::autoIndex(const std::string& path)
         html += "<td>" + (Utils::isDirectory(path + entry->d_name) ? "Directory" : Utils::getFileExtension(path + entry->d_name)) + "</td>";
         html += "</tr>";
     }
+    closedir(dir);
     html += "</table></body></html>";
     body = html;
     bodyPath.clear();
@@ -394,7 +384,10 @@ void Response::preparePOST()
     {
         std::string resource = locationCTX.getRoot() + Utils::urlDecoding(request->getRequestPath());
         if (!Utils::checkIfPathExists(resource))
+        {
+            std::cout << "HREE\n";
             throw ResponseErrorException(NotFound);
+        }
         if (Utils::isDirectory(resource))
         {
             if (!Utils::stringEndsWith(resource, "/"))

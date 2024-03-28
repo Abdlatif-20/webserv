@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/26 21:13:08 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/27 22:51:56 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ std::vector<Server> Request::servers;
 Request::Request()
 {
 	this->status = OK;
+	this->tmpFile = -1;
 	this->detectHost = 0;
 	this->bodyDone = false;
 	this->foundUri = false;
@@ -45,8 +46,10 @@ Request::Request()
 	this->requestData.clear();
 	this->boundaryName.clear();
 	this->_chunkedName.clear();
+	this->_pathTmpFile.clear();
 	this->requestVector.clear();
 	this->requestLineData.clear();
+	bzero(this->buffer, BUFFER_SIZE);
 }
 
 Request::Request(const Request& obj)
@@ -90,6 +93,9 @@ Request& Request::operator=(const Request& obj)
 		this->_requestIsWellFormed = obj._requestIsWellFormed;
 		this->remainingChunkLength = obj.remainingChunkLength;
 		this->requestLineInProgress = obj.requestLineInProgress;
+		this->requestLineData = obj.requestLineData;
+		this->tmpFile = obj.tmpFile;
+		this->_pathTmpFile = obj._pathTmpFile;
 	}
 	return (*this);
 }
@@ -241,13 +247,19 @@ void	Request::resetRequest()
 	this->_body.clear();
 	this->_params.clear();
 	this->headers.clear();
+	this->headers.clear();
 	this->requestData.clear();
 	this->boundaryName.clear();
 	this->_chunkedName.clear();
 	this->requestLine.clear();
-	this->headers.clear();
 	this->requestData.clear();
+	this->_pathTmpFile.clear();
 	this->requestVector.clear();
+	this->requestLineData.clear();
+	close(this->tmpFile);
+	this->tmpFile = -1;
+	bzero(this->buffer, BUFFER_SIZE);
+	
 }
 
 void	Request::selectServerContext(const String& host)
@@ -310,35 +322,11 @@ void	Request::parseRequest(const std::string& receivedRequest, ServerContext ser
 		{
 			if (receivedRequest.front() == CR && this->requestInProgress)
 				return;
+			// printf("%lu\n", receivedRequest.size());
 			this->_body = receivedRequest;
+			// printf("%lu\n", _body.size());
 		}
 		if (!this->_body.empty())
 			parseBody();
 	}
 }
-
-
-/*
-
-8d2^M$
-¾¡©y^H#Y�M-^Yç�M-^T^UU�M-^C�M-^Dc³¬å·s�M-^T�M-^_�M-^N²,�M-^XTcm¹m^_�M-^Hªý�M-^PH�M-^_«¿^Y)@�M-^AM�M-^D¹�M-^_[|�M-^Z�M-^C^Sz�M-^I^T^M$
-�M-^Fi·2îW�M-^KTo�M-^O�M-^GEN�M-^[å�M-^Fs²®�M-^P^¦ù«è«�M-^K^�M-^[aèc5�M-^]�M-^R^â�M-^LRv"±�M-^T�M-^T[Y(T�M-^U^Z<# 7�M-^Q^\v^X^T?g�M-^^�M-^\M^H*sw7·ã^Gi^Qyl^Zc/^UXe&úê¨:�M-^PP¢?'UB,^B?�M-^U^Q�M-^Js�M-^T["�M-^AeOní¼l^A^K^Q^RXñò[^?�M-^@Bj�M-^Yç>·ëg|E�M-^C�M-^Da�M-^Eü^^�M-^R²�M-^LAë@�M-^_õ¿�M-^Sg�M-^Pî^Cà:åøº°     ÿU�M-^S÷ú,­"^âbUü¼Ióá�M-^My¢ã�M-^MR*é-º�M-^V^Gþ�M-^Xä�M-^F�M-^G�M-^P[^OWE8#�M-^G,rC*ê^YG�M-^Fµê^M$
-c^SZw�M-^R�M-^[<�M-^L^Rý<�M-^]^NpLE�M-^I�M-^PP^W�M-^N9y!^D�M-^X^U^H�M-^N^]§\ìm°e©�M-^U^\Q�M-^EãD4�M-^\ª'-�M-^Fª�M-^W^[^C&µ¾e�M-^D^N5©^?¤^~Xü»�M-^E@¼�M-^[^HAO*4s¼�M-^T�M-^G2�M-^\J�M-^S�M-^I�M-^]�M-^U+�M-^E�M-^Bv�M-^W`^F�M-^X�M-^OY9�M-^Y�M-^X%^R^P�M-^]/íj^V�M-^YçS�M-^Qk¬tw>�M-^YøJ�M-^Aõ^E�M-^ZpB^Q^Ho^^Y�M-^^j�M-^A^Tö�M-^Z�M-^Nm�M-^X¥^[ãvë^X^ACù�M-^H�M-^Dü�M-^Mìsó�M-^^²|m�M-^H¼�M-^Cknò1ìA�M-^Yñ�M-^Y^[^Fì^L�M-^G^Uíg�M-^H^]�M-^U>s^C^Léï³�M-^\7^S�M-^[5^B�M-^[l^E�M-^Q^Z�M-^T�M-^OH�M-^S^W�M-^R^H"u^A�M-^B�M-^Q "ê^]è�M-^K�M-^C �M-^H�M-^B<*^N«ª¹"ëD�M-^Y÷e\^T�M-^R^[9^F÷ezfê8d2^M$
-¾¡©y^H#Y�M-^Yç�M-^T^UU�M-^C�M-^Dc³¬å·s�M-^T�M-^_�M-^N²,�M-^XTcm¹m^_�M-^Hªý�M-^PH�M-^_«¿^Y)@�M-^AM�M-^D¹�M-^_[|�M-^Z�M-^C^Sz�M-^I^T^M$
-�M-^Fi·2îW�M-^KTo�M-^O�M-^GEN�M-^[å�M-^Fs²®�M-^P^¦ù«è«�M-^K^�M-^[aèc5�M-^]�M-^R^â�M-^LRv"±�M-^T�M-^T[Y(T�M-^U^Z<# 7�M-^Q^\v^X^T?g�M-^^�M-^\M^H*sw7·ã^Gi^Qyl^Zc/^UXe&úê¨:�M-^PP¢?'UB,^B?�M-^U^Q�M-^Js�M-^T["�M-^AeOní¼l^A^K^Q^RXñò[^?�M-^@Bj�M-^Yç>·ëg|E�M-^C�M-^Da�M-^Eü^^�M-^R²�M-^LAë@�M-^_õ¿�M-^Sg�M-^Pî^Cà:åøº°     ÿU�M-^S÷ú,­"^âbUü¼Ióá�M-^My¢ã�M-^MR*é-º�M-^V^Gþ�M-^Xä�M-^F�M-^G�M-^P[^OWE8#�M-^G,rC*ê^YG�M-^Fµê^M$
-c^SZw�M-^R�M-^[<�M-^L^Rý<�M-^]^NpLE�M-^I�M-^PP^W�M-^N9y!^D�M-^X^U^H�M-^N^]§\ìm°e©�M-^U^\Q�M-^EãD4�M-^\ª'-�M-^Fª�M-^W^[^C&µ¾e�M-^D^N5©^?¤^~Xü»�M-^E@¼�M-^[^HAO*4s¼�M-^T�M-^G2�M-^\J�M-^S�M-^I�M-^]�M-^U+�M-^E�M-^Bv�M-^W`^F�M-^X�M-^OY9�M-^Y�M-^X%^R^P�M-^]/íj^V�M-^YçS�M-^Qk¬tw>�M-^YøJ�M-^Aõ^E�M-^ZpB^Q^Ho^^Y�M-^^j�M-^A^Tö�M-^Z�M-^Nm�M-^X¥^[ãvë^X^ACù�M-^H�M-^Dü�M-^Mìsó�M-^^²|m�M-^H¼�M-^Cknò1ìA�M-^Yñ�M-^Y^[^Fì^L�M-^G^Uíg�M-^H^]�M-^U>s^C^Léï³�M-^\7^S�M-^[5^B�M-^[l^E�M-^Q^Z�M-^T�M-^OH�M-^S^W�M-^R^H"u^A�M-^B�M-^Q "ê^]è�M-^K�M-^C �M-^H�M-^B<*^N«ª¹"ëD�M-^Y÷e\^T�M-^R^[9^F÷ezfê�M-^Fi·2îW�M-^KTo�M-^O�M-^GEN�M-^[å�M-^Fs²®�M-^P^¦ù«è«�M-^K^�M-^[aèc5�M-^]�M-^R^â�M-^LRv"±�M-^T�M-^T[Y(T�M-^U^Z<# 7�M-^Q^\v^X^T?g�M-^^�M-^\M^H*sw7·ã^Gi^Qyl^Zc/^UXe&úê¨:�M-^PP¢?'UB,^B?�M-^U^Q�M-^Js�M-^T["�M-^AeOní¼l^A^K^Q^RXñò[^?�M-^@Bj�M-^Yç>·ëg|E�M-^C�M-^Da�M-^Eü^^�M-^R²�M-^LAë@�M-^_õ¿�M-^Sg�M-^Pî^Cà:åøº°     ÿU�M-^S÷ú,­"^âbUü¼Ióá�M-^My¢ã�M-^MR*é-º�M-^V^Gþ�M-^Xä�M-^F�M-^G�M-^P[^OWE8#�M-^G,rC*ê^YG�M-^Fµê^M$
-c^SZw�M-^R�M-^[<�M-^L^Rý<�M-^]^NpLE�M-^I�M-^PP^W�M-^N9y!^D�M-^X^U^H�M-^N^]§\ìm°e©�M-^U^\Q�M-^EãD4�M-^\ª'-�M-^Fª�M-^W^[^C&µ¾e�M-^D^N5©^?¤^~Xü»�M-^E@¼�M-^[^HAO*4s¼�M-^T�M-^G2�M-^\J�M-^S�M-^I�M-^]�M-^U+�M-^E�M-^Bv�M-^W`^F�M-^X�M-^OY9�M-^Y�M-^X%^R^P�M-^]/íj^V�M-^YçS�M-^Qk¬tw>�M-^YøJ�M-^Aõ^E�M-^ZpB^Q^Ho^^Y�M-^^j�M-^A^Tö�M-^Z�M-^Nm�M-^X¥^[ãvë^X^ACù�M-^H�M-^Dü�M-^Mìsó�M-^^²|m�M-^H¼�M-^Cknò1ìA�M-^Yñ�M-^Y^[^Fì^L�M-^G^Uíg�M-^H^]�M-^U>s^C^Léï³�M-^\7^S�M-^[5^B�M-^[l^E�M-^Q^Z�M-^T�M-^OH�M-^S^W�M-^R^H"u^A�M-^B�M-^Q "ê^]è�M-^K�M-^C �M-^H�M-^B<*^N«ª¹"ëD�M-^Y÷e\^T�M-^R^[9^F÷ezfêS�M-^_%�M-^LT�M-^Oê"{;�M-^G¨ú^Dâ�M-^]WZ^H0^H¨^B@í-jé ,^NBçR^^Cù^?�M-^A^D/^^5:óï�M-^G>�M-^Hw�M-^Lvê�M-^Mý7�M-^G[u^GN^Y½�M-^T^_uQ^M$
-0wI~G¤1çX©f^WeFE¥õ^X�M-^C�M-^D�M-^D�M-^@¾�M-^M·hGèk�M-^MùbH�M-^T?�M-^@^W¼ä¤�M-^[hd^^�M-^NSL�M-^H¢�M-^O¤#fV-ú·$~N�M-^\è(`�M-^Y¿�M-^C�M-^FjOUáh^S�M-^J�M-^Z�M-^O�M-^W^[�M-^N®�M-^R¹�M-^Kppb�M-^\/»§üV�M-^]¤V*c¿á�M-^F&{«à,¥�M-^R³f3�M-^F`»`N�M-^N6�M-^V2�M-^Jâ�M-^Fó¹^R^R�M-^R�M-^X�M-^^^U�M-^F{�M-^_�M-^Qn­^Bu6�M-^A�M-^[�M-^X¾¸^Z^K^U3^O�M-^BI^W�M-^JR�M-^Bïé¦¦2�M-^J�M-^Z�M-^So^H^^    l9b�M-^X�M-^P%J�M-^_^R¸¹a�M-^UD�M-^B j'£j}ù�M-^^S¦X�M-^IE�M-^\p)23^W còã�M-^G/ég¿�M-^Pø^A^Y/w+fL^D�M-^XKàqqT�M-^CaA^^]�M-^A�M-^^�M-^Füuê�M-^NJ�M-^^»'>@XhW�M-^M¯¹�M-^H:�M-^P�M-^An:î¹y-E�M-^L�M-^P�M-^^¾h^�M-^^'ùrúQ¥�M-^FjX,<�M-^_�M-^Xê£ì^HO^P®�M-^Xaw�M-^K71�M-^E^)`�M-^KNU�M-^C�M-^M,W�M-^Rr¸�M-^K�M-^W�M-^AO�M-^[W�M-^\=ºµ�M-^Lp¼^B&(þ�M-^F[}�M-^A²¯±x#g�M-^@EöSðo°ã�M-^V¡«~*.Y^R�M-^A00pN±õ�M-^D^M$
-î�M-^F�M-^L�M-^]�M-^W³�M-^C^DgCêmº�M-^E�M-^Q¢�M-^V-hûu^V^K»â:�M-^G¢=�M-^I^K�M-^QN8¢ñ&�M-^Y^M$
-­õ^Z^_{D^T�M-^Z�M-^N�M-^S¦^\^E0^U�M-^Nï�M-^IX�M-^X�M-^Qn< ã^R^]S�M-^H�M-^Vt�M-^X�M-^]¦D|^]�M-^Uº^\�M-^X{^B�M-^EYQ:§�M-^\�M-^[�M-^S�M-^Z�M-^G�M-^V�M-^]^X�M-^H«H�M-^J�M-^X^CVID�M-^T¤ô3A�M-^Rá&4ÿ¶Y²^Zj^R�M-^J�M-^\s÷tF*?:ä1î�M-^H�M-^A�M-^Wð^^»åû+�M-^E½�M-^B�M-^T^M$
-�M-^F�M-^Dô^?¨�M-^_xe^\^D#l}e�M-^P�M-^Q�M-^W'^M$
-�M-^Zi�M-^Q^R´�M-^G^P¹^A�M-^Z�M-^X_bKM,èZ�M-^@@�M-^L�M-^O�M-^E�M-^R�M-^C�M-^X�M-^Dmý�M-^_ë­5ú.�M-^L^?Q�M-^B¹�M-^L^W Y�M-^WE^Y�M-^P²y8Lôö�M-^@�M-^Ecoe,^]ð,î^A"k�M-^Ft^X^Tâç*^?^?Q�M-^^¿´^CB�M-^^�M-^[^D"O804²glGrE^?q*�M-^Ibð�M-^Eµ�M-^[v/g�M-^G8       l�M-^@�M-^J�M-^F�M-^X�M-^I-í^M$
-f{[�M-^^®=aèè¬á(�M-^@:J¼�M-^Fõë7�M-^^óR.;�M-^CtV�M-^GL²�M-^A¯�M-^]�M-^Pö6­%ðð ¿÷ñ^Q�M-^E^\�M-^KA^V$�M-^\á�M-^O0mõ�M-^Mt^M$
-à�M-^T�M-^Q�M-^N�M-^Bñ¢½^B�M-^U¦�M-^M^M$
-�M-^@�M-^W_h^M$
-^S�M-^]{�M-^Od³�M-^]�M-^RJ�M-^S�M-^Q^B^Eÿ¤07�M-^T^?·$�M-^U½°v�M-^E�M-^K1¾`W®�M-^W�M-^K2^Hª0�M-^U�M-^[�M-^G§æ¾�M-^DR�M-^Vo^RºS;³�M-^\_ª%�M-^ZF^Y�M-^Nã¡z�M-^\�M-^W�M-^_^BóP/&¶�M-^\^Q^_ç�M-^Múdr^]vñ�M-^T�M-^W�M-^L)J²KH^H^K;�M-^_�M-^B�M-^E^G¨E«�M-^_¬^^î^[^S'­6�M-^Z�M-^R      J�M-^@�M-^L�M-^Rs_^G`ln#�M-^I^U~¼�M-^I�M-^^�M-^Në�M-^O¼C%·fD�M-^Fý�M-^D �M-^Q¢^S2�M-^Z^[£�M-^Ní$½b�M-^D�M-^]|{^B~�M-^A~�M-^Igq�M-^U'á^M$
-¤h�M-^P$c^F�M-^W?æZ¨õz^G�M-^Y¤6úí^M$
-0^M$
-^M$
-
-*/

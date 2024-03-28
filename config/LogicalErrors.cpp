@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/16 15:14:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/23 20:52:10 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/27 21:19:03 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@ const char* LogicalErrorException::what() const throw()
 
 static bool isNumber(const std::string& str)
 {
-    for (size_t i = 0; i < str.length(); i++)
-        if (!std::isdigit(str[i]))
-            return false;
+    size_t i = str.find_first_not_of("0123456789");
+    if (i != std::string::npos)
+        return false;
     return true;
 }
 
@@ -123,8 +123,21 @@ static void checkReturn(Context& ctx)
     {
         StringVector::iterator vec_it = it->second.begin();
         int code = std::atoi((*vec_it).c_str());
+        std::atoi((*vec_it).c_str());
         if (!isNumber(*vec_it) || code < 300 || code > 307)
             throw LogicalErrorException("invalid value for `return` directive");
+    }
+}
+
+static void checkCGI_timeout(Context& ctx)
+{
+    DirectivesMap::iterator it = ctx.getDirectives().find("cgi_max_timeout");
+    if (it != ctx.getDirectives().end())
+    {
+        StringVector::iterator vec_it = it->second.begin();
+        int timeout = std::atoi((*vec_it).c_str());
+        if (!isNumber(*vec_it) || timeout <= 0)
+            throw LogicalErrorException("invalid value for `cgi_max_timeout` directive");
     }
 }
 
@@ -135,6 +148,7 @@ static void checkHttpDirectives(Context& ctx)
     checkAllowedMethods(ctx);
     checkErrorPages(ctx);
     checkReturn(ctx);
+    checkCGI_timeout(ctx);
 }
 
 void checkLogicalErrors(ServersVector& servers)

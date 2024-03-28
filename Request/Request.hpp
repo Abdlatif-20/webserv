@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 02:50:20 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/27 23:24:16 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,9 @@
 #include "Server.hpp"
 #include <fcntl.h>
 #include <sys/stat.h> // For mkdir
+
+
+#define BUFFER_SIZE 102400
 
 #define CR '\r'
 #define CRLF "\r\n"
@@ -51,16 +54,19 @@ class Request
 		bool	requestLineDone;
 		bool	requestInProgress;
 		bool	requestIscomplete;
-		bool	requestLineInProgress;
 		bool	_requestIsWellFormed;
 		bool	_chunkedComplete;
+		bool	requestLineInProgress;
+
+		char	buffer[BUFFER_SIZE];
+		int		tmpFile;
 		// serverctxs range
 		size_t	serv_end;
 		size_t	serv_begin;
 		//unsigned int
 		unsigned int	sizeBoundary;
 		unsigned int	contentLength;
-		int				remainingChunkLength;
+		size_t			remainingChunkLength;
 		unsigned int	remainingChunk;
 		//config
 		ServerContext serverCTX;
@@ -75,6 +81,7 @@ class Request
 		Vector	files;
 		//strings
 		String	_path;
+		String	_pathTmpFile;
 		String	_params;
 		String	_body;
 		String	headers;
@@ -88,6 +95,7 @@ class Request
 			void			parseUri();
 			void			parseBody();
 			void			fillParams();
+			int				preparName();
 			void			parseBoundary();
 			void			ContentLength();
 			void			parseChunkedBody();
@@ -95,7 +103,9 @@ class Request
 			void			setUploadingPath();
 			void			parseContentLength();
 			void			requestIsWellFormed();
+			void			createChunkedTmpFile();
 			void			parseTransferEncoding();
+			bool			writeInfile(int fdFile);
 			void			isMethodAllowedInLocation();
 			void			fillHeaders(Vector headers);
 			String			prepareFileName(String line);
@@ -106,7 +116,8 @@ class Request
 			int				parseRequestLine(const String& requestLine);
 			int				checkDuplicate(const String& receivedRequest);
 			int				takingRequests(String receivedRequest);
-			void			preparLengthAndName(size_t pos, String& length, std::ofstream& file);
+			void			preparLength(String& length);
+			void			readBytes(int fd, ssize_t& bytesRead);
 	public:
 	/* *************************** constructors ****************************** */
 	
