@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 15:16:11 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/23 20:56:47 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/27 20:16:56 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ static void checkDirective(t_directive d, TokensVector& tokens, TokensVector::it
     size_t count = countDirectiveArgs(tokens, ++i);
     switch (d)
     {
-        case ROOT: case AUTO_INDEX: case CLIENT_MAX_BODY_SIZE: case LISTEN: case UPLOAD_STORE:
+        case ROOT: case AUTO_INDEX: case CLIENT_MAX_BODY_SIZE: case LISTEN: case UPLOAD_STORE: case CGI_MAX_TIMEOUT:
             if (count != 1)
                 throw SyntaxErrorException("invalid number of args at line: ", currLineIndex);
             break;

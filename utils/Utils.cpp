@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/25 02:50:47 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 06:35:36 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,13 @@ std::string Utils::strTrim(const std::string& str, char c)
 
 t_directive Utils::getDirectiveFromTokenName(const std::string& tokenName)
 {
-	std::string tokens[12] = 
+	std::string tokens[13] = 
 	{
 		"root", "index", "auto_index", "error_page", "client_max_body_size",
-		"allowed_methods", "listen", "server_name", "return", "location", "upload_store", "cgi_assign"
+		"allowed_methods", "listen", "server_name", "return", "location",
+		"upload_store", "cgi_assign", "cgi_max_timeout"
 	};
-	for (int i = 0; i < 12; i++)
+	for (int i = 0; i < 13; i++)
 		if (tokenName == tokens[i])
 			return static_cast<t_directive>(i);
 	return UNKNOWN;
@@ -100,6 +101,13 @@ void    Utils::toLower(std::string& str)
 		*it = tolower(*it);
 }
 
+void    Utils::toUpper(std::string& str)
+{
+	std::string::iterator it;
+	for (it = str.begin(); it != str.end(); it++)
+		*it = toupper(*it);
+}
+
 void		Utils::printFile(std::string filename)
 {
 	std::ifstream file(filename);
@@ -157,6 +165,8 @@ std::string Utils::getTokenNameFromDirective(t_directive d)
 			return "upload_store";
 		case CGI_ASSIGN:
 			return "cgi_assign";
+		case CGI_MAX_TIMEOUT:
+			return "cgi_max_timeout";
 		default:
 			break;
 	}

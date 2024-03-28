@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/27 16:08:58 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 05:57:20 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@
 #include <sys/stat.h> // For mkdir
 
 
-#define BUFFER_SIZE 10000
+#define BUFFER_SIZE 102400
 
 #define CR '\r'
 #define CRLF "\r\n"
@@ -56,6 +56,7 @@ class Request
 		bool	requestIscomplete;
 		bool	_requestIsWellFormed;
 		bool	_chunkedComplete;
+		bool	_BoundaryComplete;
 		bool	requestLineInProgress;
 
 		char	buffer[BUFFER_SIZE];
@@ -78,7 +79,6 @@ class Request
 		Map	requestLine;
 		//vector
 		Vector	requestVector;
-		Vector	files;
 		//strings
 		String	_path;
 		String	_pathTmpFile;
@@ -104,6 +104,7 @@ class Request
 			void			parseContentLength();
 			void			requestIsWellFormed();
 			void			createChunkedTmpFile();
+			void			createBoundaryTmpFile();
 			void			parseTransferEncoding();
 			bool			writeInfile(int fdFile);
 			void			isMethodAllowedInLocation();
@@ -111,6 +112,7 @@ class Request
 			String			prepareFileName(String line);
 			unsigned int	convertToDecimal(String hex);
 			String& 		isExist(Map& headers, String key);
+			bool			fileExists(const std::string& fileName);
 			void			separateRequest(String receivedRequest);
 			void			fillRequestLine(const String& requestLine);
 			int				parseRequestLine(const String& requestLine);

@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/23 20:57:16 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/27 20:15:35 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,4 +233,12 @@ StringVector Context::getHttpRedirection()
 std::map<std::string, std::string> Context::getCGI()
 {
     return cgi;
+}
+
+unsigned int Context::getCGI_timeout()
+{
+    DirectivesMap::iterator it = directives.find("cgi_max_timeout");
+    if (it != directives.end())
+        return std::atoi(it->second.begin()->c_str());
+    return 60;
 }

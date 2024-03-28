@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/10 20:50:20 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 06:10:36 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,89 +19,80 @@ void Request::parseContentType()
 		return (this->status = BadRequest, requestIscomplete = true, void());
 	if (isExist(_headers, "content-length") == "")
 		return (this->status = LengthRequired, requestIscomplete = true, void());
-	contentLength = Utils::stringToInt(_headers["content-length"]);
-}
-
-void	removeFiles(Vector files)
-{
-	for (size_t i = 0; i < files.size(); i++)
-		std::remove(files[i].c_str());
+	contentLength = std::stol(_headers["content-length"]);
 }
 
 // function to parse the boundary and write the actual file
 void Request::parseBoundary()
 {
-	std::ofstream file;
-	String randomStr = Utils::intToString(std::rand() % 1000);
-	String firstBoundary = "--" + _headers["content-type"].substr(30);
-	String lastBoundary = firstBoundary + "--";
-	size_t pos;
-
-	if (!this->multipart)
-		this->sizeBoundary += this->_body.size();
-	if (!this->boundaryName.size())
+	createBoundaryTmpFile();
+	if (!this->_BoundaryComplete)
+		return(receivecount++, void());
+	if (sizeBoundary != contentLength)
+		return (status = BadRequest, requestIscomplete = true,
+			std::remove(_pathTmpFile.c_str()), void());
+	int fd = open(this->_pathTmpFile.c_str(), O_RDONLY);
+	if (fd == -1)
+		return (status = InternalServerError, requestIscomplete = true, void());
+	ssize_t bytesRead = 0;
+	String boundary = _headers["content-type"].substr(30);
+	String startBoundary = "--" + boundary;
+	String endBoundary = startBoundary + "--";
+	int file = -1;
+	while (true)
 	{
-		this->boundaryName = prepareFileName(this->_body);
-		if (this->boundaryName == "")
-			return(this->status = BadRequest, this->requestIscomplete = true, void());
-		pos = this->_body.find("\r\n\r\n");
-		if (pos != String::npos)
-			this->_body = this->_body.substr(pos + 4);
-		else
-			this->_body = "";
-		this->multipart = false;
-	}
-	if (!file.is_open())
-	{
-		file.open(this->boundaryName, std::ios::app);
-		if (!file.is_open())
-			return (this->status = BadRequest, this->requestIscomplete = true, void());
-		files.push_back(this->boundaryName);
-	}
-		if (this->sizeBoundary <= contentLength)
+		readBytes(fd, bytesRead);
+		if (!bytesRead)
+			break;
+		if (boundaryName.empty())
 		{
-			size_t posLastBoundary = this->_body.find(lastBoundary);
-			size_t posFirstBoundary = this->_body.find(firstBoundary);
-			if (posLastBoundary == String::npos)
+			size_t pos = _body.find(startBoundary);
+			if (pos != String::npos)
 			{
-				if (posFirstBoundary != String::npos)
+				_body.erase(0, pos + startBoundary.size());
+				pos = _body.find("filename=");
+				if (pos == String::npos)
+					pos = _body.find("name=");
+				if (pos != String::npos)
 				{
-					file << this->_body.substr(0, posFirstBoundary - 2);
-					this->_body = this->_body.substr(posFirstBoundary - 2);
-					file.close();
-					this->boundaryName = "";
-					this->multipart = true;
-					Request::parseBoundary();
+					boundaryName = prepareFileName(_body.substr(pos));
+					if (boundaryName.empty())
+						return (status = InternalServerError, requestIscomplete = true,
+							std::remove(_pathTmpFile.c_str()), void());
+					file = open(boundaryName.c_str(), O_CREAT | O_EXCL | O_RDWR, 0666);
+					if (file == -1)
+						return (status = InternalServerError, requestIscomplete = true,
+							std::remove(_pathTmpFile.c_str()), void());
+					_body.erase(0, _body.find("\r\n\r\n") + 4);
 				}
 				else
-				{
-					pos = this->_body.find("\r\n\r\n");
-					if (pos != String::npos)
-						this->_body = this->_body.substr(pos + 4);
-					file << this->_body;
-				}
-			}
-			else
-			{
-				file << this->_body.substr(0, posLastBoundary - 2);
-				file.close();
-				if (this->sizeBoundary != contentLength)
-				{
-					this->sizeBoundary = 0;
-					removeFiles(files);
-					return (this->status = BadRequest, this->requestIscomplete = true, void());
-				}
-				bodyDone = true;
-				this->requestIscomplete = true;
-				this->sizeBoundary = 0;
+					return (status = InternalServerError, requestIscomplete = true,
+						std::remove(_pathTmpFile.c_str()), void());
 			}
 		}
-		else
+		if (_body.find(endBoundary) != String::npos)
 		{
-			this->sizeBoundary = 0;
-			removeFiles(files);
-			return (this->status = BadRequest, this->requestIscomplete = true, void());
+			write(file, _body.c_str(), _body.find(endBoundary) - 2);
+			close(file);
+			close(fd);
+			file = -1;
+			tmpFile = -1;
+			boundaryName.clear();
+			requestIscomplete = true;
+			_body.clear();
+			std::remove(_pathTmpFile.c_str());
+			break;
 		}
-	
-	this->receivecount++;
+		else if (_body.find(startBoundary) != String::npos)
+		{
+			write(file, _body.c_str(), _body.find(startBoundary) - 2);
+			close(file);
+			file = -1;
+			boundaryName.clear();
+			_body.erase(0, _body.find(startBoundary));
+			continue;
+		}
+		write(file, _body.c_str(), _body.size());
+		_body.clear();
+	}
 }

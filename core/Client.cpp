@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/25 22:39:24 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/28 00:42:50 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,12 +45,12 @@ void	Client::reset(void)
 ssize_t Client::recvRequest(void)
 {
 	std::memset(buff, 0, sizeof(buff));
-	len = recv(sockId, buff, 1023, 0);
+	len = recv(sockId, buff, sizeof(buff) - 1, 0);
 	if (len > 0)
 	{
 		request.parseRequest(std::string(buff, len), serverCTX);
 		requestDone = request.isDone();
-		// last_update_time = std::time(NULL); to think about later
+		last_update_time = std::time(NULL); //to think about later
 	}
 	else
 		requestDone = true;;

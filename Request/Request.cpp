@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 01:36:13 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 02:38:30 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ std::vector<Server> Request::servers;
 Request::Request()
 {
 	this->status = OK;
+	this->tmpFile = -1;
 	this->detectHost = 0;
 	this->bodyDone = false;
 	this->foundUri = false;
@@ -36,6 +37,7 @@ Request::Request()
 	this->_chunkedComplete = false;
 	this->requestIscomplete = false;
 	this->requestInProgress = false;
+	this->_BoundaryComplete = false;
 	this->_requestIsWellFormed = false;
 	this->requestLineInProgress = false;
 	this->_path.clear();
@@ -88,6 +90,7 @@ Request& Request::operator=(const Request& obj)
 		this->requestLineDone = obj.requestLineDone;
 		this->_chunkedComplete = obj._chunkedComplete;
 		this->requestIscomplete = obj.requestIscomplete;
+		this->_BoundaryComplete = obj._BoundaryComplete;
 		this->requestInProgress = obj.requestInProgress;
 		this->_requestIsWellFormed = obj._requestIsWellFormed;
 		this->remainingChunkLength = obj.remainingChunkLength;
@@ -238,6 +241,7 @@ void	Request::resetRequest()
 	this->requestLineDone = false;
 	this->remainingChunkLength = 0;
 	this->_chunkedComplete = false;
+	this->_BoundaryComplete = false;
 	this->requestIscomplete = false;
 	this->requestInProgress = false;
 	this->_requestIsWellFormed = false;
@@ -255,6 +259,8 @@ void	Request::resetRequest()
 	this->_pathTmpFile.clear();
 	this->requestVector.clear();
 	this->requestLineData.clear();
+	close(this->tmpFile);
+	this->tmpFile = -1;
 	bzero(this->buffer, BUFFER_SIZE);
 	
 }

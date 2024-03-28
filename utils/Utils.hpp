@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/25 00:14:35 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/28 06:35:55 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ namespace Utils
 	void		printVector(std::vector<std::string> vec);
 	void		printMap(const std::map<std::string, std::string>& map);
 	void		toLower(std::string& str);
+	void		toUpper(std::string& str);
 	void		printFile(std::string filename);
 	std::string intToString(int number);
 	t_directive getDirectiveFromTokenName(const std::string& tokenName);

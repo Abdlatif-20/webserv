@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/26 02:45:32 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/27 22:35:23 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,14 +24,15 @@ Response::Response()
     responseDone = false;
     headersSent = false;
     std::memset(buffer, 0, sizeof(buffer));
-    fd = INT_MIN;
     isWorking = false;
     isRedirection = false;
     hasCGI = false;
-    isPartialContent = false;
+    isRanged = false;
     startOffset = 0;
     endOffset = 0;
     alreadySeeked = false;
+    sendedBytes = 0;
+    readSize = sizeof(buffer);
 }
 
 Response::Response(const Response &obj)
@@ -52,22 +53,22 @@ Response& Response::operator=(const Response& obj)
     headersSent = obj.headersSent;
     bodyPath = obj.bodyPath;
     std::memcpy(buffer, obj.buffer, sizeof(buffer));
-    fd = obj.fd;
     isWorking = obj.isWorking;
     isRedirection = obj.isRedirection;
     location = obj.location;
     hasCGI = obj.hasCGI;
-    isPartialContent = obj.isPartialContent;
+    isRanged = obj.isRanged;
     startOffset = obj.startOffset;
     endOffset = obj.endOffset;
     alreadySeeked = obj.alreadySeeked;
+    sendedBytes = obj.sendedBytes;
+    readSize = obj.readSize;
     return *this;
 }
 
 Response::~Response()
 {
-	close(fd);
-	fd = INT_MIN;
+    ifs.close();
 }
 
 void Response::setRequest(Request* request)
@@ -174,24 +175,15 @@ void Response::prepareHeaders()
     headers["Server"] = std::string(SERVER) + " (" + OS_MAC + ")";
     headers["Date"] = Utils::getCurrentTime();
     headers["Content-Length"] = (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath)));
-    headers["Accept-Ranges"] = "bytes";
     headers["Content-Type"] = (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath)));
     if (isRedirection)
         headers["Location"] = location;
-    if (isPartialContent)
+    if (isRanged)
     {
+        headers["Accept-Ranges"] = "bytes";
         headers["Content-Length"] = Utils::longlongToString((endOffset - startOffset) + 1);
         headers["Content-Range"] = "bytes " + Utils::longlongToString(startOffset) + "-" + Utils::longlongToString(endOffset) + "/" + Utils::longlongToString(Utils::getFileSize(bodyPath));
     }
-    // headers += "Connection: " + request->getHeaderByName("connection") + CRLF;
-    // headers += "Server: " + std::string(SERVER) + " (" + OS_MAC + ")" + CRLF;
-    // headers += "Date: " + Utils::getCurrentTime() + CRLF;
-    // headers += "Content-Length: " + (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))) + CRLF;
-    // headers += std::string("Accept-Ranges: bytes") + CRLF;
-    // headers += "Content-Type: " + (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath))) + CRLF;
-    // if (isRedirection)
-    //     headers += "Location: " + location + CRLF;
-    // headers += CRLF;
 }
 
 void Response::prepareBody()
@@ -201,32 +193,39 @@ void Response::prepareBody()
         responseDone = true;
         return;
     }
-    if (fd == INT_MIN)
-        fd = open(bodyPath.c_str(), O_RDONLY);
-    if (fd == -1)
-        throw ResponseErrorException(*this, InternalServerError);
+    if (!ifs.is_open())
+        ifs.open(bodyPath);
+    if (!ifs.good())
+        throw ResponseErrorException(InternalServerError);
     std::memset(buffer, 0, sizeof(buffer));
-    if (!alreadySeeked)
+    if (isRanged)
     {
-        lseek(fd, startOffset, SEEK_SET);
-        alreadySeeked = true;
+        if (!alreadySeeked)
+        {
+            ifs.seekg(startOffset, ifs.beg);
+            alreadySeeked = true;
+        }
+        size_t contentLength = endOffset - startOffset;
+        if (contentLength <= sizeof(buffer))
+            readSize = contentLength;
     }
-    ssize_t readedBytes = read(fd, buffer, sizeof(buffer));
+    ssize_t readedBytes = myRead(ifs, buffer, readSize);
     if (readedBytes == -1)
     {
-        close(fd);
+        ifs.close();
         statusCode = OK;
         responseDone = true;
-        return;
     }
-    if (readedBytes == 0)
+    if (!readedBytes || (isRanged && sendedBytes >= endOffset - startOffset))
     {
-        close(fd);
+        body.clear();
+        ifs.close();
         responseDone = true;
         return;
     }
     body.clear();
-    body.append(buffer, readedBytes);
+    body.append(buffer, readSize);
+    sendedBytes += readedBytes;
 }
 
 void Response::prepareCGI()
@@ -274,7 +273,7 @@ void Response::prepareGET()
         return;
     std::string resource = locationCTX.getRoot() + Utils::urlDecoding(request->getRequestPath());
     if (!Utils::checkIfPathExists(resource))
-        throw ResponseErrorException(*this, NotFound);
+        throw ResponseErrorException(NotFound);
     if (Utils::isDirectory(resource))
     {
         if (!Utils::stringEndsWith(resource, "/"))
@@ -289,7 +288,7 @@ void Response::prepareGET()
                     if (locationCTX.getAutoIndex())
                         autoIndex(resource);
                     else
-                        throw ResponseErrorException(*this, FORBIDDEN);
+                        throw ResponseErrorException(FORBIDDEN);
                     return;
                 }
                 bodyPath = resource + index;
@@ -297,48 +296,22 @@ void Response::prepareGET()
             }
             catch (const Utils::FilePermissionDenied& e)
             {
-                throw ResponseErrorException(*this, FORBIDDEN);
+                throw ResponseErrorException(FORBIDDEN);
             }
             catch (const Utils::FileNotFoundException& e)
             {
-                throw ResponseErrorException(*this, NotFound);
+                throw ResponseErrorException(NotFound);
             }
         }
     }
     else
     {
         if (!Utils::isReadableFile(resource))
-            throw ResponseErrorException(*this, FORBIDDEN);
+            throw ResponseErrorException(FORBIDDEN);
         bodyPath = resource;
-        std::string rangeHeader = request->getHeaderByName("Range");
-        if (!rangeHeader.empty())
-        {
-            size_t i = rangeHeader.find('=');
-            if (i != std::string::npos)
-            {
-                std::string unit = rangeHeader.substr(0, i);
-                if (unit == "bytes" || unit == "Bytes")
-                {
-                    isPartialContent = true;
-                    std::string range = rangeHeader.substr(i + 1, rangeHeader.length());
-                    i = range.find('-');
-                    if (i != std::string::npos)
-                    {
-                        startOffset = std::atoll(range.substr(0, i).c_str());
-                        endOffset = std::atoll(range.substr(i + 1, range.length()).c_str());
-                        if (endOffset == 0)
-                            endOffset = Utils::getFileSize(bodyPath);
-                        endOffset--;
-                    }
-                    statusCode = PartialContent;
-                    isWorking = true;
-                    return;
-                }
-            }
-            std::cout << "Start_Offset = " << startOffset << "  " << "End_Offset = " << endOffset << std::endl;
-        }
         statusCode = OK;
     }
+    prepareRanged();
     isWorking = true;
 }
 
@@ -356,9 +329,7 @@ void Response::autoIndex(const std::string& path)
     std::string html = Utils::replaceAll(AUTO_INDEX_TEMPLATE, "$indexof$", request->getRequestPath());
     dir = opendir(path.c_str());
     if (!dir)
-    {
-        throw ResponseErrorException(*this, FORBIDDEN);
-    }
+        throw ResponseErrorException(FORBIDDEN);
     while ((entry = readdir(dir)))
     {
         if (Utils::isDirectory(path + entry->d_name))
@@ -371,10 +342,34 @@ void Response::autoIndex(const std::string& path)
         html += "<td>" + (Utils::isDirectory(path + entry->d_name) ? "Directory" : Utils::getFileExtension(path + entry->d_name)) + "</td>";
         html += "</tr>";
     }
+    closedir(dir);
     html += "</table></body></html>";
     body = html;
     bodyPath.clear();
     statusCode = OK;
+}
+
+void Response::prepareRanged()
+{
+    std::string rangeHeader = request->getHeaderByName("Range");
+    if (!rangeHeader.empty())
+    {
+        if (getRangeUnit(rangeHeader) == "bytes")
+        {
+            std::string range = getRangeBytes(rangeHeader);
+            ssize_t contentLength = Utils::getFileSize(bodyPath);
+            if (range.empty())
+                return;
+            isRanged = true;
+            startOffset = getStartOffset(range);
+            endOffset = getEndOffset(range);
+            if (endOffset == -1 || endOffset >= contentLength)
+                endOffset = contentLength - 1;
+            if (startOffset >= contentLength || endOffset < startOffset)
+                throw ResponseErrorException(RequestedRangeNotSatisfiable);
+            statusCode = PartialContent;
+        }
+    }
 }
 
 void Response::preparePOST()
@@ -389,7 +384,10 @@ void Response::preparePOST()
     {
         std::string resource = locationCTX.getRoot() + Utils::urlDecoding(request->getRequestPath());
         if (!Utils::checkIfPathExists(resource))
-            throw ResponseErrorException(*this, NotFound);
+        {
+            std::cout << "HREE\n";
+            throw ResponseErrorException(NotFound);
+        }
         if (Utils::isDirectory(resource))
         {
             if (!Utils::stringEndsWith(resource, "/"))
@@ -405,14 +403,14 @@ void Response::preparePOST()
                 }
                 catch (const std::exception& e)
                 {
-                    throw ResponseErrorException(*this, FORBIDDEN);
+                    throw ResponseErrorException(FORBIDDEN);
                 }
             }
         }
         else
         {
             if (!hasCGI)
-                throw ResponseErrorException(*this, FORBIDDEN);
+                throw ResponseErrorException(FORBIDDEN);
         }
     }
 }
@@ -422,7 +420,7 @@ void Response::prepareResponse()
     try
     {
         if (request->getStatus() >= 400)
-            throw ResponseErrorException(*this, request->getStatus());
+            throw ResponseErrorException(request->getStatus());
         if (locationCTX.getHttpRedirection().size() > 0)
         {
             prepareRedirection(Utils::stringToInt(locationCTX.getHttpRedirection().at(0)), locationCTX.getHttpRedirection().at(1));
@@ -452,12 +450,18 @@ void Response::prepareResponse()
             
         }
     }
-    catch (const ResponseErrorException& e) { }
+    catch (const ResponseErrorException& e)
+    {
+        isRanged = false;
+        statusCode = e.status;
+        generateResponseError();
+        prepareBody();
+        prepareHeaders();
+    }
 }
 
 void Response::resetResponse()
 {
-    fd = INT_MIN;
     request = NULL;
     statusCode = 200;
     headersSent = false;
@@ -469,10 +473,13 @@ void Response::resetResponse()
     bodyPath.clear();
     headers.clear();
     hasCGI = false;
-    isPartialContent = false;
+    isRanged = false;
     startOffset = 0;
     endOffset = 0;
     alreadySeeked = false;
+    sendedBytes = 0;
+    readSize = sizeof(buffer);
+    ifs.close();
 }
 
 std::string Response::headersToString()

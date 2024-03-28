@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 16:42:03 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/27 17:14:27 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 03:28:52 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	Request::readBytes(int fd, ssize_t& bytesRead)
 {
 	bytesRead = read(fd, this->buffer, BUFFER_SIZE);
 	if (bytesRead == -1)
-		return (std::cerr << "Error: could not read chunked file" << std::endl, void());
+		return (requestIscomplete = true, void());
 	_body.append(this->buffer, bytesRead);
 	bzero(this->buffer, BUFFER_SIZE);
 }
