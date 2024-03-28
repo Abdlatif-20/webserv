@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 22:35:23 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/28 17:08:22 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -176,6 +176,8 @@ void Response::prepareHeaders()
     headers["Date"] = Utils::getCurrentTime();
     headers["Content-Length"] = (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath)));
     headers["Content-Type"] = (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath)));
+    if (!bodyPath.empty())
+        headers["Last-Modified"] = Utils::get_last_modified_date(bodyPath);
     if (isRedirection)
         headers["Location"] = location;
     if (isRanged)
