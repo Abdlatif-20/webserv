@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/28 06:35:36 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 16:03:13 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -205,13 +205,14 @@ bool Utils::stringEndsWith(const std::string& str, const std::string& suffix)
 
 std::string Utils::getCurrentTime()
 {
-	time_t rawTime;
-	struct tm * tmInfo;
 	char buffer[128];
+	time_t rawTime;
+	struct tm timeinfo;
+
 	time(&rawTime);
-	tmInfo = localtime(&rawTime);
-	std::strftime(buffer, 128, "%a, %d %b %Y %H:%M:%S %Z", tmInfo);
-	return buffer;
+	gmtime_r(&rawTime, &timeinfo);
+	std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", &timeinfo);
+	return std::string(buffer);
 }
 
 bool Utils::checkIfPathExists(const std::string& path)
@@ -274,14 +275,15 @@ std::string Utils::replaceAll(std::string str, const std::string& s1, const std:
 
 std::string Utils::get_last_modified_date(const std::string& path)
 {
-	struct stat statbuf;
-	char buffer[1024];
-	if (stat(path.c_str(), &statbuf) < 0)
+	struct stat result;
+	char buffer[128];
+	if (stat(path.c_str(), &result) != 0)
 		return "--";
-	time_t last_modified = statbuf.st_mtime;
-	tm *lastTm = localtime(&last_modified);
-	std::strftime(buffer, 128, "%Y-%m-%d %H:%M:%S", lastTm);
-	return buffer;
+	time_t modified_time = result.st_mtime;
+	struct tm timeinfo;
+	gmtime_r(&modified_time, &timeinfo);
+	std::strftime(buffer, sizeof(buffer), "%a, %d %b %Y %H:%M:%S GMT", &timeinfo);
+	return std::string(buffer);
 }
 
 std::string Utils::intToHex(int i)
