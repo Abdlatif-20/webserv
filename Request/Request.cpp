@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 07:37:38 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 21:39:59 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ Request::Request()
 	this->tmpFile = -1;
 	this->detectHost = 0;
 	this->bodyDone = false;
+	this->lastTime = std::time(NULL);
 	this->foundUri = false;
 	this->receivecount = 0;
 	this->sizeBoundary = 0;
@@ -97,6 +98,7 @@ Request& Request::operator=(const Request& obj)
 		this->requestLineInProgress = obj.requestLineInProgress;
 		this->requestLineData = obj.requestLineData;
 		this->tmpFile = obj.tmpFile;
+		this->lastTime = obj.lastTime;
 		this->_pathTmpFile = obj._pathTmpFile;
 	}
 	return (*this);
@@ -244,6 +246,7 @@ void	Request::resetRequest()
 	this->_BoundaryComplete = false;
 	this->requestIscomplete = false;
 	this->requestInProgress = false;
+	this->lastTime = std::time(NULL);
 	this->_requestIsWellFormed = false;
 	this->requestLineInProgress = false;
 	this->_path.clear();
@@ -263,6 +266,11 @@ void	Request::resetRequest()
 	this->tmpFile = -1;
 	bzero(this->buffer, BUFFER_SIZE);
 	
+}
+
+time_t	Request::getLastTime() const
+{
+	return (lastTime);
 }
 
 void	Request::selectServerContext(const String& host)

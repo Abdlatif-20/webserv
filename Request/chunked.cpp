@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 16:42:03 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 08:02:32 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/29 00:16:01 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ void	Request::readBytes(int fd, ssize_t& bytesRead)
 	bytesRead = read(fd, this->buffer, BUFFER_SIZE);
 	if (bytesRead == -1)
 		return (requestIscomplete = true, void());
-	_body.clear();
 	_body.append(this->buffer, bytesRead);
 	bzero(this->buffer, BUFFER_SIZE);
 }
@@ -30,6 +29,7 @@ bool	Request::writeInfile(int fdFile)
 		{
 			write(fdFile, _body.c_str(), _body.size());
 			remainingChunkLength -= _body.size();
+			_body.clear();
 		}
 		else
 		{
@@ -64,7 +64,8 @@ void	Request::parseChunkedBody()
 		if (!_setLength)
 			preparLength(length);
 		if (!remainingChunkLength && _setLength)
-			return(bodyDone = true, close(file), requestIscomplete = true, close(fd), void());
+			return(bodyDone = true, close(file), requestIscomplete = true, close(fd),
+				std::remove(this->_pathTmpFile.c_str()), void());
 		if (!writeInfile(file))
 			continue;
 		readBytes(fd, bytesRead);
