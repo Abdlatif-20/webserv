@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 21:40:48 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/29 16:45:44 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,8 @@ class Request
 		size_t	serv_end;
 		size_t	serv_begin;
 		//unsigned int
-		unsigned int	sizeBoundary;
-		unsigned int	contentLength;
+		long long		bodySize;
+		long long		contentLength;
 		size_t			remainingChunkLength;
 		unsigned int	remainingChunk;
 		//config

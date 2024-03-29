@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   boundary.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/29 00:15:48 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/29 17:03:30 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,8 @@ void Request::parseBoundary()
 	}
 	if (!this->_BoundaryComplete)
 		return(receivecount++, void());
-	if (sizeBoundary != contentLength && !multipart)
-		return (status = BadRequest, requestIscomplete = true,
-			std::remove(_pathTmpFile.c_str()), void());
+	if (bodySize != contentLength && !multipart)
+		return (status = BadRequest, requestIscomplete = true, std::remove(_pathTmpFile.c_str()), void());
 	int fd = open(this->_pathTmpFile.c_str(), O_RDONLY);
 	if (fd == -1)
 		return (status = InternalServerError, requestIscomplete = true, void());

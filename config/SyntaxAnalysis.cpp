@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 15:16:11 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 20:16:56 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/29 00:34:37 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ static void checkDirective(t_directive d, TokensVector& tokens, TokensVector::it
             if (count < 2)
                 throw SyntaxErrorException("invalid number of args at line: ", currLineIndex);
             break;
-        case RETURN: case CGI_ASSIGN:
+        case RETURN: case CGI:
             if (count != 2)
                 throw SyntaxErrorException("invalid number of args at line: ", currLineIndex);
             break;

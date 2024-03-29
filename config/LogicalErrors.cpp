@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/16 15:14:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 21:19:03 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/29 15:17:52 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,8 +74,16 @@ static void checkAutoIndex(Context& ctx)
 static void checkMaxClientBodySize(Context& ctx)
 {
     DirectivesMap::iterator it = ctx.getDirectives().find("client_max_body_size");
-    if (it != ctx.getDirectives().end() && !isNumber(*it->second.begin()))
-        throw LogicalErrorException("invalid value for `client_max_body_size` directive");
+    if (it != ctx.getDirectives().end())
+    {
+        std::string value = *it->second.begin();
+        size_t i = value.find_first_not_of("0123456789");
+        if (i != std::string::npos)
+        {
+            if (i != value.length() - 1 || (value[i] != 'K' && value[i] != 'M' && value[i] != 'G'))
+                throw LogicalErrorException("invalid value for `client_max_body_size` directive");
+        }
+    }
 }
 
 static void checkAllowedMethods(Context& ctx)

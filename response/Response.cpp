@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/28 23:33:29 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/29 21:47:28 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,8 +124,8 @@ bool Response::responseIsDone() const
 
 std::string Response::generateHtmlErrorPage()
 {
-    return HTML_RESPONSE_PAGE + Utils::intToString(statusCode) + " - "
-        + reasonPhrases[statusCode]+ "</h2><hr><h4>WebServer 1.0</h4></body></html>";
+    return Utils::replaceAll(HTML_RESPONSE_PAGE, "$title$", reasonPhrases[statusCode]) + Utils::intToString(statusCode) + " - "
+        + reasonPhrases[statusCode] + "</h2><hr><h4>WebServer 1.0</h4></body></html>";
 }
 
 bool Response::checkErrorPage(const std::string& path)
@@ -150,7 +150,8 @@ bool Response::checkErrorPage(const std::string& path)
 void Response::generateResponseError()
 {
     std::string errorPage = locationCTX.getErrorPage(Utils::intToString(statusCode));
-    if (errorPage.empty())
+    static int prevStatus;
+    if (errorPage.empty() || statusCode == prevStatus)
     {
         bodyPath.clear();
         body = generateHtmlErrorPage();
@@ -338,7 +339,7 @@ void Response::autoIndex(const std::string& path)
             html += "<tr><td><i class='glyphicon glyphicon-file'></i>";
         html+= "<a style='text-decoration:none'; href='" + Utils::urlEncoding(std::string(entry->d_name)) + "'> " + entry->d_name + "</td>";
         html += "<td>" + Utils::get_last_modified_date(path + entry->d_name) + "</td>";
-        html += "<td>" + (Utils::getFileSize(path + entry->d_name) == -1 ? "--" : Utils::longlongToString(Utils::getFileSize(path + entry->d_name))) + "</td>";
+        html += "<td>" + (Utils::getFileSize(path + entry->d_name) == -1 ? "--" : Utils::bytesToHuman(Utils::getFileSize(path + entry->d_name))) + "</td>";
         html += "<td>" + (Utils::isDirectory(path + entry->d_name) ? "Directory" : Utils::getFileExtension(path + entry->d_name)) + "</td>";
         html += "</tr>";
     }
@@ -414,7 +415,6 @@ void Response::preparePOST()
 
 void Response::prepareDELETE()
 {
-    std::cout << locationCTX.hasCGI() << std::endl;
     if (!locationCTX.hasCGI())
         throw ResponseErrorException(MethodNotAllowed);
     /*CGI job*/
@@ -540,7 +540,7 @@ void Response::initReasonPhrases()
     reasonPhrases[410] = "Gone";
     reasonPhrases[411] = "Length Required";
     reasonPhrases[412] = "Precondition Failed";
-    reasonPhrases[413] = "Payload Too Large";
+    reasonPhrases[413] = "Content Too Large";
     reasonPhrases[414] = "URI Too Long";
     reasonPhrases[415] = "Unsupported Media Type";
     reasonPhrases[416] = "Requested Range Not Satisfiable";

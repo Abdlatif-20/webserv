@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   chunkedUtils.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:40:48 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 20:08:47 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/29 16:49:38 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,9 @@ void Request::createChunkedTmpFile()
 	}
 	if (!fileExists(_pathTmpFile))
 		return (status = InternalServerError, requestIscomplete = true, void());
+	bodySize += _body.size();
+	if (bodySize > locationCTX.getClientMaxBodySize())
+		return (removeFiles(), status = RequestEntityTooLarge, requestIscomplete = true, void());
 	write(tmpFile, _body.c_str(), _body.size());
 	std::string chunkEnd = _body.substr(_body.size() - 5, 5);
 	if (chunkEnd.find("0\r\n\r\n") != std::string::npos)

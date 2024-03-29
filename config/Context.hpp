@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/28 23:04:16 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/29 16:01:41 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ class Context
         std::string getRoot();
         std::string getIndex(const std::string& path);
         bool getAutoIndex();
-        int getClientMaxBodySize();
+        long long getClientMaxBodySize();
         StringVector getAllowedMethods();
         std::string getUploadStore();
         std::string getErrorPage(const std::string& status);
