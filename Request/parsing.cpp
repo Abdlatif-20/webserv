@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 07:15:59 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 19:51:10 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,12 @@ void	Request::requestIsWellFormed()
 		if (_headers.find("content-type") != _headers.end()
 				&& _headers.find("transfer-encoding") == _headers.end())
 			parseContentType();
+		else if (_headers.find("content-type") != _headers.end()
+				&& _headers.find("transfer-encoding") != _headers.end())
+		{
+			parseContentType();
+			parseTransferEncoding();
+		}
 		else if (_headers.find("transfer-encoding") != _headers.end())
 			parseTransferEncoding();
 		else if (_headers.find("content-length") != _headers.end())
@@ -139,7 +145,8 @@ void	Request::parseBody()
 		&& _headers.find("transfer-encoding") == _headers.end())
 			parseBoundary();
 	else if (this->requestLine["method"] == "POST"
-		&& _headers.find("content-type") != _headers.end() && _headers.find("transfer-encoding") != _headers.end())
+		&& _headers.find("content-type") != _headers.end()
+		&& _headers.find("transfer-encoding") != _headers.end())
 		{
 			multipart = true;
 			parseChunkedBody();

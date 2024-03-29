@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 08:01:28 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 21:40:48 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,8 @@ class Request
 		String	requestLineData;
 		String	boundaryName;
 		String	_chunkedName;
+		//time
+		time_t	lastTime;
 
 		/* *************************** methods ********************************* */
 			void			findUri();
@@ -132,6 +134,7 @@ class Request
 
 	/* *************************** methods ****************************** */
 		void	resetRequest();
+		time_t	getLastTime() const;
 		void	selectServerContext(const String& host);
 		void	setServerCTXEnd(size_t i);
 		void	setServerCTXBegin(size_t i);

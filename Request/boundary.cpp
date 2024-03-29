@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 08:02:09 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/29 00:15:48 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ void Request::parseBoundary()
 	else
 	{
 		this->_pathTmpFile = _chunkedName;
+		tmpFiles.push_back(_pathTmpFile);
 		_BoundaryComplete = true;
 	}
 	if (!this->_BoundaryComplete)
@@ -98,6 +99,7 @@ void Request::parseBoundary()
 			continue;
 		}
 		write(file, _body.c_str(), _body.size());
+		_body.clear();
 	}
 	removeFiles();
 }

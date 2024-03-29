@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:40:48 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 07:58:58 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 20:08:47 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,8 @@ void Request::createChunkedTmpFile()
 		}
 		tmpFiles.push_back(_pathTmpFile);
 	}
+	if (!fileExists(_pathTmpFile))
+		return (status = InternalServerError, requestIscomplete = true, void());
 	write(tmpFile, _body.c_str(), _body.size());
 	std::string chunkEnd = _body.substr(_body.size() - 5, 5);
 	if (chunkEnd.find("0\r\n\r\n") != std::string::npos)

@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:12:18 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 08:01:17 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 20:10:13 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,8 @@ void Request::createBoundaryTmpFile()
 		}
 		tmpFiles.push_back(_pathTmpFile);
 	}
+	if (!fileExists(_pathTmpFile))
+		return (status = InternalServerError, requestIscomplete = true, void());
 	write(tmpFile, _body.c_str(), _body.size());
 	this->sizeBoundary += _body.size();
 	std::string boundary = _headers["content-type"].substr(30);
