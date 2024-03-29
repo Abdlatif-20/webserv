@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 21:40:48 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/29 18:23:45 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ class Request
 		String	_params;
 		String	_body;
 		String	headers;
+		String	rawExtension;
 		String	requestData;
 		String	requestLineData;
 		String	boundaryName;
@@ -103,6 +104,7 @@ class Request
 			void			parseContentType();
 			void			setUploadingPath();
 			void			parseContentLength();
+			String 			getExtenstionOfBody();
 			void			requestIsWellFormed();
 			void			createChunkedTmpFile();
 			void			createBoundaryTmpFile();

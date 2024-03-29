@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/29 00:15:48 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/29 00:40:21 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,10 +92,10 @@ void Request::parseBoundary()
 		else if (_body.find(startBoundary) != String::npos)
 		{
 			write(file, _body.c_str(), _body.find(startBoundary) - 2);
+			_body.erase(0, _body.find(startBoundary));
 			close(file);
 			file = -1;
 			boundaryName.clear();
-			_body.erase(0, _body.find(startBoundary));
 			continue;
 		}
 		write(file, _body.c_str(), _body.size());

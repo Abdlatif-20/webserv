@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 21:39:59 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/29 18:24:16 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ Request::Request()
 	this->_chunkedName.clear();
 	this->_pathTmpFile.clear();
 	this->requestVector.clear();
+	this->rawExtension.clear();
 	this->requestLineData.clear();
 	bzero(this->buffer, BUFFER_SIZE);
 }
@@ -84,6 +85,7 @@ Request& Request::operator=(const Request& obj)
 		this->receivecount = obj.receivecount;
 		this->_chunkedName = obj._chunkedName;
 		this->sizeBoundary = obj.sizeBoundary;
+		this->rawExtension = obj.rawExtension;
 		this->boundaryName = obj.boundaryName;
 		this->contentLength = obj.contentLength;
 		this->requestVector = obj.requestVector;
@@ -260,6 +262,7 @@ void	Request::resetRequest()
 	this->requestLine.clear();
 	this->requestData.clear();
 	this->_pathTmpFile.clear();
+	this->rawExtension.clear();
 	this->requestVector.clear();
 	this->requestLineData.clear();
 	close(this->tmpFile);

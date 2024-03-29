@@ -6,11 +6,27 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 06:54:19 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/29 18:23:08 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
+
+String Request::getExtenstionOfBody()
+{
+	String extension = ".txt";
+	String str = _headers["content-type"];
+	String format = "";
+	size_t pos = 0;
+
+	pos = str.find("/");
+	if (pos != String::npos)
+	{
+		format = str.substr(pos + 1);
+		extension = format;
+	}
+	return extension;
+}
 
 //function to parse the content length
 void	Request::parseContentLength()
@@ -25,6 +41,7 @@ void	Request::parseContentLength()
 		status = RequestEntityTooLarge;
 		requestIscomplete = true;
 	}
+	getExtenstionOfBody();
 	contentLength = Utils::stringToInt(_headers["content-length"]);
 }
 

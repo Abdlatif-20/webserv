@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 19:51:10 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/29 18:15:54 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,11 @@ void	Request::requestIsWellFormed()
 		return (this->status = RequestURITooLong, requestIscomplete = true, void());
 	if (this->requestLine["method"] == "POST")
 	{
-		if (_headers.find("content-type") != _headers.end()
+		if (_headers.find("content-length") != _headers.end()
+			&& _headers.find("transfer-encoding") == _headers.end()
+			&& _headers["content-type"].find("multipart/form-data") == String::npos)
+			parseContentLength();
+		else if (_headers.find("content-type") != _headers.end()
 				&& _headers.find("transfer-encoding") == _headers.end())
 			parseContentType();
 		else if (_headers.find("content-type") != _headers.end()
@@ -61,8 +65,6 @@ void	Request::requestIsWellFormed()
 		}
 		else if (_headers.find("transfer-encoding") != _headers.end())
 			parseTransferEncoding();
-		else if (_headers.find("content-length") != _headers.end())
-			parseContentLength();
 		else
 			return (this->status = BadRequest, requestIscomplete = true, void());
 	}
@@ -137,6 +139,11 @@ void	Request::parseUri()
 void	Request::parseBody()
 {
 	if (this->requestLine["method"] == "POST"
+			&& _headers.find("content-length") != _headers.end()
+			&& _headers.find("transfer-encoding") == _headers.end()
+			&& _headers["content-type"].find("multipart/form-data") == String::npos)
+				ContentLength();
+	else if (this->requestLine["method"] == "POST"
 			&& _headers.find("transfer-encoding") != _headers.end()
 			&& _headers.find("content-type") == _headers.end())
 			parseChunkedBody();
@@ -154,9 +161,6 @@ void	Request::parseBody()
 				parseBoundary();
 			multipart = false;
 		}
-	else if (this->requestLine["method"] == "POST"
-			&& _headers.find("content-length") != _headers.end())
-				ContentLength();
 }
 
 //function to parse the request line and fill it to the map and return 1 if the request line is separated
