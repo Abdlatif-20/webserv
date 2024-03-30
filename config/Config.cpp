@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/29 00:32:54 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/30 21:17:53 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,10 +132,10 @@ void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context
         else
             ctx.addDirective(Directive(key, value));
     }
-    else if (d == ERROR_PAGE || d == CGI)
+    else if (d == ERROR_PAGE || d == CGI_ASSIGN)
     {
         tok_iter++;
-        if (d == CGI)
+        if (d == CGI_ASSIGN)
         {
             ctx.addCGI(std::pair<std::string, std::string>(tok_iter->getContent(), (++tok_iter)->getContent()));
             return;

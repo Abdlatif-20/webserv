@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 14:36:15 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/29 00:32:24 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/30 21:16:51 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ typedef enum e_directive
     RETURN,
     LOCATION,
     UPLOAD_STORE,
-    CGI,
+    CGI_ASSIGN,
     CGI_MAX_TIMEOUT,
     UNKNOWN
 } t_directive;
