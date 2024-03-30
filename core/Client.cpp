@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/28 00:42:50 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/30 18:08:19 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,7 @@ void	Client::sendResponse(void)
 {
 	if (requestDone && !responseDone)
 	{
+
 		response.setRequest(&request);
 		response.setLocationCTX(request.getLocationCtx());
 		response.prepareResponse();

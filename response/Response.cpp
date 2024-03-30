@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/29 21:47:28 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/30 18:09:22 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -125,7 +125,7 @@ bool Response::responseIsDone() const
 std::string Response::generateHtmlErrorPage()
 {
     return Utils::replaceAll(HTML_RESPONSE_PAGE, "$title$", reasonPhrases[statusCode]) + Utils::intToString(statusCode) + " - "
-        + reasonPhrases[statusCode] + "</h2><hr><h4>WebServer 1.0</h4></body></html>";
+        + reasonPhrases[statusCode] + "</h2><hr><h4>WebServer 1.0</h4></body></html>\n";
 }
 
 bool Response::checkErrorPage(const std::string& path)
@@ -149,9 +149,9 @@ bool Response::checkErrorPage(const std::string& path)
 
 void Response::generateResponseError()
 {
+    LABEL_00:
     std::string errorPage = locationCTX.getErrorPage(Utils::intToString(statusCode));
-    static int prevStatus;
-    if (errorPage.empty() || statusCode == prevStatus)
+    if (errorPage.empty())
     {
         bodyPath.clear();
         body = generateHtmlErrorPage();
@@ -159,8 +159,28 @@ void Response::generateResponseError()
     else
     {
         std::string path = locationCTX.getRoot() + errorPage;
-        if (!checkErrorPage(path))
-            return;
+        if (!Utils::checkIfPathExists(path))
+        {
+            if (statusCode == NotFound)
+            {
+                bodyPath.clear();
+                body = generateHtmlErrorPage();
+                return;
+            }
+            statusCode = NotFound;
+            goto LABEL_00;
+        }
+        if (Utils::isDirectory(path) || !Utils::isReadableFile(path))
+        {
+            if (statusCode == FORBIDDEN)
+            {
+                bodyPath.clear();
+                body = generateHtmlErrorPage();
+                return;
+            }
+            statusCode = FORBIDDEN;
+            goto LABEL_00;
+        }
         bodyPath = path;
     }
 }
@@ -195,9 +215,12 @@ void Response::prepareBody()
         return;
     }
     if (!ifs.is_open())
+    {
         ifs.open(bodyPath);
-    if (!ifs.good())
-        throw ResponseErrorException(InternalServerError);
+        if (!ifs.is_open())
+            throw ResponseErrorException(InternalServerError);
+    }
+
     std::memset(buffer, 0, sizeof(buffer));
     if (isRanged)
     {
@@ -211,12 +234,6 @@ void Response::prepareBody()
             readSize = contentLength;
     }
     ssize_t readedBytes = myRead(ifs, buffer, readSize);
-    if (readedBytes == -1)
-    {
-        ifs.close();
-        statusCode = OK;
-        responseDone = true;
-    }
     if (!readedBytes || (isRanged && sendedBytes >= endOffset - startOffset))
     {
         body.clear();
