@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 14:31:01 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 16:06:21 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ const std::string& Response::getBody() const
     return body;
 }
 
-const std::map<std::string, std::string>& Response::getHeaders() const
+std::map<std::string, std::string>& Response::getHeaders()
 {
     return headers;
 }
@@ -188,11 +188,7 @@ void Response::prepareHeaders()
 void Response::prepareBody()
 {
 	if (hasCGI || bodyPath.find_first_of('.') != std::string::npos)
-	{
 		runCGI();
-		responseDone = true;
-		return ;
-	}
     if (bodyPath.empty())
     {
         responseDone = true;
@@ -322,7 +318,7 @@ void Response::runCGI()
 	CGI cgi(this, request);
 
 	cgi.setupEnv(bodyPath);
-	cgi.execute();
+	ifs.open(cgi.execute());
 }
 
 void Response::handleRange()
@@ -523,23 +519,6 @@ LocationContext &Response::getLocationCtx()
 {
 	return (locationCTX);
 }
-
-// void Response::setupEnv(char **_env)
-// {
-// 	std::string	var;
-// 	env_ptr = _env;
-// 	for (size_t i = 0; env_ptr && env_ptr[i]; i++)
-// 	{
-// 		var = env_ptr[i];
-// 		if (Utils::stringStartsWith(var, "PATH="))
-// 		{
-// 			PATH =  var.substr(5);
-// 			break;
-// 		}
-// 	}
-// 	if (!env_ptr || Response::PATH.empty())
-// 		throw Fail("needs PATH variable");
-// }
 
 void Response::initReasonPhrases()
 {

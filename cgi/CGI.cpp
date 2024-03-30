@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/30 14:27:20 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 17:06:57 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,16 @@ std::string CGI::getBinPath(void)
 	return (locationctx.getCGI()[script.substr(pos)]);
 }
 
+std::string CGI::prepareResponse(std::string &out)
+{
+	std::ifstream	output;
+	std::stringstream	ss;
+
+	output.open(out);
+	if (!output.good())
+		throw ResponseErrorException(InternalServerError);
+}
+
 void g(int s)
 {
 	if (s == SIGSEGV)
@@ -63,7 +73,7 @@ void g(int s)
 }
 
 
-void CGI::execute(void)
+std::string CGI::execute(void)
 {
 	pid_t	pid;
 	std::string	bin;
@@ -75,6 +85,7 @@ void CGI::execute(void)
 	if (pid < 0)
 		throw ResponseErrorException(InternalServerError);
 	traceCGIProcess(pid);
+	return (prepareResponse(out));
 }
 
 void CGI::traceCGIProcess(pid_t pid)

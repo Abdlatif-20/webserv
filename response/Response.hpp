@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/28 02:39:29 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 15:03:28 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,13 +81,14 @@ class Response
         void setHeadersSent(bool flag);
         static std::string getMimeType(const std::string& extension);
         const std::string& getBody() const;
-        const std::map<std::string, std::string>& getHeaders() const;
         const std::string& getHeaderByName(const std::string& name);
         bool getHeadersSent() const;
         bool responseIsDone() const;
 
-        void prepareResponse();
         void resetResponse();
+        void prepareResponse();
+
+        std::map<std::string, std::string>& getHeaders();
         std::string headersToString();
 
 		ServerContext&	getServerCtx();
