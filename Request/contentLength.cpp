@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/22 21:22:24 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/29 17:07:55 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,16 +16,16 @@
 void	Request::parseContentLength()
 {
 	if (_headers["content-length"].find_first_not_of("0123456789") != std::string::npos)
-	{ 
+	{
 		status = BadRequest;
 		requestIscomplete = true;
 	}
-	if (Utils::stringToInt(_headers["content-length"]) > locationCTX.getClientMaxBodySize())
+	if (Utils::strToll(_headers["content-length"]) > locationCTX.getClientMaxBodySize())
 	{
 		status = RequestEntityTooLarge;
 		requestIscomplete = true;
 	}
-	contentLength = Utils::stringToInt(_headers["content-length"]);
+	contentLength = Utils::strToll(_headers["content-length"]);
 }
 
 //function to parse the content length and write the body to a file
@@ -36,7 +36,9 @@ void	Request::ContentLength()
 	String path = requestLine["path"];
 	String extension = "";
 	
-	if (contentLength != _body.size())
+	if (contentLength > locationCTX.getClientMaxBodySize())
+		return (status = RequestEntityTooLarge, requestIscomplete = true, void());
+	if (contentLength != (long long)_body.size())
 		return (status = BadRequest, requestIscomplete = true, void());
 	if (!file.is_open())
 	{

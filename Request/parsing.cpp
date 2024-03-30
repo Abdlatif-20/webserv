@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 02:58:21 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/28 19:51:10 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,17 @@ void	Request::requestIsWellFormed()
 		return;
 	if (this->requestLine["path"].size() > 2048)
 		return (this->status = RequestURITooLong, requestIscomplete = true, void());
-	// if (this->requestLine["path"].find_first_not_of(ALLOWED_CHARACTERS) != String::npos)
-	// 	return (this->status = BadRequest, requestIscomplete = true, void());
 	if (this->requestLine["method"] == "POST")
 	{
 		if (_headers.find("content-type") != _headers.end()
 				&& _headers.find("transfer-encoding") == _headers.end())
 			parseContentType();
+		else if (_headers.find("content-type") != _headers.end()
+				&& _headers.find("transfer-encoding") != _headers.end())
+		{
+			parseContentType();
+			parseTransferEncoding();
+		}
 		else if (_headers.find("transfer-encoding") != _headers.end())
 			parseTransferEncoding();
 		else if (_headers.find("content-length") != _headers.end())
@@ -91,10 +95,7 @@ void	Request::separateRequest(String receivedRequest)
 	if (pos != String::npos)
 	{
 		this->headers = receivedRequest.substr(0, pos + 4);
-		// std::cout <<"-----------------HEADERS------------------\n";
-		// write(1, receivedRequest.c_str(), receivedRequest.size());
 		this->_body = receivedRequest.substr(pos + 4);
-		// write(1, _body.c_str(), _body.size());
 	}
 	else
 	{
@@ -144,8 +145,15 @@ void	Request::parseBody()
 		&& _headers.find("transfer-encoding") == _headers.end())
 			parseBoundary();
 	else if (this->requestLine["method"] == "POST"
-		&& _headers.find("content-type") != _headers.end() && _headers.find("transfer-encoding") != _headers.end())
-			return (this->status = NotImplemented, requestIscomplete = true, void());
+		&& _headers.find("content-type") != _headers.end()
+		&& _headers.find("transfer-encoding") != _headers.end())
+		{
+			multipart = true;
+			parseChunkedBody();
+			if (requestIscomplete)
+				parseBoundary();
+			multipart = false;
+		}
 	else if (this->requestLine["method"] == "POST"
 			&& _headers.find("content-length") != _headers.end())
 				ContentLength();

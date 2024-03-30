@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/28 21:30:17 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 18:32:42 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ void	Client::reset(void)
 ssize_t Client::recvRequest(void)
 {
 	std::memset(buff, 0, sizeof(buff));
-	len = recv(sockId, buff, 1023, 0);
+	len = recv(sockId, buff, sizeof(buff) - 1, 0);
 	if (len > 0)
 	{
 		request.parseRequest(std::string(buff, len), serverCTX);
@@ -62,6 +62,7 @@ void	Client::sendResponse(void)
 {
 	if (requestDone && !responseDone)
 	{
+
 		response.setRequest(&request);
 		response.setServerCTX(request.getServerCTX());
 		response.setLocationCTX(request.getLocationCtx());

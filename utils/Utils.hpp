@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/25 12:28:44 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 18:38:02 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ namespace Utils
 	void		printVector(std::vector<std::string> vec);
 	void		printMap(const std::map<std::string, std::string>& map);
 	void		toLower(std::string& str);
+	void		toUpper(std::string& str);
 	void		printFile(std::string filename);
 	std::string intToString(int number);
 	t_directive getDirectiveFromTokenName(const std::string& tokenName);
@@ -59,7 +60,10 @@ namespace Utils
 	bool isReadableFile(const std::string& path);
 	std::string getFileExtension(const std::string& filePath);
 	long long getFileSize(const std::string& filePath);
+	std::string bytesToHuman(long long bytes);
 	std::string longlongToString(long long number);
+	long long strToll(const std::string& str);
+	std::string floatToString(float f);
 	std::string replaceAll(std::string str, const std::string& s1, const std::string& s2);
 	std::string get_last_modified_date(const std::string& path);
 	std::string intToHex(int i);

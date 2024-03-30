@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/25 16:20:49 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 18:32:32 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ Context& Context::operator=(const Context& obj)
 	cgi = obj.cgi;
     directives = obj.directives;
     errorPages = obj.errorPages;
+    cgi = obj.cgi;
     return *this;
 }
 
@@ -95,7 +96,7 @@ std::string Context::getRoot()
     DirectivesMap::iterator it = directives.find("root");
     if (it != directives.end())
         return *it->second.begin() + "/";
-    return "assets/www/";
+    return "www/";
 }
 
 /* The `std::string Context::getIndex() const` function in the `Context` class is a const member
@@ -121,7 +122,7 @@ std::string Context::getIndex(const std::string& path)
         if (Utils::isDirectory(indexPath) || !Utils::isReadableFile(indexPath))
             throw Utils::FilePermissionDenied();
     }
-    if (getRoot() == "assets/www/")
+    if (getRoot() == "www/")
         return "html/index.html";
     return "";
 }
@@ -146,12 +147,25 @@ function that retrieves the value associated with the "client_max_body_size" dir
 directives map and if it is, it converts the value to an integer using `std::atoi` and returns it.
 If the directive is not found, it returns a default value of 1. This function is used to get the
 maximum allowed size of the client request body specified in the server configuration. */
-int Context::getClientMaxBodySize()
+long long Context::getClientMaxBodySize()
 {
     DirectivesMap::iterator it = directives.find("client_max_body_size");
+    long long clientMaxBodySize = 1000000000;
     if (it != directives.end())
-        return std::atoi((*it->second.begin()).c_str());
-    return 10000000;
+    {
+        std::string value = *it->second.begin();
+        if (value.find('K') != std::string::npos)
+            clientMaxBodySize = Utils::strToll(value.c_str()) * 1000;
+        else if (value.find('M') != std::string::npos)
+            clientMaxBodySize = Utils::strToll(value.c_str()) * 1000000;
+        else if (value.find('G') != std::string::npos)
+            clientMaxBodySize = Utils::strToll(value.c_str()) * 1000000000;
+        else
+            clientMaxBodySize = Utils::strToll(value.c_str());
+    }
+    if (clientMaxBodySize > 9223372036854775806)
+        return 9223372036854775806;
+    return clientMaxBodySize;
 }
 
 /* The `StringVector Context::getAllowedMethods() const` function in the `Context` class is a const
@@ -234,4 +248,17 @@ StringVector Context::getHttpRedirection()
 std::map<std::string, std::string> Context::getCGI()
 {
     return cgi;
+}
+
+bool Context::hasCGI()
+{
+    return !cgi.empty();
+}
+
+unsigned int Context::getCGI_timeout()
+{
+    DirectivesMap::iterator it = directives.find("cgi_max_timeout");
+    if (it != directives.end())
+        return std::atoi(it->second.begin()->c_str());
+    return 60;
 }

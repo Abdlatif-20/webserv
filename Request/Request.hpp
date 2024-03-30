@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/27 16:15:59 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 18:33:48 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,11 @@
 #include <fcntl.h>
 #include <sys/stat.h> // For mkdir
 
+
+#define BUFFER_SIZE 102400
+
 #define CR '\r'
 #define CRLF "\r\n"
-#define ALLOWED_CHARACTERS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJ\
-							KLMNOPQRSTUVWXYZ0123456789-._~:/?#[]@!$&'()*+,;=% "
-
 typedef std::vector<std::string> Vector;
 typedef std::map<std::string, std::string> Map;
 typedef std::string String;
@@ -51,16 +51,20 @@ class Request
 		bool	requestLineDone;
 		bool	requestInProgress;
 		bool	requestIscomplete;
-		bool	requestLineInProgress;
 		bool	_requestIsWellFormed;
 		bool	_chunkedComplete;
+		bool	_BoundaryComplete;
+		bool	requestLineInProgress;
+
+		char	buffer[BUFFER_SIZE];
+		int		tmpFile;
 		// serverctxs range
 		size_t	serv_end;
 		size_t	serv_begin;
 		//unsigned int
-		unsigned int	sizeBoundary;
-		unsigned int	contentLength;
-		int				remainingChunkLength;
+		long long		bodySize;
+		long long		contentLength;
+		size_t			remainingChunkLength;
 		unsigned int	remainingChunk;
 		//config
 		ServerContext serverCTX;
@@ -72,9 +76,11 @@ class Request
 		Map	requestLine;
 		//vector
 		Vector	requestVector;
-		Vector	files;
+		Vector	tmpFiles;
 		//strings
 		String	_path;
+		String	_pathTmpFile;
+		String	_params;
 		String	_body;
 		String	headers;
 		String	requestData;
@@ -82,12 +88,16 @@ class Request
 		String	requestLineData;
 		String	boundaryName;
 		String	_chunkedName;
+		//time
+		time_t	lastTime;
 
 		/* *************************** methods ********************************* */
 			void			findUri();
 			void			parseUri();
 			void			parseBody();
 			void			fillParams();
+			int				preparName();
+			void			removeFiles();
 			void			parseBoundary();
 			void			ContentLength();
 			void			parseChunkedBody();
@@ -95,18 +105,23 @@ class Request
 			void			setUploadingPath();
 			void			parseContentLength();
 			void			requestIsWellFormed();
+			void			createChunkedTmpFile();
+			void			createBoundaryTmpFile();
 			void			parseTransferEncoding();
+			bool			writeInfile(int fdFile);
 			void			isMethodAllowedInLocation();
 			void			fillHeaders(Vector headers);
 			String			prepareFileName(String line);
 			unsigned int	convertToDecimal(String hex);
 			String& 		isExist(Map& headers, String key);
+			bool			fileExists(const std::string& fileName);
 			void			separateRequest(String receivedRequest);
 			void			fillRequestLine(const String& requestLine);
 			int				parseRequestLine(const String& requestLine);
 			int				checkDuplicate(const String& receivedRequest);
 			int				takingRequests(String receivedRequest);
-			void			preparLengthAndName(size_t pos, String& length, std::ofstream& file);
+			void			preparLength(String& length);
+			void			readBytes(int fd, ssize_t& bytesRead);
 	public:
 	/* *************************** constructors ****************************** */
 	
@@ -120,6 +135,7 @@ class Request
 
 	/* *************************** methods ****************************** */
 		void	resetRequest();
+		time_t	getLastTime() const;
 		void	selectServerContext(const String& host);
 		void	setServerCTXEnd(size_t i);
 		void	setServerCTXBegin(size_t i);

@@ -6,40 +6,71 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 16:42:03 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 04:03:42 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/29 00:16:01 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-void	Request::parseChunkedBody()
+void	Request::readBytes(int fd, ssize_t& bytesRead)
 {
-	String length;
-	static std::ofstream file;
-	size_t pos = 0;
+	bytesRead = read(fd, this->buffer, BUFFER_SIZE);
+	if (bytesRead == -1)
+		return (requestIscomplete = true, void());
+	_body.append(this->buffer, bytesRead);
+	bzero(this->buffer, BUFFER_SIZE);
+}
 
-	if (this->_chunkedName.empty() || !_setLength)
-		preparLengthAndName(pos, length, file);
-	if (!remainingChunkLength)
-		return(bodyDone = true, file.close(), requestIscomplete = true, void());
-	else if (remainingChunkLength)
+bool	Request::writeInfile(int fdFile)
+{
+	if (remainingChunkLength && _setLength)
 	{
-		if (_body.size() < (size_t)remainingChunkLength)
+		if (_body.size() < remainingChunkLength)
 		{
-			file.write(_body.c_str(), _body.size());
+			write(fdFile, _body.c_str(), _body.size());
 			remainingChunkLength -= _body.size();
+			_body.clear();
 		}
 		else
 		{
-			if (remainingChunkLength > 0)
-			{
-				file.write(_body.c_str(), remainingChunkLength);
-				_body = _body.substr(remainingChunkLength + 2);
-			}
+			write(fdFile, _body.c_str(), remainingChunkLength);
+			_body.erase(0, remainingChunkLength + 2);
 			remainingChunkLength = 0;
 			_setLength = false;
-			parseChunkedBody();
+			if (!_body.empty())
+				return (false);
 		}
 	}
-	receivecount++;
+	return (true);
+}
+
+void	Request::parseChunkedBody()
+{
+	createChunkedTmpFile();
+	if (!_chunkedComplete)
+		return(receivecount++, void());
+	int fd = open(this->_pathTmpFile.c_str(), O_RDONLY);
+	if (fd == -1)
+		return (status = InternalServerError, requestIscomplete = true, void());
+	ssize_t bytesRead = 0;
+	int file = preparName();
+	if (!file)
+		return (close(fd), void());
+	String length = "";
+	bytesRead = read(fd, this->buffer, BUFFER_SIZE);
+	_body.append(this->buffer, bytesRead);
+	while (bytesRead)
+	{
+		if (!_setLength)
+			preparLength(length);
+		if (!remainingChunkLength && _setLength)
+			return(bodyDone = true, close(file), requestIscomplete = true, close(fd),
+				std::remove(this->_pathTmpFile.c_str()), void());
+		if (!writeInfile(file))
+			continue;
+		readBytes(fd, bytesRead);
+		if (!bytesRead)
+			break;
+	}
+	removeFiles();
 }

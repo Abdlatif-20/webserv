@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 16:06:21 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 18:37:27 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,6 @@ Response::Response()
     std::memset(buffer, 0, sizeof(buffer));
     isWorking = false;
     isRedirection = false;
-    hasCGI = false;
     isRanged = false;
     startOffset = 0;
     endOffset = 0;
@@ -55,7 +54,6 @@ Response& Response::operator=(const Response& obj)
     isWorking = obj.isWorking;
     isRedirection = obj.isRedirection;
     location = obj.location;
-    hasCGI = obj.hasCGI;
     isRanged = obj.isRanged;
     startOffset = obj.startOffset;
     endOffset = obj.endOffset;
@@ -125,8 +123,8 @@ bool Response::responseIsDone() const
 
 std::string Response::generateHtmlErrorPage()
 {
-    return HTML_RESPONSE_PAGE + Utils::intToString(statusCode) + " - "
-        + reasonPhrases[statusCode]+ "</h2><hr><h4>WebServer 1.0</h4></body></html>";
+    return Utils::replaceAll(HTML_RESPONSE_PAGE, "$title$", reasonPhrases[statusCode]) + Utils::intToString(statusCode) + " - "
+        + reasonPhrases[statusCode] + "</h2><hr><h4>WebServer 1.0</h4></body></html>\n";
 }
 
 bool Response::checkErrorPage(const std::string& path)
@@ -150,6 +148,7 @@ bool Response::checkErrorPage(const std::string& path)
 
 void Response::generateResponseError()
 {
+    LABEL_00:
     std::string errorPage = locationCTX.getErrorPage(Utils::intToString(statusCode));
     if (errorPage.empty())
     {
@@ -159,8 +158,28 @@ void Response::generateResponseError()
     else
     {
         std::string path = locationCTX.getRoot() + errorPage;
-        if (!checkErrorPage(path))
-            return;
+        if (!Utils::checkIfPathExists(path))
+        {
+            if (statusCode == NotFound)
+            {
+                bodyPath.clear();
+                body = generateHtmlErrorPage();
+                return;
+            }
+            statusCode = NotFound;
+            goto LABEL_00;
+        }
+        if (Utils::isDirectory(path) || !Utils::isReadableFile(path))
+        {
+            if (statusCode == FORBIDDEN)
+            {
+                bodyPath.clear();
+                body = generateHtmlErrorPage();
+                return;
+            }
+            statusCode = FORBIDDEN;
+            goto LABEL_00;
+        }
         bodyPath = path;
     }
 }
@@ -175,6 +194,8 @@ void Response::prepareHeaders()
     headers["Date"] = Utils::getCurrentTime();
     headers["Content-Length"] = (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath)));
     headers["Content-Type"] = (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath)));
+    if (!bodyPath.empty())
+        headers["Last-Modified"] = Utils::get_last_modified_date(bodyPath);
     if (isRedirection)
         headers["Location"] = location;
     if (isRanged)
@@ -195,9 +216,12 @@ void Response::prepareBody()
         return;
     }
     if (!ifs.is_open())
+    {
         ifs.open(bodyPath);
-    if (!ifs.good())
-        throw ResponseErrorException(InternalServerError);
+        if (!ifs.is_open())
+            throw ResponseErrorException(InternalServerError);
+    }
+
     std::memset(buffer, 0, sizeof(buffer));
     if (isRanged)
     {
@@ -211,12 +235,6 @@ void Response::prepareBody()
             readSize = contentLength;
     }
     ssize_t readedBytes = myRead(ifs, buffer, readSize);
-    if (readedBytes == -1)
-    {
-        ifs.close();
-        statusCode = OK;
-        responseDone = true;
-    }
     if (!readedBytes || (isRanged && sendedBytes >= endOffset - startOffset))
     {
         body.clear();
@@ -274,7 +292,7 @@ void Response::prepareGET()
         bodyPath = resource;
         statusCode = OK;
     }
-    handleRange();
+    prepareRanged();
     isWorking = true;
 }
 
@@ -292,9 +310,7 @@ void Response::autoIndex(const std::string& path)
     std::string html = Utils::replaceAll(AUTO_INDEX_TEMPLATE, "$indexof$", request->getRequestPath());
     dir = opendir(path.c_str());
     if (!dir)
-    {
         throw ResponseErrorException(FORBIDDEN);
-    }
     while ((entry = readdir(dir)))
     {
         if (Utils::isDirectory(path + entry->d_name))
@@ -303,10 +319,11 @@ void Response::autoIndex(const std::string& path)
             html += "<tr><td><i class='glyphicon glyphicon-file'></i>";
         html+= "<a style='text-decoration:none'; href='" + Utils::urlEncoding(std::string(entry->d_name)) + "'> " + entry->d_name + "</td>";
         html += "<td>" + Utils::get_last_modified_date(path + entry->d_name) + "</td>";
-        html += "<td>" + (Utils::getFileSize(path + entry->d_name) == -1 ? "--" : Utils::longlongToString(Utils::getFileSize(path + entry->d_name))) + "</td>";
+        html += "<td>" + (Utils::getFileSize(path + entry->d_name) == -1 ? "--" : Utils::bytesToHuman(Utils::getFileSize(path + entry->d_name))) + "</td>";
         html += "<td>" + (Utils::isDirectory(path + entry->d_name) ? "Directory" : Utils::getFileExtension(path + entry->d_name)) + "</td>";
         html += "</tr>";
     }
+    closedir(dir);
     html += "</table></body></html>";
     body = html; 
     bodyPath.clear();
@@ -321,7 +338,7 @@ void Response::runCGI()
 	ifs.open(cgi.execute());
 }
 
-void Response::handleRange()
+void Response::prepareRanged()
 {
     std::string rangeHeader = request->getHeaderByName("Range");
     if (!rangeHeader.empty())
@@ -340,8 +357,6 @@ void Response::handleRange()
             if (startOffset >= contentLength || endOffset < startOffset)
                 throw ResponseErrorException(RequestedRangeNotSatisfiable);
             statusCode = PartialContent;
-            isWorking = true;
-            std::cout << "Start Offset [" << startOffset << "]  End Offset [" << endOffset << "]" << std::endl;
         }
     }
 }
@@ -368,7 +383,7 @@ void Response::preparePOST()
                 try
                 {
                     std::string index = locationCTX.getIndex(resource);
-                    if (index.empty() || !hasCGI)
+                    if (index.empty() || !locationCTX.hasCGI())
                         throw Utils::FilePermissionDenied();
                     /* Request BODY goes to CGI !! */
                 }
@@ -380,48 +395,18 @@ void Response::preparePOST()
         }
         else
         {
-            if (!hasCGI)
+            if (!locationCTX.hasCGI())
                 throw ResponseErrorException(FORBIDDEN);
         }
     }
 }
 
-// void Response::copyEnv()
-// {
-// 	std::string	req_path = request->getRequestPath();
-// 	env.push_back("SERVER_PROTOCOL=");
-// 	env.back() += request->getProtocol();
-// 	env.push_back("SERVER_PORT=");
-// 	env.back() += serverCTX.getPort();
-// 	env.push_back("REQUEST_METHOD=");
-// 	env.back() += request->getMethod();
-// 	env.push_back("PATH_INFO=");
-// 	env.back() += req_path;
-// 	env.push_back("PATH_TRANSLATED=");
-// 	env.back() += locationCTX.getRoot() + req_path;
-// 	env.push_back("SCRIPT_NAME=");
-// 	env.back() += bodyPath.substr(bodyPath.find_last_of('/') + 1);
-// 	env.push_back("DOCUMENT_ROOT=");
-// 	env.back() += bodyPath.substr(0, bodyPath.find_last_of('/'));
-// 	env.push_back("QUERY_STRING=");
-// 	env.back() += request->getQueryString();
-// 	env.push_back("CONTENT_TYPE=");
-// 	env.back() += request->getHeaderByName("CONTENT-TYPE");
-// 	env.push_back("CONTENT_LENGTH=");
-// 	env.back() += request->getHeaderByName("CONTENT-LENGTH");
-// 	env.push_back("PATH=");
-// 	env.back() += PATH;
-// 	env.push_back("REDIRECT_STATUS=");
-// 	env.back() += Utils::intToString(request->getStatus());
-// 	Map m = request->getHeaders();
-// 	for (Map::iterator it = m.begin(); it != m.end(); it++)
-// 	{
-// 		std::string first = it->first;
-// 		Utils::toLower(first);
-// 		if (first != "content-length" && first != "content-type")
-// 			env.push_back(Utils::envName(it->first) + "=" + it->second);
-// 	}
-// }
+void Response::prepareDELETE()
+{
+    if (!locationCTX.hasCGI())
+        throw ResponseErrorException(MethodNotAllowed);
+    /*CGI job*/
+}
 
 void Response::prepareResponse()
 {
@@ -438,28 +423,19 @@ void Response::prepareResponse()
             return;
         }
         if (request->getMethod() == "GET")
-        {
             prepareGET();
-            prepareBody();
-            prepareHeaders();
-        }
         else if (request->getMethod() == "POST")
-        {
             preparePOST();
-            prepareBody();
-            prepareHeaders();
-        }
         else if (request->getMethod() == "DELETE")
-        {
-            /* Prepare DELETE */
-        }
+            prepareDELETE();
         else
-        {
-            
-        }
+            throw ResponseErrorException(NotImplemented);
+        prepareBody();
+        prepareHeaders();
     }
     catch (const ResponseErrorException& e)
     {
+        isRanged = false;
         statusCode = e.status;
         generateResponseError();
         prepareBody();
@@ -487,7 +463,6 @@ void Response::resetResponse()
     headers.clear();
     bodyPath.clear();
     location.clear();
-    hasCGI = false;
     isRanged = false;
     startOffset = 0;
     endOffset = 0;
@@ -554,7 +529,7 @@ void Response::initReasonPhrases()
     reasonPhrases[410] = "Gone";
     reasonPhrases[411] = "Length Required";
     reasonPhrases[412] = "Precondition Failed";
-    reasonPhrases[413] = "Payload Too Large";
+    reasonPhrases[413] = "Content Too Large";
     reasonPhrases[414] = "URI Too Long";
     reasonPhrases[415] = "Unsupported Media Type";
     reasonPhrases[416] = "Requested Range Not Satisfiable";

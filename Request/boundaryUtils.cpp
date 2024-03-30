@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:12:18 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/20 02:39:36 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/29 17:03:39 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,12 @@ String& Request::isExist(Map& headers, String key)
 	if (headers.find(key) != headers.end())
 		return headers[key];
 	return headers[key] = "";
+}
+
+void	Request::removeFiles()
+{
+	for (size_t i = 0; i < tmpFiles.size(); i++)
+		std::remove(tmpFiles[i].c_str());
 }
 
 // function to prepare the filename and return it
@@ -34,7 +40,7 @@ String Request::prepareFileName(String line)
 		if (posFile != String::npos)
 			filename = filename.substr(0, filename.find("\""));
 		else
-			return (status = BadRequest, requestIscomplete = true, "");
+			return (status = InternalServerError, requestIscomplete = true, "");
 	}
 	else if (posName != String::npos)
 	{
@@ -43,13 +49,50 @@ String Request::prepareFileName(String line)
 		if (posFile != String::npos)
 			filename = filename.substr(0, filename.find("\""));
 		else
-			return (status = BadRequest, requestIscomplete = true, "");
+			return (status = InternalServerError, requestIscomplete = true, "");
 	}
 	if (filename.empty())
 		return (filename);
 	extension = Utils::getFileExtension(filename);
 	int random = std::rand() % 1000;
 	filename = filename.substr(0, filename.find_last_of("."));
-	filename = this->_path + filename + "_" + Utils::intToString(random) + "." + extension;
+	filename = this->_path + filename + "_" + Utils::intToString(random) + extension;
 	return (filename);
+}
+
+// function to create the boundary tmp file
+void Request::createBoundaryTmpFile()
+{
+	if (_pathTmpFile.empty())
+		_pathTmpFile = "/goinfre/boundary_" + Utils::intToString(rand() % 1000);
+	if (tmpFile < 0)
+	{
+		while (true)
+		{
+			if (!fileExists(_pathTmpFile))
+			{
+				tmpFile = open(_pathTmpFile.c_str(), O_CREAT | O_RDWR | O_APPEND, 0666);
+				break;
+			}
+			else
+				_pathTmpFile = "/goinfre/boundary_" + Utils::intToString(rand() % 1000);
+		}
+		tmpFiles.push_back(_pathTmpFile);
+	}
+	if (!fileExists(_pathTmpFile))
+		return (status = InternalServerError, requestIscomplete = true, void());
+	this->bodySize += _body.size();
+	if (bodySize > locationCTX.getClientMaxBodySize())
+		return (removeFiles(), status = RequestEntityTooLarge, requestIscomplete = true, void());
+	write(tmpFile, _body.c_str(), _body.size());
+	std::string boundary = _headers["content-type"].substr(30);
+	std::string startBoundary = "--" + boundary;
+	std::string EndBoundary = "--" + boundary + "--";
+	if (_body.find(EndBoundary) != String::npos)
+	{
+		_body.clear();
+		this->_BoundaryComplete = true;
+		close(tmpFile);
+		tmpFile = -1;
+	}
 }

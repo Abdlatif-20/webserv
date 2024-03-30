@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/27 16:15:25 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 18:33:18 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,13 @@ void	Request::fillHeaders(Vector headers)
 	this->requestInProgress == false ? it++ : it;
 	for (; it != headers.end(); it++)
 	{
-		Utils::toLower(*it);
 		String key;
 		String value;
 		size_t pos =  it->find(':');
 		if (pos != String::npos)
 		{
 			key = it->substr(0, pos);
+			Utils::toLower(key);
 			if (key == "host")
 				checkHostIsFound++;
 			value = Utils::strTrim(Utils::strTrim(it->substr(pos + 1), CR), ' ');

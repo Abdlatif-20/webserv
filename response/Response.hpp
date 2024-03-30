@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 15:03:28 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 18:34:36 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ class Response
         bool isWorking;
         bool isRedirection;
         std::string location;
-        bool hasCGI;
 
         std::vector<std::string> env;
 
@@ -59,11 +58,13 @@ class Response
         void prepareBody();
         void prepareGET();
         void preparePOST();
+        void prepareDELETE();
         void prepareRedirection(int _status, const std::string& _location);
         void autoIndex(const std::string& path);
 
         void runCGI();
         void handleRange();
+        void prepareRanged();
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;

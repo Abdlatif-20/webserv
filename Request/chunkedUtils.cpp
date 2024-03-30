@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   chunkedUtils.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:40:48 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/25 02:49:18 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/29 16:49:38 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,22 +25,75 @@ unsigned int Request::convertToDecimal(String hex)
 	return decimalNumber;
 }
 
-// function to prepare the length and the name of the file
-void	Request::preparLengthAndName(size_t pos, String& length, std::ofstream& file)
+// function to prepare the length of the chunked body
+void	Request::preparLength(String& length)
 {
-	if (!_setLength && (pos = _body.find("\r\n")) != String::npos)
+	size_t pos = 0;
+	pos = _body.find("\r\n");
+	if (pos != std::string::npos)
 	{
 		length = _body.substr(0, pos);
 		remainingChunkLength = convertToDecimal(length);
-		_body = _body.substr(pos + 2);
+		length.clear();
+		_body.erase(0, pos + 2);
 		_setLength = true;
 	}
-	if (this->_chunkedName.empty())
+}
+// function to check if the file exists
+bool Request::fileExists(const std::string& fileName)
+{
+	return access(fileName.c_str(), F_OK) != -1;
+}
+
+// function to prepare the name of the chunked file
+int Request::preparName()
+{
+	int file;
+
+	while (true)
 	{
-		int random = std::rand() % 1000;
-		if (_setLength && _chunkedName.empty() && remainingChunkLength)
-			_chunkedName = "chunked_" + Utils::intToString(random);
-		if (!_chunkedName.empty() && !file.is_open())
-			file.open(this->_path + _chunkedName, std::ios::app);
+		this->_chunkedName = this->_path + "chunked_" + Utils::intToString(rand() % 1000);
+		if (!fileExists(this->_chunkedName))
+		{
+			file = open(this->_chunkedName.c_str(), O_CREAT | O_EXCL | O_RDWR, 0666);
+			if (file > 0)
+				return file;
+		}
+	}
+	return -1;
+}
+
+// function to create the chunked file
+void Request::createChunkedTmpFile()
+{
+	if (_pathTmpFile.empty())
+		_pathTmpFile = "/goinfre/chunked_" + Utils::intToString(rand() % 1000);
+	if (tmpFile < 0)
+	{
+		while (true)
+		{
+			if (!fileExists(_pathTmpFile))
+			{
+				tmpFile = open(_pathTmpFile.c_str(), O_CREAT | O_RDWR | O_APPEND, 0666);
+				break;
+			}
+			else
+				_pathTmpFile = "/goinfre/chunked_" + Utils::intToString(rand() % 1000);
+		}
+		tmpFiles.push_back(_pathTmpFile);
+	}
+	if (!fileExists(_pathTmpFile))
+		return (status = InternalServerError, requestIscomplete = true, void());
+	bodySize += _body.size();
+	if (bodySize > locationCTX.getClientMaxBodySize())
+		return (removeFiles(), status = RequestEntityTooLarge, requestIscomplete = true, void());
+	write(tmpFile, _body.c_str(), _body.size());
+	std::string chunkEnd = _body.substr(_body.size() - 5, 5);
+	if (chunkEnd.find("0\r\n\r\n") != std::string::npos)
+	{
+		_body.clear();
+		_chunkedComplete = true;
+		close(tmpFile);
+		tmpFile = -1;
 	}
 }

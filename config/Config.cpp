@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/25 16:22:52 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 18:32:25 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,8 @@ void Config::parseSingleValueDirectives(TokensVector::iterator& tok_iter, Contex
     t_directive d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
     std::string key = tok_iter->getContent();
     StringVector value;
-    if (d == LISTEN || d == ROOT || d == CLIENT_MAX_BODY_SIZE || d == AUTO_INDEX || d == UPLOAD_STORE)
+    if (d == LISTEN || d == ROOT || d == CLIENT_MAX_BODY_SIZE
+        || d == AUTO_INDEX || d == UPLOAD_STORE || d == CGI_MAX_TIMEOUT)
     {
         if (ctx.getDirectives().count(tok_iter->getContent()) != 0)
             throw SyntaxErrorException("`" + tok_iter->getContent() + "` directive is duplicated at line: ", tok_iter->getLineIndex());
@@ -131,10 +132,10 @@ void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context
         else
             ctx.addDirective(Directive(key, value));
     }
-    else if (d == ERROR_PAGE || d == CGI_ASSIGN)
+    else if (d == ERROR_PAGE || d == CGI)
     {
         tok_iter++;
-        if (d == CGI_ASSIGN)
+        if (d == CGI)
         {
             ctx.addCGI(std::pair<std::string, std::string>(tok_iter->getContent(), (++tok_iter)->getContent()));
             return;

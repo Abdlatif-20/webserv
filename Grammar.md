@@ -12,6 +12,8 @@
                     | "client_max_body_size" <WORD> <!-- To be checked later, example: 20MB, 2GB -->
                     | "allowed_methods" {"GET" | "POST" | "DELETE"}
                     | "upload_store" <WORD>
+                    | "cgi_assign" <WORD> <WORD>
+                    | "cgi_max_timeout" <INT>
 
 <server_directive> = "listen" <WORD>
                     | "server_name" <WORD>+
