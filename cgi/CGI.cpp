@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/30 17:06:57 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 22:35:17 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ std::string CGI::prepareResponse(std::string &out)
 	output.open(out);
 	if (!output.good())
 		throw ResponseErrorException(InternalServerError);
+	return (out);
 }
 
 void g(int s)

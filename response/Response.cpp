@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 18:37:27 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 23:03:03 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,7 +208,7 @@ void Response::prepareHeaders()
 
 void Response::prepareBody()
 {
-	if (hasCGI || bodyPath.find_first_of('.') != std::string::npos)
+	if (locationCTX.hasCGI() || bodyPath.find_first_of('.') != std::string::npos)
 		runCGI();
     if (bodyPath.empty())
     {

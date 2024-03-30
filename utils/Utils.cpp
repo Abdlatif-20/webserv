@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 18:37:49 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 22:34:43 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,7 +178,7 @@ std::string Utils::getTokenNameFromDirective(t_directive d)
 			return "location";
 		case UPLOAD_STORE:
 			return "upload_store";
-		case CGI:
+		case CGI_ASSIGN:
 			return "cgi";
 		case CGI_MAX_TIMEOUT:
 			return "cgi_max_timeout";
