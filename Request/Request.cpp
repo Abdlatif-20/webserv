@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/29 18:24:16 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/30 00:53:58 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ Request::Request()
 	this->isComplete = false;
 	this->remainingChunk = 0;
 	this->headersDone = false;
+	this->rawExtension = ".txt";
 	this->requestLineDone = false;
 	this->remainingChunkLength = 0;
 	this->_chunkedComplete = false;
@@ -50,7 +51,6 @@ Request::Request()
 	this->_chunkedName.clear();
 	this->_pathTmpFile.clear();
 	this->requestVector.clear();
-	this->rawExtension.clear();
 	this->requestLineData.clear();
 	bzero(this->buffer, BUFFER_SIZE);
 }
@@ -232,6 +232,8 @@ void	Request::resetRequest()
 {
 	this->status = OK;
 	this->detectHost = 0;
+	close(this->tmpFile);
+	this->tmpFile = -1;
 	this->bodyDone = false;
 	this->foundUri = false;
 	this->receivecount = 0;
@@ -242,6 +244,7 @@ void	Request::resetRequest()
 	this->_setLength = false;
 	this->isComplete = false;
 	this->headersDone = false;
+	this->rawExtension = ".txt";
 	this->requestLineDone = false;
 	this->remainingChunkLength = 0;
 	this->_chunkedComplete = false;
@@ -262,11 +265,8 @@ void	Request::resetRequest()
 	this->requestLine.clear();
 	this->requestData.clear();
 	this->_pathTmpFile.clear();
-	this->rawExtension.clear();
 	this->requestVector.clear();
 	this->requestLineData.clear();
-	close(this->tmpFile);
-	this->tmpFile = -1;
 	bzero(this->buffer, BUFFER_SIZE);
 	
 }

@@ -6,26 +6,32 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/29 18:23:08 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/29 20:22:59 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Request.hpp"
 
-String Request::getExtenstionOfBody()
+void	Request::getExtenstionOfBody()
 {
-	String extension = ".txt";
 	String str = _headers["content-type"];
 	String format = "";
 	size_t pos = 0;
+	Map formats;
+
+	formats["plain"] = ".txt";
+	formats["html"] = ".html";
+	formats["javascript"] = ".js";
+	formats["json"] = ".json";
+	formats["xml"] = ".xml";
 
 	pos = str.find("/");
 	if (pos != String::npos)
 	{
 		format = str.substr(pos + 1);
-		extension = format;
+		if (formats.find(format) != formats.end())
+			rawExtension = formats[format];
 	}
-	return extension;
 }
 
 //function to parse the content length
@@ -52,13 +58,13 @@ void	Request::ContentLength()
 	std::ofstream file;
 	String path = requestLine["path"];
 	String extension = "";
-	
+
 	if (contentLength != _body.size())
 		return (status = BadRequest, requestIscomplete = true, void());
 	if (!file.is_open())
 	{
 		if (path == "/")
-			file.open(this->_path + "body" + randomStr + ".txt", std::ios::app);
+			file.open(this->_path + "body" + randomStr + rawExtension, std::ios::app);
 		else
 		{
 			path = path.substr(1);
@@ -73,14 +79,10 @@ void	Request::ContentLength()
 	}
 	if (bodyDone == false)
 	{
-		file << _body;
+		file.write(_body.c_str(), _body.size());
 		contentLength -= _body.size();
 		receivecount++;
 	}
-	if (contentLength == 0)
-	{
-		file.close();
-		bodyDone = true;
-		requestIscomplete = true;
-	}
+	if (!contentLength)
+		return (file.close(), bodyDone = true, requestIscomplete = true, void());
 }
