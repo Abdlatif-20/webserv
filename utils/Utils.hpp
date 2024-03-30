@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.hpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/28 06:35:55 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/29 17:41:51 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,10 @@ namespace Utils
 	bool isReadableFile(const std::string& path);
 	std::string getFileExtension(const std::string& filePath);
 	long long getFileSize(const std::string& filePath);
+	std::string bytesToHuman(long long bytes);
 	std::string longlongToString(long long number);
+	long long strToll(const std::string& str);
+	std::string floatToString(float f);
 	std::string replaceAll(std::string str, const std::string& s1, const std::string& s2);
 	std::string get_last_modified_date(const std::string& path);
 	std::string intToHex(int i);

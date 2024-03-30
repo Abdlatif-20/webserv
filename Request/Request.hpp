@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/30 01:01:08 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/30 02:17:32 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,8 @@ class Request
 		size_t	serv_end;
 		size_t	serv_begin;
 		//unsigned int
-		unsigned int	sizeBoundary;
-		unsigned int	contentLength;
+		long long		bodySize;
+		long long		contentLength;
 		size_t			remainingChunkLength;
 		unsigned int	remainingChunk;
 		//config
@@ -98,6 +98,7 @@ class Request
 			void			fillParams();
 			int				preparName();
 			void			removeFiles();
+			String			generatePath(String fileName);
 			void			parseBoundary();
 			void			ContentLength();
 			void			parseChunkedBody();

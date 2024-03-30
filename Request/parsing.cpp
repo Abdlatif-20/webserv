@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/29 21:47:49 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/30 02:41:16 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,8 @@ void	Request::requestIsWellFormed()
 			parseContentType();
 			parseTransferEncoding();
 		}
-		else if (_headers.find("transfer-encoding") != _headers.end())
+		else if (_headers.find("transfer-encoding") != _headers.end()
+				&& _headers.find("content-type") == _headers.end())
 			parseTransferEncoding();
 		else
 			return (this->status = BadRequest, requestIscomplete = true, void());

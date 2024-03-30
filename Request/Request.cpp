@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/30 00:53:58 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/30 07:23:10 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ Request::Request()
 	this->lastTime = std::time(NULL);
 	this->foundUri = false;
 	this->receivecount = 0;
-	this->sizeBoundary = 0;
+	this->bodySize = 0;
 	this->contentLength = 0;
 	this->multipart = false;
 	this->_setLength = false;
@@ -84,8 +84,8 @@ Request& Request::operator=(const Request& obj)
 		this->requestData = obj.requestData;
 		this->receivecount = obj.receivecount;
 		this->_chunkedName = obj._chunkedName;
-		this->sizeBoundary = obj.sizeBoundary;
 		this->rawExtension = obj.rawExtension;
+		this->bodySize = obj.bodySize;
 		this->boundaryName = obj.boundaryName;
 		this->contentLength = obj.contentLength;
 		this->requestVector = obj.requestVector;
@@ -237,7 +237,7 @@ void	Request::resetRequest()
 	this->bodyDone = false;
 	this->foundUri = false;
 	this->receivecount = 0;
-	this->sizeBoundary = 0;
+	this->bodySize = 0;
 	this->contentLength = 0;
 	this->multipart = false;
 	this->remainingChunk = 0;
