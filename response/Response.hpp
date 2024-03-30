@@ -6,12 +6,13 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 16:48:29 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/28 02:39:29 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "CGI.hpp"
 #include "Request.hpp"
 #include "ServerContext.hpp"
 #include "ResponseUtils.hpp"
@@ -56,20 +57,18 @@ class Response
         void generateResponseError();
         void prepareHeaders();
         void prepareBody();
-        // void prepareCGI();
         void prepareGET();
         void preparePOST();
         void prepareRedirection(int _status, const std::string& _location);
         void autoIndex(const std::string& path);
 
+        void runCGI();
         void handleRange();
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;
 
     public:
-		static char	**env_ptr;
-		static std::string	PATH;
 
         Response();
         Response(const Response& obj);
@@ -91,10 +90,9 @@ class Response
         void resetResponse();
         std::string headersToString();
 
-		// void	copyEnv();
-
+		ServerContext&	getServerCtx();
+		LocationContext&	getLocationCtx();
 
         static void initMimeTypes();
         static void initReasonPhrases();
-		static void	setupEnv(char **_env);
 };

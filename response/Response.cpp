@@ -6,14 +6,12 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 16:46:57 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 14:31:01 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 
-std::string	Response::PATH;
-char	**Response::env_ptr;
 std::map<int, std::string> Response::reasonPhrases;
 std::map<std::string, std::string> Response::mimeTypes;
 
@@ -185,19 +183,16 @@ void Response::prepareHeaders()
         headers["Content-Length"] = Utils::longlongToString((endOffset - startOffset) + 1);
         headers["Content-Range"] = "bytes " + Utils::longlongToString(startOffset) + "-" + Utils::longlongToString(endOffset) + "/" + Utils::longlongToString(Utils::getFileSize(bodyPath));
     }
-    // headers += "Connection: " + request->getHeaderByName("connection") + CRLF;
-    // headers += "Server: " + std::string(SERVER) + " (" + OS_MAC + ")" + CRLF;
-    // headers += "Date: " + Utils::getCurrentTime() + CRLF;
-    // headers += "Content-Length: " + (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))) + CRLF;
-    // headers += std::string("Accept-Ranges: bytes") + CRLF;
-    // headers += "Content-Type: " + (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath))) + CRLF;
-    // if (isRedirection)
-    //     headers += "Location: " + location + CRLF;
-    // headers += CRLF;
 }
 
 void Response::prepareBody()
 {
+	if (hasCGI || bodyPath.find_first_of('.') != std::string::npos)
+	{
+		runCGI();
+		responseDone = true;
+		return ;
+	}
     if (bodyPath.empty())
     {
         responseDone = true;
@@ -238,62 +233,6 @@ void Response::prepareBody()
     sendedBytes += readedBytes;
 }
 
-// void g(int s)
-// {
-// 	if (s == SIGSEGV)
-// 		std::cout << "segv"  << std::endl;
-// }
-
-// void Response::prepareCGI()
-// {
-// 	size_t	idx;
-// 	std::string	ext;
-// 	std::string	line;
-// 	std::vector<char*> ee;
-// 	std::stringstream ss(PATH);
-// 	Map cgi = locationCTX.getCGI();
-
-// 	signal(SIGSEGV, g);
-// 	idx = bodyPath.find_last_of(".");
-// 	ext = bodyPath.substr(idx);
-// 	if (idx == std::string::npos || cgi[ext].empty())
-// 		return ;
-// 	for (size_t i = 0; i < env.size(); i++)
-// 		ee.push_back((char *)env[i].c_str());
-// 	ee.push_back(NULL);
-// 	while(std::getline(ss, line,':'))
-// 	{
-// 		line+= "/" + cgi[ext];
-// 		if (!access(line.c_str(), F_OK | X_OK))
-// 		{
-// 			std::cout << line << std::endl;
-// 			std::cout << bodyPath << std::endl;
-			
-// 			char *args[3] = {(char *)line.c_str(), (char *)bodyPath.c_str(), NULL};
-// 			std::string name = "/tmp/output_" ;
-// 			name += Utils::intToString(std::rand());
-// 			name += ".html";
-// 			std::cout << name << std::endl;
-// 			int fd = open(name.c_str(), O_TRUNC|O_CREAT|O_RDWR, 0664);
-// 			if (fd < 0)
-// 			{
-// 				std::cerr << "FAILED\n";
-// 			}
-// 			int pid = fork();
-// 			if (!pid)
-// 			{
-// 				dup2(fd, 1);
-// 				close(fd);
-// 				execve(line.c_str(), args, ee.data());
-// 				exit(0);
-// 			}
-// 			wait(NULL);
-// 			bodyPath = name;
-// 			break;
-// 		}
-// 	}
-// }
-
 void Response::prepareGET()
 {
     if (isWorking)
@@ -318,7 +257,7 @@ void Response::prepareGET()
                         throw ResponseErrorException(FORBIDDEN);
                     return;
                 }
-				// cgi
+				// hasCGI = true;
                 bodyPath = resource + index;
                 statusCode = OK;
             }
@@ -373,9 +312,17 @@ void Response::autoIndex(const std::string& path)
         html += "</tr>";
     }
     html += "</table></body></html>";
-    body = html;
+    body = html; 
     bodyPath.clear();
     statusCode = OK;
+}
+
+void Response::runCGI()
+{
+	CGI cgi(this, request);
+
+	cgi.setupEnv(bodyPath);
+	cgi.execute();
 }
 
 void Response::handleRange()
@@ -497,11 +444,6 @@ void Response::prepareResponse()
         if (request->getMethod() == "GET")
         {
             prepareGET();
-			// if (fd == INT_MIN)
-			// {
-			// 	copyEnv();
-			// 	prepareCGI();
-			// }
             prepareBody();
             prepareHeaders();
         }
@@ -527,6 +469,13 @@ void Response::prepareResponse()
         prepareBody();
         prepareHeaders();
     }
+	catch (...)
+	{
+		statusCode = InternalServerError;
+		generateResponseError();
+		prepareBody();
+		prepareHeaders();
+	}
 }
 
 void Response::resetResponse()
@@ -563,6 +512,16 @@ std::string Response::headersToString()
     }
     headers_str += CRLF;
     return headers_str;
+}
+
+ServerContext &Response::getServerCtx()
+{
+	return (serverCTX);
+}
+
+LocationContext &Response::getLocationCtx()
+{
+	return (locationCTX);
 }
 
 // void Response::setupEnv(char **_env)

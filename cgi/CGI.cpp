@@ -6,39 +6,188 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/27 18:27:39 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 14:27:20 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CGI.hpp"
 
+std::string	CGI::PATH;
+
 CGI::CGI(void)
 {
+	request = NULL;
+	response = NULL;
+	// nothing
+}
+
+CGI::CGI(Response *resp, Request *req): serverctx(resp->getServerCtx()), locationctx(resp->getLocationCtx())
+{
+	request = req;
+	response = resp;
 }
 
 CGI::CGI(const CGI &cpy)
 {
+	*this = cpy;
 }
 
 CGI &CGI::operator=(const CGI &cpy)
 {
-	// TODO: insert return statement here
+	if (this != &cpy)
+	{
+		env = cpy.env;
+		path = cpy.path;
+		request = cpy.request;
+		response = cpy.response;
+		serverctx = cpy.serverctx;
+		locationctx = cpy.locationctx;
+	}
+	return (*this);
 }
 
-void Response::setupEnv(char **_env)
+std::string CGI::getBinPath(void)
+{
+	size_t	pos;
+
+	pos = script.find_last_of(".");
+	if (pos == std::string::npos)
+		return ("");
+	return (locationctx.getCGI()[script.substr(pos)]);
+}
+
+void g(int s)
+{
+	if (s == SIGSEGV)
+		std::cout << "segv"  << std::endl;
+}
+
+
+void CGI::execute(void)
+{
+	pid_t	pid;
+	std::string	bin;
+	std::string	out;
+
+	out = "output";
+	bin = getBinPath();
+	pid = runCGIProcess(bin, out);
+	if (pid < 0)
+		throw ResponseErrorException(InternalServerError);
+	traceCGIProcess(pid);
+}
+
+void CGI::traceCGIProcess(pid_t pid)
+{
+	int	status;
+	time_t	start;
+
+	start = std::time(NULL);
+	while (!waitpid(pid, &status, WNOHANG))
+	{
+		if (std::difftime(std::time(NULL), start) > 60)
+			kill(pid, SIGKILL);
+	}
+	if (WIFEXITED(status))
+		std::cout << "exited " << WEXITSTATUS(status) << "\n";
+	std::cout << "\nDONE" << std::endl;;
+}
+
+pid_t CGI::runCGIProcess(std::string &bin, std::string &out)
+{
+	int	fd;
+	pid_t	pid;
+	std::vector<char *>	envv;
+
+	for (size_t i = 0; i < env.size(); i++)
+		envv.push_back((char *) env[i].c_str());
+	envv.push_back(NULL);
+	if ((pid = fork()) < 0 || access(bin.c_str(), F_OK | X_OK) != 0)
+		return (-1); // err
+	if (!pid)
+	{
+		char *args[3] = {(char *)bin.c_str(), (char *)script.c_str(), NULL};
+		std::cout << args[0] << " " << args[1] << std::endl;
+		fd = open(out.c_str(), O_CREAT|O_TRUNC|O_WRONLY, 0644);
+		dup2(fd, 1);
+		close(fd);
+		if (chdir(dir.c_str()) != 0)
+			exit(1);
+		if (execve(args[0], args, envv.data()) != 0)
+			exit(1);
+	}
+	return (pid);
+}
+
+void CGI::setupEnv(std::string bodyPath)
+{
+	try
+	{
+		if (!request || !response)
+			throw ResponseErrorException(InternalServerError);
+		processFilePath(bodyPath);
+		env.push_back("GATEWAY_INTERFACE=CGI/1.1");
+		env.push_back("SERVER_SOFTWARE=webserv/1.0");
+		env.push_back("SERVER_PORT=" + serverctx.getPort());
+		env.push_back("REQUEST_METHOD=" + request->getMethod());
+		env.push_back("QUERY_STRING=" + request->getQueryString());
+		env.push_back("SERVER_PROTOCOL=" + request->getProtocol());
+		env.push_back("PATH_INFO=" +  path.substr(0, path.find_last_of('/')));
+		env.push_back("SCRIPT_FILENAME=" + path);
+		env.push_back("SCRIPT_NAME=" + script);
+		env.push_back("DOCUMENT_ROOT=" + path);
+		env.push_back("CONTENT_TYPE=" + request->getHeaderByName("content-type"));
+		env.push_back("CONTENT_LENGTH=" + request->getHeaderByName("content-length"));
+		env.push_back("REDIRECT_STATUS=" + Utils::intToString(request->getStatus()));
+		env.push_back("PATH=" + PATH);
+		Map m = request->getHeaders();
+		for (Map::iterator it = m.begin(); it != m.end(); it++)
+		{
+			std::string first = it->first;
+			Utils::toLower(first);
+			if (first != "content-length" && first != "content-type")
+				env.push_back(Utils::envName(it->first) + "=" + it->second);
+		}
+		for (size_t i = 0; i < env.size(); i++)
+			std::cout << env[i] << std::endl;
+	}
+	catch(const std::exception& e)
+	{
+		throw ResponseErrorException(InternalServerError);
+	}
+}
+
+void CGI::processFilePath(std::string &str)
+{
+	std::stringstream ss(str);
+	std::string	name;
+
+	while (std::getline(ss,name, '/'))
+	{
+		if (name.empty())
+			continue;
+		if (!Utils::isDirectory(path + name))
+		{
+			dir = path;
+			script = name;
+		}
+		path +=  "/" + name;
+	}
+}
+
+void CGI::setPath(char **_env)
 {
 	std::string	var;
-	env_ptr = _env;
-	for (size_t i = 0; env_ptr && env_ptr[i]; i++)
+	for (size_t i = 0; _env && _env[i]; i++)
 	{
-		var = env_ptr[i];
+		var = _env[i];
 		if (Utils::stringStartsWith(var, "PATH="))
 		{
 			PATH =  var.substr(5);
 			break;
 		}
 	}
-	if (!env_ptr || Response::PATH.empty())
+	if (!_env || CGI::PATH.empty())
 		throw Fail("needs PATH variable");
 }
 

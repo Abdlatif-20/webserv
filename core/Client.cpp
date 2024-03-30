@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/27 16:47:37 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/28 21:30:17 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,8 @@ ssize_t Client::recvRequest(void)
 	if (len > 0)
 	{
 		request.parseRequest(std::string(buff, len), serverCTX);
-		requestDone = request.isDone();
 		last_update_time = std::time(NULL); // to think about later
+		requestDone = request.isDone();
 	}
 	else
 		requestDone = true;;
