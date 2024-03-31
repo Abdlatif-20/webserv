@@ -6,14 +6,12 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 18:09:22 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/30 22:31:08 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Response.hpp"
 
-char	**Response::env;
-std::string	Response::PATH;
 std::map<int, std::string> Response::reasonPhrases;
 std::map<std::string, std::string> Response::mimeTypes;
 
@@ -122,39 +120,20 @@ bool Response::responseIsDone() const
     return responseDone;
 }
 
-std::string Response::generateHtmlErrorPage()
+std::string Response::generateHtmlResponsePage()
 {
     return Utils::replaceAll(HTML_RESPONSE_PAGE, "$title$", reasonPhrases[statusCode]) + Utils::intToString(statusCode) + " - "
         + reasonPhrases[statusCode] + "</h2><hr><h4>WebServer 1.0</h4></body></html>\n";
 }
 
-bool Response::checkErrorPage(const std::string& path)
-{
-    if (!Utils::checkIfPathExists(path))
-    {
-        bodyPath.clear();
-        statusCode = NotFound;
-        body = generateHtmlErrorPage();
-        return false;
-    }
-    if (Utils::isDirectory(path) || !Utils::isReadableFile(path))
-    {
-        bodyPath.clear();
-        statusCode = FORBIDDEN;
-        body = generateHtmlErrorPage();
-        return false;
-    }
-    return true;
-}
-
 void Response::generateResponseError()
 {
-    LABEL_00:
+    Label:
     std::string errorPage = locationCTX.getErrorPage(Utils::intToString(statusCode));
     if (errorPage.empty())
     {
         bodyPath.clear();
-        body = generateHtmlErrorPage();
+        body = generateHtmlResponsePage();
     }
     else
     {
@@ -162,24 +141,16 @@ void Response::generateResponseError()
         if (!Utils::checkIfPathExists(path))
         {
             if (statusCode == NotFound)
-            {
-                bodyPath.clear();
-                body = generateHtmlErrorPage();
-                return;
-            }
+                return (bodyPath.clear(), body = generateHtmlResponsePage(), void());
             statusCode = NotFound;
-            goto LABEL_00;
+            goto Label;
         }
         if (Utils::isDirectory(path) || !Utils::isReadableFile(path))
         {
             if (statusCode == FORBIDDEN)
-            {
-                bodyPath.clear();
-                body = generateHtmlErrorPage();
-                return;
-            }
+                return (bodyPath.clear(), body = generateHtmlResponsePage(), void());
             statusCode = FORBIDDEN;
-            goto LABEL_00;
+            goto Label;
         }
         bodyPath = path;
     }
@@ -220,7 +191,6 @@ void Response::prepareBody()
         if (!ifs.is_open())
             throw ResponseErrorException(InternalServerError);
     }
-
     std::memset(buffer, 0, sizeof(buffer));
     if (isRanged)
     {
@@ -244,45 +214,6 @@ void Response::prepareBody()
     body.clear();
     body.append(buffer, readSize);
     sendedBytes += readedBytes;
-}
-
-void Response::prepareCGI()
-{
-	std::stringstream ss(PATH);
-	std::string	line;
-	std::string	tt[2] = {".php", "php"};
-
-	while(std::getline(ss, line,':'))
-	{
-		line+="/php";
-		if (!access(line.c_str(), F_OK | X_OK))
-		{
-			std::cout << line << std::endl;
-			std::cout << bodyPath << std::endl;
-			const char *args[3] = {line.c_str(), bodyPath.c_str(), NULL};
-			std::string name = "/tmp/output_" ;
-			name += Utils::intToString(std::rand());
-			name += ".html";
-			std::cout << name << std::endl;
-			int fd = open(name.c_str(), O_TRUNC|O_CREAT|O_RDWR, 0664);
-			if (fd < 0)
-			{
-				std::cerr << "FAILED\n";
-			}
-			int pid = fork();
-			if (!pid)
-			{
-				dup2(fd, 1);
-				close(fd);
-				execve(args[0], (char *const*)args, env);
-				exit(0);
-			}
-			wait(NULL);
-			bodyPath = name;
-			break;
-		}
-	}
-	responseDone = true;
 }
 
 void Response::prepareGET()
@@ -395,7 +326,7 @@ void Response::preparePOST()
     if (!locationCTX.getUploadStore().empty())
     {
         statusCode = Created;
-        body = generateHtmlErrorPage();
+        body = generateHtmlResponsePage();
         bodyPath.clear();
     }
     else
@@ -470,6 +401,14 @@ void Response::prepareResponse()
         prepareBody();
         prepareHeaders();
     }
+    catch (...)
+    {
+        isRanged = false;
+        statusCode = InternalServerError;
+        generateResponseError();
+        prepareBody();
+        prepareHeaders();
+    }
 }
 
 void Response::resetResponse()
@@ -504,23 +443,6 @@ std::string Response::headersToString()
     }
     headers_str += CRLF;
     return headers_str;
-}
-
-void Response::setupEnv(char **_env)
-{
-	std::string	var;
-	env = _env;
-	for (size_t i = 0; env && env[i]; i++)
-	{
-		var = env[i];
-		if (Utils::stringStartsWith(var, "PATH="))
-		{
-			PATH =  var.substr(5);
-			break;
-		}
-	}
-	if (!env || Response::PATH.empty())
-		throw Fail("needs PATH variable");
 }
 
 void Response::initReasonPhrases()

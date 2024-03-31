@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 21:17:53 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/30 23:38:42 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ Config::Config(const std::string& configPath)
     setupDefaultServer();
     setupDefaultLocation();
     checkLogicalErrors(servers);
+    inheritServerDirectives();
 }
 
 Config::Config(const Config& obj)
@@ -78,14 +79,6 @@ void Config::parseLocation(TokensVector::iterator& tok_iter, ServerContext& serv
             d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
             parseDirective(tok_iter, locationCtx);
             tok_iter++;
-        }
-        DirectivesMap::iterator it = serverCtx.getDirectives().begin();
-        while (it != serverCtx.getDirectives().end())
-        {
-            if (it->first != "listen" && it->first != "server_name"
-                && locationCtx.getDirectives().count(it->first) == 0)
-                locationCtx.addDirective(*it);
-            it++;
         }
         serverCtx.addLocation(locationCtx);
     }
@@ -206,6 +199,27 @@ void Config::setupDefaultLocation()
     {
         if (serv_it->getLocations().empty())
             serv_it->addLocation(LocationContext("/"));
+        serv_it++;
+    }
+}
+
+void Config::inheritServerDirectives()
+{
+    ServersVector::iterator serv_it = servers.begin();
+    while (serv_it != servers.end())
+    {
+        LocationsVector::iterator location_it = serv_it->getLocations().begin();
+        while (location_it != serv_it->getLocations().end())
+        {
+            DirectivesMap::iterator it = serv_it->getDirectives().begin();
+            while (it != serv_it->getDirectives().end())
+            {
+                if (it->first != "listen" && it->first != "server_name" && !location_it->getDirectives().count(it->first))
+                        location_it->addDirective(*it);
+                it++;
+            }
+            location_it++;
+        }
         serv_it++;
     }
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Lexer.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 11:15:21 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/15 00:22:51 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/30 22:12:44 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ TokensVector Lexer::tokenize(const std::string& configFile)
     size_t lineIndex = 1;
 
     if (!ifs.good())
-        throw std::runtime_error("Error while opening config_file");
+        throw std::runtime_error("Error: this file `" + configFile + "` doesn't exists!");
     while (std::getline(ifs, line))
     {
         getToken(line, lineIndex);

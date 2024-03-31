@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/28 23:10:16 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/30 22:06:49 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,13 +46,10 @@ class Response
         bool isRedirection;
         std::string location;
 
-        std::string generateHtmlErrorPage();
-        bool checkErrorPage(const std::string& path);
-
+        std::string generateHtmlResponsePage();
         void generateResponseError();
         void prepareHeaders();
         void prepareBody();
-        void prepareCGI();
         void prepareGET();
         void preparePOST();
         void prepareDELETE();
@@ -62,11 +59,7 @@ class Response
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;
-
     public:
-		static char	**env;
-		static std::string	PATH;
-
         Response();
         Response(const Response& obj);
         Response& operator=(const Response& obj);
@@ -87,8 +80,6 @@ class Response
         void resetResponse();
         std::string headersToString();
 
-
         static void initMimeTypes();
         static void initReasonPhrases();
-		static void	setupEnv(char **_env);
 };

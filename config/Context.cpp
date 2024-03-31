@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/29 18:09:12 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/31 01:58:39 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -122,7 +122,14 @@ std::string Context::getIndex(const std::string& path)
             throw Utils::FilePermissionDenied();
     }
     if (getRoot() == "www/")
-        return "html/index.html";
+    {
+        indexPath = getRoot() + "index.html";
+        if (!Utils::checkIfPathExists(indexPath))
+            throw Utils::FileNotFoundException();
+        if (Utils::isDirectory(indexPath) || !Utils::isReadableFile(indexPath))
+            throw Utils::FilePermissionDenied();
+        return "index.html";
+    }
     return "";
 }
 
@@ -162,8 +169,9 @@ long long Context::getClientMaxBodySize()
         else
             clientMaxBodySize = Utils::strToll(value.c_str());
     }
+    
     if (clientMaxBodySize > 9223372036854775806)
-        return 9223372036854775806;
+        return (9223372036854775806);
     return clientMaxBodySize;
 }
 
@@ -258,6 +266,11 @@ unsigned int Context::getCGI_timeout()
 {
     DirectivesMap::iterator it = directives.find("cgi_max_timeout");
     if (it != directives.end())
-        return std::atoi(it->second.begin()->c_str());
+    {
+        int t = std::atoi(it->second.begin()->c_str());
+        if (t < 30)
+            t = 30;
+        return t;
+    }
     return 60;
 }

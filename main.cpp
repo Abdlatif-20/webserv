@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/19 22:34:46 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/30 23:55:29 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,10 +17,10 @@
 
 int main(int argc, char **argv, char  **env)
 {
+	(void)env;
 	std::string configPath = "webserv.conf";
 	try
 	{
-		Response::setupEnv(env);
 		if (argc == 2)
 			configPath = argv[1];
 		else if (argc > 2)
@@ -28,6 +28,7 @@ int main(int argc, char **argv, char  **env)
 		try
 		{
 			Config	_config(configPath);
+			// std::cout << *_config.getServers().begin()->getLocations().begin()->getDirectives().begin()->second.begin() << std::endl;
 			Core core(_config);
 			core.run();
 		}
