@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/31 00:44:01 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/31 02:37:10 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@
 
 namespace Utils
 {
+	std::string envName(std::string str);
 	std::string strTrim(const std::string& str, char c);
 	std::vector<std::string> splitRequest(const std::string& str, const char *sep);
 	std::vector<std::string> split(const std::string& str, const char sep);

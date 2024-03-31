@@ -6,16 +6,18 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 22:06:49 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/31 02:36:36 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "CGI.hpp"
 #include "Request.hpp"
 #include "ServerContext.hpp"
 #include "ResponseUtils.hpp"
 #include <dirent.h>
+#include <map>
 
 class Response
 {
@@ -46,7 +48,11 @@ class Response
         bool isRedirection;
         std::string location;
 
+        std::vector<std::string> env;
+
         std::string generateHtmlResponsePage();
+        bool checkErrorPage(const std::string& path);
+
         void generateResponseError();
         void prepareHeaders();
         void prepareBody();
@@ -55,6 +61,9 @@ class Response
         void prepareDELETE();
         void prepareRedirection(int _status, const std::string& _location);
         void autoIndex(const std::string& path);
+
+        void runCGI();
+        void handleRange();
         void prepareRanged();
 
         static std::map<int, std::string> reasonPhrases;
@@ -71,14 +80,18 @@ class Response
         void setHeadersSent(bool flag);
         static std::string getMimeType(const std::string& extension);
         const std::string& getBody() const;
-        const std::map<std::string, std::string>& getHeaders() const;
         const std::string& getHeaderByName(const std::string& name);
         bool getHeadersSent() const;
         bool responseIsDone() const;
 
-        void prepareResponse();
         void resetResponse();
+        void prepareResponse();
+
+        std::map<std::string, std::string>& getHeaders();
         std::string headersToString();
+
+	ServerContext& getServerCtx();
+	LocationContext& getLocationCtx();
 
         static void initMimeTypes();
         static void initReasonPhrases();

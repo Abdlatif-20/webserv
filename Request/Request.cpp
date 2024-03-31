@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/30 18:08:25 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/30 18:33:25 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ Request::Request()
 	this->requestLineInProgress = false;
 	this->_path.clear();
 	this->_body.clear();
-	this->_params.clear();
+	this->queryString.clear();
 	this->headers.clear();
 	this->requestData.clear();
 	this->boundaryName.clear();
@@ -68,7 +68,7 @@ Request& Request::operator=(const Request& obj)
 		serv_end = obj.serv_end;
 		this->status = obj.status;
 		serv_begin = obj.serv_begin;
-		this->_params = obj._params;
+		this->queryString = obj.queryString;
 		this->headers = obj.headers;
 		this->serverCTX = obj.serverCTX;
 		this->locationCTX = obj.locationCTX;
@@ -150,6 +150,11 @@ const bool& Request::getHeadersDone() const
 	return (headersDone);
 }
 
+String Request::getQueryString(void)
+{
+	return queryString;
+}
+
 const String Request::getHeaderByName(const String& name) const
 {
 	Utils::toLower((String&)name);
@@ -165,6 +170,11 @@ const String Request::getHeaderByName(const String& name) const
 			return "";
 	}
 	return ("");
+}
+
+String Request::getProtocol(void)
+{
+	return requestLine["protocol"];
 }
 
 const ServerContext& Request::getServerCTX(void) const
@@ -251,7 +261,7 @@ void	Request::resetRequest()
 	this->requestLineInProgress = false;
 	this->_path.clear();
 	this->_body.clear();
-	this->_params.clear();
+	this->queryString.clear();
 	this->headers.clear();
 	this->headers.clear();
 	this->requestData.clear();

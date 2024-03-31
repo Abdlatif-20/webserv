@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 22:31:08 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/31 02:38:53 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,7 @@ Response& Response::operator=(const Response& obj)
 {
     if (this == &obj)
         return *this;
+	env = obj.env;
     request = obj.request;
     serverCTX = obj.serverCTX;
     locationCTX = obj.locationCTX;
@@ -100,7 +101,7 @@ const std::string& Response::getBody() const
     return body;
 }
 
-const std::map<std::string, std::string>& Response::getHeaders() const
+std::map<std::string, std::string>& Response::getHeaders()
 {
     return headers;
 }
@@ -180,6 +181,8 @@ void Response::prepareHeaders()
 
 void Response::prepareBody()
 {
+	if (locationCTX.hasCGI() || bodyPath.find_first_of('.') != std::string::npos)
+		runCGI();
     if (bodyPath.empty())
     {
         responseDone = true;
@@ -240,6 +243,7 @@ void Response::prepareGET()
                         throw ResponseErrorException(FORBIDDEN);
                     return;
                 }
+				// hasCGI = true;
                 bodyPath = resource + index;
                 statusCode = OK;
             }
@@ -293,9 +297,17 @@ void Response::autoIndex(const std::string& path)
     }
     closedir(dir);
     html += "</table></body></html>";
-    body = html;
+    body = html; 
     bodyPath.clear();
     statusCode = OK;
+}
+
+void Response::runCGI()
+{
+	CGI cgi(this, request);
+
+	cgi.setupEnv(bodyPath);
+	ifs.open(cgi.execute());
 }
 
 void Response::prepareRanged()
@@ -376,7 +388,7 @@ void Response::prepareResponse()
             throw ResponseErrorException(request->getStatus());
         if (locationCTX.getHttpRedirection().size() > 0)
         {
-            prepareRedirection(Utils::stringToInt(locationCTX.getHttpRedirection().at(0)), locationCTX.getHttpRedirection().at(1));
+            prepareRedirection(Utils::stringToInt(locationCTX.getHttpRedirection()[0]), locationCTX.getHttpRedirection()[1]);
             prepareBody();
             prepareHeaders();
             responseDone = true;
@@ -415,14 +427,15 @@ void Response::resetResponse()
 {
     request = NULL;
     statusCode = 200;
+    isWorking = false;
     headersSent = false;
     responseDone = false;
-    isWorking = false;
     isRedirection = false;
-    location.clear();
+	env.clear();
     body.clear();
-    bodyPath.clear();
     headers.clear();
+    bodyPath.clear();
+    location.clear();
     isRanged = false;
     startOffset = 0;
     endOffset = 0;
@@ -443,6 +456,16 @@ std::string Response::headersToString()
     }
     headers_str += CRLF;
     return headers_str;
+}
+
+ServerContext &Response::getServerCtx()
+{
+	return (serverCTX);
+}
+
+LocationContext &Response::getLocationCtx()
+{
+	return (locationCTX);
 }
 
 void Response::initReasonPhrases()

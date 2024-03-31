@@ -3,16 +3,31 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 21:18:58 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/30 22:34:43 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
 
-std::string Utils::strTrim(const std::string& str, char c)
+std::string Utils::envName(std::string str)
+{
+	std::string::iterator	it;
+
+	it = str.begin();
+	while (it != str.end())
+	{
+		*it = std::toupper(*it);
+		if (*it == '-')
+			*it = '_';
+		it++;
+	}
+	return ("HTTP_" + str);
+}
+
+std::string Utils::strTrim(const std::string &str, char c)
 {
 	if (str.empty())
 		return str;

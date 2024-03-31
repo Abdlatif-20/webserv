@@ -3,19 +3,19 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+         #
+#    By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/01/28 16:53:41 by mel-yous          #+#    #+#              #
-#    Updated: 2024/03/23 22:13:36 by aben-nei         ###   ########.fr        #
+#    Updated: 2024/03/28 02:36:29 by houmanso         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = webserv
-CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g #-fsanitize=address
+CPPFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
 SRCS = $(wildcard *.cpp) $(wildcard */*.cpp) $(wildcard */*/*.cpp)
 OBJS = $(patsubst %.cpp,.obj/%.o,$(SRCS))
 INC  = $(wildcard *.hpp) $(wildcard */*.hpp)
-ALLFLAGS = $(CPPFLAGS) -I config -I utils -I request -I core -I response
+ALLFLAGS = $(CPPFLAGS) -I config -I utils -I request -I core -I response -I cgi
 
 TOTAL := $(words $(SRCS))
 CURRENT = 0

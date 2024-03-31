@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/29 16:45:44 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/30 18:33:48 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ class Request
 		String	_body;
 		String	headers;
 		String	requestData;
+		String	queryString;
 		String	requestLineData;
 		String	boundaryName;
 		String	_chunkedName;
@@ -160,4 +161,6 @@ class Request
 		const bool& 			getRequestIsWellFormed(void) const;
 		const String 			getHeaderByName(const String& name) const;
 
+		String			getProtocol(void);
+		String 			getQueryString(void);
 };

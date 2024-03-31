@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 18:08:19 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/30 18:32:42 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,8 +49,8 @@ ssize_t Client::recvRequest(void)
 	if (len > 0)
 	{
 		request.parseRequest(std::string(buff, len), serverCTX);
+		last_update_time = std::time(NULL); // to think about later
 		requestDone = request.isDone();
-		last_update_time = std::time(NULL); //to think about later
 	}
 	else
 		requestDone = true;;
@@ -64,6 +64,7 @@ void	Client::sendResponse(void)
 	{
 
 		response.setRequest(&request);
+		response.setServerCTX(request.getServerCTX());
 		response.setLocationCTX(request.getLocationCtx());
 		response.prepareResponse();
 		if (!response.getHeadersSent())
@@ -72,7 +73,7 @@ void	Client::sendResponse(void)
 			len = send(sockId, headers.c_str(), headers.size(), 0);
 			response.setHeadersSent(true);
 		}
-		len = send(sockId, response.getBody().c_str(), response.getBody().size(), 0);// when fail? we should remove the client and continue :)
+		len = send(sockId, response.getBody().c_str(), response.getBody().size(), 0);// when fail? we should remove the client and continue :) // ok
 		responseDone = response.responseIsDone();
 		last_update_time = std::time(NULL);
 	}

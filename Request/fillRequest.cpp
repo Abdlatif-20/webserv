@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fillRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 06:38:33 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/03/30 18:33:18 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ void	Request::fillRequestLine(const String& requestLine)
 	}
 	requestLineMap["method"] = requestLineVector[0];
 	requestLineMap["path"] = requestLineVector[1];
+	requestLineMap["protocol"] = requestLineVector[2];
 	this->requestLineDone = true;
 	this->requestLine = requestLineMap;	
 	fillParams();
@@ -91,5 +92,5 @@ void	Request::fillParams()
 		return;
 	sepPath = Utils::split(path, '?');
 	this->requestLine["path"] = sepPath[0];
-	this->_params = sepPath[1];
+	this->queryString = sepPath[1];
 }
