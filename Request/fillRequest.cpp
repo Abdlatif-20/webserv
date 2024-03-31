@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   fillRequest.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/30 18:33:18 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/31 20:48:57 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,9 +71,16 @@ void	Request::fillRequestLine(const String& requestLine)
 	if (requestLineVector[2] != "HTTP/1.1")
 	{
 		String str = requestLineVector[2];
-		size_t pos = str.find("HTTP/");
-		if (pos != std::string::npos && *(str.end() - 1) != '/')
-			return (this->status = HTTPVersionNotSupported, requestIscomplete = true, void());
+		size_t i = str.find('/');
+		if (i != std::string::npos)
+		{
+			std::string part1 = str.substr(0, i);
+			std::string part2 = str.substr(i + 1, str.length() - i);
+			char* end;
+			double d = std::strtod(part2.c_str(), &end);
+			if (part1 == "HTTP" && !*end && d > 0)
+				return (this->status = HTTPVersionNotSupported, requestIscomplete = true, void());
+		}
 		return (this->status = BadRequest, requestIscomplete = true, void());
 	}
 	requestLineMap["method"] = requestLineVector[0];

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/30 18:33:25 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/03/31 23:27:23 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -262,7 +262,7 @@ void	Request::resetRequest()
 	this->_path.clear();
 	this->_body.clear();
 	this->queryString.clear();
-	this->headers.clear();
+	this->_headers.clear();
 	this->headers.clear();
 	this->requestData.clear();
 	this->boundaryName.clear();

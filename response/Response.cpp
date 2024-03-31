@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/31 02:38:53 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/31 23:27:36 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -181,8 +181,8 @@ void Response::prepareHeaders()
 
 void Response::prepareBody()
 {
-	if (locationCTX.hasCGI() || bodyPath.find_first_of('.') != std::string::npos)
-		runCGI();
+	// if (locationCTX.hasCGI() || bodyPath.find_first_of('.') != std::string::npos)
+	// 	runCGI();
     if (bodyPath.empty())
     {
         responseDone = true;
@@ -326,8 +326,8 @@ void Response::prepareRanged()
             endOffset = getEndOffset(range);
             if (endOffset == -1 || endOffset >= contentLength)
                 endOffset = contentLength - 1;
-            if (startOffset >= contentLength || endOffset < startOffset)
-                throw ResponseErrorException(RequestedRangeNotSatisfiable);
+            if (startOffset > contentLength || endOffset < startOffset)
+                    throw ResponseErrorException(RequestedRangeNotSatisfiable);
             statusCode = PartialContent;
         }
     }

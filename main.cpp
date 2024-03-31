@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/31 02:34:11 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/31 16:27:46 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,6 @@ int main(int argc, char **argv, char  ** __unused env)
 		try
 		{
 			Config	_config(configPath);
-			// std::cout << *_config.getServers().begin()->getLocations().begin()->getDirectives().begin()->second.begin() << std::endl;
 			Core core(_config);
 			core.run();
 		}
