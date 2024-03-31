@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/31 02:36:36 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/31 23:39:29 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ class Response
 
         /*Attributes for handling Ranged Request*/
         bool isRanged;
-        ssize_t startOffset;
-        ssize_t endOffset;
+        long long startOffset;
+        long long endOffset;
         bool alreadySeeked;
         ssize_t sendedBytes;
         size_t readSize;
@@ -90,8 +90,8 @@ class Response
         std::map<std::string, std::string>& getHeaders();
         std::string headersToString();
 
-	ServerContext& getServerCtx();
-	LocationContext& getLocationCtx();
+	    ServerContext& getServerCtx();
+	    LocationContext& getLocationCtx();
 
         static void initMimeTypes();
         static void initReasonPhrases();
