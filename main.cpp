@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/31 21:38:09 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/01 18:18:24 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,22 @@
 #include "CGI.hpp"
 #include "Core.hpp"
 
-int main(int argc, char **argv, char  ** __unused env)
+void	printBanner()
 {
+	std::cout << "\n\033[94m";
+	std::cout << "██╗    ██╗███████╗██████╗ ███████╗███████╗██████╗ ██╗   ██╗" << std::endl;
+	std::cout << "██║    ██║██╔════╝██╔══██╗██╔════╝██╔════╝██╔══██╗██║   ██║" << std::endl;
+	std::cout << "██║ █╗ ██║█████╗  ██████╔╝███████╗█████╗  ██████╔╝██║   ██║" << std::endl;
+	std::cout << "██║███╗██║██╔══╝  ██╔══██╗╚════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝" << std::endl;
+	std::cout << "╚███╔███╔╝███████╗██████╔╝███████║███████╗██║  ██║ ╚████╔╝ " << std::endl;
+	std::cout << " ╚══╝╚══╝ ╚══════╝╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  " << std::endl;
+	std::cout << "\033[0m";
+	std::cout << "\033[94mCopyright (c) 2024 \033[0m \033[92m[aben-nei - mel-yous - houmanso]\033[0m\n" << std::endl;
+}
+
+int main(int argc, char **argv, char  **env)
+{
+	printBanner();
 	std::string configPath = "webserv.conf";
 	try
 	{

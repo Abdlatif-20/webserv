@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   chunkedUtils.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:40:48 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/29 16:49:38 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/01 02:01:36 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,17 +50,36 @@ int Request::preparName()
 {
 	int file;
 
+	this->_chunkedName = this->_path + "chunked";
+	if (fileExists(_chunkedName))
+		_chunkedName = generatePath(_chunkedName);
+	file = open(this->_chunkedName.c_str(), O_CREAT | O_EXCL | O_RDWR, 0666);
+	if (file > 0)
+		return file;
+	return -1;
+}
+
+String Request::generatePath(String fileName)
+{
 	while (true)
 	{
-		this->_chunkedName = this->_path + "chunked_" + Utils::intToString(rand() % 1000);
-		if (!fileExists(this->_chunkedName))
+		if (!fileExists(fileName))
+			return fileName;
+		else
 		{
-			file = open(this->_chunkedName.c_str(), O_CREAT | O_EXCL | O_RDWR, 0666);
-			if (file > 0)
-				return file;
+			size_t pos = fileName.find_last_of(".");
+			if (pos != String::npos)
+			{
+				String extension = fileName.substr(pos);
+				fileName = fileName.substr(0, pos) + "_";
+				fileName += Utils::intToString(rand() % 1000);
+				fileName += extension;
+			}
+			else
+				fileName += "_" + Utils::intToString(rand() % 1000);
 		}
 	}
-	return -1;
+	return fileName;
 }
 
 // function to create the chunked file
@@ -70,16 +89,8 @@ void Request::createChunkedTmpFile()
 		_pathTmpFile = "/goinfre/chunked_" + Utils::intToString(rand() % 1000);
 	if (tmpFile < 0)
 	{
-		while (true)
-		{
-			if (!fileExists(_pathTmpFile))
-			{
-				tmpFile = open(_pathTmpFile.c_str(), O_CREAT | O_RDWR | O_APPEND, 0666);
-				break;
-			}
-			else
-				_pathTmpFile = "/goinfre/chunked_" + Utils::intToString(rand() % 1000);
-		}
+		_pathTmpFile = generatePath(_pathTmpFile);
+		tmpFile = open(_pathTmpFile.c_str(), O_CREAT | O_RDWR | O_APPEND, 0666);
 		tmpFiles.push_back(_pathTmpFile);
 	}
 	if (!fileExists(_pathTmpFile))

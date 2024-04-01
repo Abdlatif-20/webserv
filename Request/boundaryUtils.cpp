@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   boundaryUtils.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:12:18 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/29 17:03:39 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/01 02:01:39 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,9 +54,11 @@ String Request::prepareFileName(String line)
 	if (filename.empty())
 		return (filename);
 	extension = Utils::getFileExtension(filename);
-	int random = std::rand() % 1000;
+	// int random = std::rand() % 1000;
 	filename = filename.substr(0, filename.find_last_of("."));
-	filename = this->_path + filename + "_" + Utils::intToString(random) + extension;
+	filename = this->_path + filename + extension;
+	if (fileExists(filename))
+		filename = generatePath(filename);
 	return (filename);
 }
 
@@ -67,16 +69,8 @@ void Request::createBoundaryTmpFile()
 		_pathTmpFile = "/goinfre/boundary_" + Utils::intToString(rand() % 1000);
 	if (tmpFile < 0)
 	{
-		while (true)
-		{
-			if (!fileExists(_pathTmpFile))
-			{
-				tmpFile = open(_pathTmpFile.c_str(), O_CREAT | O_RDWR | O_APPEND, 0666);
-				break;
-			}
-			else
-				_pathTmpFile = "/goinfre/boundary_" + Utils::intToString(rand() % 1000);
-		}
+		_pathTmpFile = generatePath(_pathTmpFile);
+		tmpFile = open(_pathTmpFile.c_str(), O_CREAT | O_RDWR | O_APPEND, 0666);
 		tmpFiles.push_back(_pathTmpFile);
 	}
 	if (!fileExists(_pathTmpFile))

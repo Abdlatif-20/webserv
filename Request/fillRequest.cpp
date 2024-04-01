@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/30 18:33:18 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/01 18:20:06 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,5 +92,6 @@ void	Request::fillParams()
 		return;
 	sepPath = Utils::split(path, '?');
 	this->requestLine["path"] = sepPath[0];
-	this->queryString = sepPath[1];
+	if (sepPath.size() > 1)
+		this->_params = sepPath[1];
 }

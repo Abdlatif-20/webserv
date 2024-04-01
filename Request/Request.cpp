@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/01 18:07:23 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/01 18:21:38 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,11 +28,12 @@ Request::Request()
 	this->receivecount = 0;
 	this->bodySize = 0;
 	this->contentLength = 0;
-	this->multipart = false;
+	this->chunkedBoundary = false;
 	this->_setLength = false;
 	this->isComplete = false;
 	this->remainingChunk = 0;
 	this->headersDone = false;
+	this->rawExtension = ".txt";
 	this->requestLineDone = false;
 	this->remainingChunkLength = 0;
 	this->_chunkedComplete = false;
@@ -74,7 +75,7 @@ Request& Request::operator=(const Request& obj)
 		this->locationCTX = obj.locationCTX;
 		this->bodyDone = obj.bodyDone;
 		this->foundUri = obj.foundUri;
-		this->multipart = obj.multipart;
+		this->chunkedBoundary = obj.chunkedBoundary;
 		this->_setLength = obj._setLength;
 		this->isComplete = obj.isComplete;
 		this->detectHost = obj.detectHost;
@@ -83,6 +84,7 @@ Request& Request::operator=(const Request& obj)
 		this->requestData = obj.requestData;
 		this->receivecount = obj.receivecount;
 		this->_chunkedName = obj._chunkedName;
+		this->rawExtension = obj.rawExtension;
 		this->bodySize = obj.bodySize;
 		this->boundaryName = obj.boundaryName;
 		this->contentLength = obj.contentLength;
@@ -245,16 +247,19 @@ void	Request::resetRequest()
 {
 	this->status = OK;
 	this->detectHost = 0;
+	close(this->tmpFile);
+	this->tmpFile = -1;
 	this->bodyDone = false;
 	this->foundUri = false;
 	this->receivecount = 0;
 	this->bodySize = 0;
 	this->contentLength = 0;
-	this->multipart = false;
+	this->chunkedBoundary = false;
 	this->remainingChunk = 0;
 	this->_setLength = false;
 	this->isComplete = false;
 	this->headersDone = false;
+	this->rawExtension = ".txt";
 	this->requestLineDone = false;
 	this->remainingChunkLength = 0;
 	this->_chunkedComplete = false;
@@ -277,8 +282,6 @@ void	Request::resetRequest()
 	this->_pathTmpFile.clear();
 	this->requestVector.clear();
 	this->requestLineData.clear();
-	close(this->tmpFile);
-	this->tmpFile = -1;
 	bzero(this->buffer, BUFFER_SIZE);
 	
 }
