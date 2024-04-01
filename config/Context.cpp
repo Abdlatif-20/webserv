@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 18:32:32 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/01 18:02:18 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -250,9 +250,19 @@ std::map<std::string, std::string> Context::getCGI()
     return cgi;
 }
 
-bool Context::hasCGI()
+bool Context::hasCGI(std::string filename)
 {
-    return !cgi.empty();
+	if (cgi.empty())
+		return (false);
+	try
+	{
+		cgi.at(Utils::getFileExtension(filename));
+	}
+	catch(const std::exception& e)
+	{
+		return (false);
+	}
+	return (true);
 }
 
 unsigned int Context::getCGI_timeout()

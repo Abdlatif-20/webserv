@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/01 00:44:38 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/01 18:07:23 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,6 +177,11 @@ String Request::getProtocol(void)
 	return requestLine["protocol"];
 }
 
+String Request::getBodyPath(void)
+{
+	return _pathTmpFile;
+}
+
 const ServerContext& Request::getServerCTX(void) const
 {
 	return serverCTX;
@@ -319,6 +324,7 @@ void	Request::parseRequest(const std::string& receivedRequest, ServerContext ser
 	if (receivedRequest.empty())
 		return;
 	this->serverCTX = serverCTX;
+	std::cout << receivedRequest << std::endl;
 	std::srand(time(NULL));
 	if (!this->requestLineDone || !this->headersDone || !this->_requestIsWellFormed)
 	{

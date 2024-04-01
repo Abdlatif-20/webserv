@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Context.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/29 16:01:41 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/01 18:01:16 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,6 @@ class Context
         std::string getErrorPage(const std::string& status);
         StringVector getHttpRedirection();
         std::map<std::string, std::string> getCGI();
-        bool hasCGI();
+        bool hasCGI(std::string filename);
         unsigned int getCGI_timeout();
 };

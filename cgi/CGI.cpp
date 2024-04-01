@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/01 00:23:53 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/01 14:54:43 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ std::string CGI::getBinPath(void)
 	return (locationctx.getCGI()[script.substr(pos)]);
 }
 
-std::string CGI::prepareResponse(std::string &out)
+void CGI::prepareResponse(std::string &out)
 {
 	std::string	key;
 	std::string	line;
@@ -83,7 +83,7 @@ std::string CGI::prepareResponse(std::string &out)
 		std::cout << "[" << key << "] ==  [" << Utils::strTrim(value,' ') << "]"<< std::endl;
 		ss.clear();
 	}
-	return (out);
+	headers["content-length"] = Utils::intToString(Utils::getFileSize("/tmp/output") - output.tellg());
 }
 
 void g(int s)
@@ -93,19 +93,19 @@ void g(int s)
 }
 
 
-std::string CGI::execute(void)
+void CGI::execute(void)
 {
 	pid_t	pid;
 	std::string	bin;
 	std::string	out;
 
-	out = "output";
+	out = "/tmp/output";
 	bin = getBinPath();
 	pid = runCGIProcess(bin, out);
 	if (pid < 0)
 		throw ResponseErrorException(InternalServerError);
 	traceCGIProcess(pid);
-	return (prepareResponse(out));
+	prepareResponse(out);
 }
 
 void CGI::traceCGIProcess(pid_t pid)
@@ -126,7 +126,8 @@ void CGI::traceCGIProcess(pid_t pid)
 
 pid_t CGI::runCGIProcess(std::string &bin, std::string &out)
 {
-	int	fd;
+	int	_in;
+	int	_out;
 	pid_t	pid;
 	std::vector<char *>	envv;
 
@@ -138,10 +139,12 @@ pid_t CGI::runCGIProcess(std::string &bin, std::string &out)
 	if (!pid)
 	{
 		char *args[3] = {(char *)bin.c_str(), (char *)script.c_str(), NULL};
-		std::cout << args[0] << " " << args[1] << std::endl;
-		fd = open(out.c_str(), O_CREAT|O_TRUNC|O_WRONLY, 0644);
-		dup2(fd, 1);
-		close(fd);
+		_out = open(out.c_str(), O_CREAT|O_TRUNC|O_WRONLY, 0644);
+		_in = open(request->getBodyPath().c_str(), O_RDONLY, 0644);
+		dup2(_out, 1);
+		dup2(_in, 0);
+		close(_out);
+		close(_in);
 		if (chdir(dir.c_str()) != 0)
 			exit(1);
 		if (execve(args[0], args, envv.data()) != 0)
@@ -179,8 +182,6 @@ void CGI::setupEnv(std::string bodyPath)
 			if (first != "content-length" && first != "content-type")
 				env.push_back(Utils::envName(it->first) + "=" + it->second);
 		}
-		for (size_t i = 0; i < env.size(); i++)
-			std::cout << env[i] << std::endl;
 	}
 	catch(const std::exception& e)
 	{

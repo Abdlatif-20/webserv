@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/30 18:33:48 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/01 14:54:10 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,5 +162,6 @@ class Request
 		const String 			getHeaderByName(const String& name) const;
 
 		String			getProtocol(void);
-		String 			getQueryString(void);
+		String			getBodyPath(void);
+		String			getQueryString(void);
 };

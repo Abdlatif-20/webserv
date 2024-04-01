@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/01 00:45:23 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/01 18:00:54 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,7 +210,7 @@ void Response::prepareHeaders()
 
 void Response::prepareBody()
 {
-	if (statusCode == 200 && locationCTX.hasCGI() && bodyPath.find_last_of('.') != std::string::npos)
+	if (statusCode == 200 && locationCTX.hasCGI(bodyPath))
 		runCGI();
     if (bodyPath.empty())
     {
@@ -386,7 +386,7 @@ void Response::preparePOST()
                 try
                 {
                     std::string index = locationCTX.getIndex(resource);
-                    if (index.empty() || !locationCTX.hasCGI())
+                    if (index.empty() )//|| !locationCTX.hasCGI(index))
                         throw Utils::FilePermissionDenied();
                     /* Request BODY goes to CGI !! */
                 }
@@ -398,16 +398,16 @@ void Response::preparePOST()
         }
         else
         {
-            if (!locationCTX.hasCGI())
-                throw ResponseErrorException(FORBIDDEN);
+            // if (!locationCTX.hasCGI())
+            //     throw ResponseErrorException(FORBIDDEN);
         }
     }
 }
 
 void Response::prepareDELETE()
 {
-    if (!locationCTX.hasCGI())
-        throw ResponseErrorException(MethodNotAllowed);
+    // if (!locationCTX.hasCGI())
+    //     throw ResponseErrorException(MethodNotAllowed);
     /*CGI job*/
 }
 
