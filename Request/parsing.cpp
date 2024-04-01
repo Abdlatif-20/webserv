@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/30 02:41:16 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/04/01 01:53:48 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	Request::requestIsWellFormed()
 	{
 		if (_headers.find("content-length") != _headers.end()
 			&& _headers.find("transfer-encoding") == _headers.end()
-			&& _headers["content-type"].find("multipart/form-data") == String::npos)
+			&& _headers["content-type"].find("chunkedBoundary/form-data") == String::npos)
 			parseContentLength();
 		else if (_headers.find("content-type") != _headers.end()
 				&& _headers.find("transfer-encoding") == _headers.end())
@@ -142,7 +142,7 @@ void	Request::parseBody()
 	if (this->requestLine["method"] == "POST"
 			&& _headers.find("content-length") != _headers.end()
 			&& _headers.find("transfer-encoding") == _headers.end()
-			&& _headers["content-type"].find("multipart/form-data") == String::npos)
+			&& _headers["content-type"].find("chunkedBoundary/form-data") == String::npos)
 				ContentLength();
 	else if (this->requestLine["method"] == "POST"
 			&& _headers.find("transfer-encoding") != _headers.end()
@@ -156,11 +156,11 @@ void	Request::parseBody()
 		&& _headers.find("content-type") != _headers.end()
 		&& _headers.find("transfer-encoding") != _headers.end())
 		{
-			multipart = true;
+			chunkedBoundary = true;
 			parseChunkedBody();
 			if (requestIscomplete)
 				parseBoundary();
-			multipart = false;
+			chunkedBoundary = false;
 		}
 }
 

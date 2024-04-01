@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/30 02:17:32 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/04/01 02:02:46 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ class Request
 		int		status;
 		bool	foundUri;
 		bool	bodyDone;
-		bool	multipart;
+		bool	chunkedBoundary;
 		int		detectHost;
 		bool	_setLength;
 		bool	headersDone;
@@ -98,7 +98,6 @@ class Request
 			void			fillParams();
 			int				preparName();
 			void			removeFiles();
-			String			generatePath(String fileName);
 			void			parseBoundary();
 			void			ContentLength();
 			void			parseChunkedBody();
@@ -114,16 +113,19 @@ class Request
 			void			isMethodAllowedInLocation();
 			void			fillHeaders(Vector headers);
 			String			prepareFileName(String line);
+			String			generatePath(String fileName);
 			unsigned int	convertToDecimal(String hex);
+			void			preparLength(String& length);
 			String& 		isExist(Map& headers, String key);
+			void			readBytes(int fd, ssize_t& bytesRead);
+			int				takingRequests(String receivedRequest);
 			bool			fileExists(const std::string& fileName);
 			void			separateRequest(String receivedRequest);
 			void			fillRequestLine(const String& requestLine);
 			int				parseRequestLine(const String& requestLine);
 			int				checkDuplicate(const String& receivedRequest);
-			int				takingRequests(String receivedRequest);
-			void			preparLength(String& length);
-			void			readBytes(int fd, ssize_t& bytesRead);
+			bool			getBoundaryName(String startBoundary, int &file);
+			int				writeInFile(int& file, String eBoundary, String sBoundary);
 	public:
 	/* *************************** constructors ****************************** */
 	

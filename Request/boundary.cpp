@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/30 01:40:17 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/04/01 02:09:19 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,65 @@ void Request::parseContentType()
 	contentLength = std::stol(_headers["content-length"]);
 }
 
+bool	Request::getBoundaryName(String startBoundary, int &file)
+{
+	size_t pos = _body.find(startBoundary);
+	if (pos != String::npos)
+	{
+		_body.erase(0, pos + startBoundary.size());
+		pos = _body.find("filename=");
+		if (pos == String::npos)
+			pos = _body.find("name=");
+		if (pos != String::npos)
+		{
+			boundaryName = prepareFileName(_body.substr(pos));
+			if (boundaryName.empty())
+				return (status = InternalServerError, requestIscomplete = true,
+					std::remove(_pathTmpFile.c_str()), false);
+			file = open(boundaryName.c_str(), O_CREAT | O_EXCL | O_RDWR, 0666);
+			if (file == -1)
+				return (status = InternalServerError, requestIscomplete = true,
+					std::remove(_pathTmpFile.c_str()), false);
+			_body.erase(0, _body.find("\r\n\r\n") + 4);
+		}
+		else
+			return (status = InternalServerError, requestIscomplete = true,
+				std::remove(_pathTmpFile.c_str()), false);
+	}
+	return true;
+}
+
+int	Request::writeInFile(int& file, String eBoundary, String sBoundary)
+{
+	if (_body.find(eBoundary) != String::npos)
+	{
+		write(file, _body.c_str(), _body.find(eBoundary) - 2);
+		close(file);
+		file = -1;
+		tmpFile = -1;
+		boundaryName.clear();
+		requestIscomplete = true;
+		_body.clear();
+		return 0;
+	}
+	else if (_body.find(sBoundary) != String::npos)
+	{
+		write(file, _body.c_str(), _body.find(sBoundary) - 2);
+		_body.erase(0, _body.find(sBoundary));
+		close(file);
+		file = -1;
+		boundaryName.clear();
+		return -1;
+	}
+	write(file, _body.c_str(), _body.size());
+	_body.clear();
+	return 1;
+}
+
 // function to parse the boundary and write the actual file
 void Request::parseBoundary()
 {
-	if (!multipart)
+	if (!chunkedBoundary)
 		createBoundaryTmpFile();
 	else
 	{
@@ -35,8 +90,9 @@ void Request::parseBoundary()
 	}
 	if (!this->_BoundaryComplete)
 		return(receivecount++, void());
-	if (bodySize != contentLength && !multipart)
-		return (status = BadRequest, requestIscomplete = true, std::remove(_pathTmpFile.c_str()), void());
+	if (bodySize != contentLength && !chunkedBoundary)
+		return (status = BadRequest, requestIscomplete = true,
+			std::remove(_pathTmpFile.c_str()), void());
 	int fd = open(this->_pathTmpFile.c_str(), O_RDONLY);
 	if (fd == -1)
 		return (status = InternalServerError, requestIscomplete = true, void());
@@ -52,53 +108,13 @@ void Request::parseBoundary()
 			break;
 		if (boundaryName.empty())
 		{
-			size_t pos = _body.find(startBoundary);
-			if (pos != String::npos)
-			{
-				_body.erase(0, pos + startBoundary.size());
-				pos = _body.find("filename=");
-				if (pos == String::npos)
-					pos = _body.find("name=");
-				if (pos != String::npos)
-				{
-					boundaryName = prepareFileName(_body.substr(pos));
-					if (boundaryName.empty())
-						return (status = InternalServerError, requestIscomplete = true,
-							std::remove(_pathTmpFile.c_str()), void());
-					file = open(boundaryName.c_str(), O_CREAT | O_EXCL | O_RDWR, 0666);
-					if (file == -1)
-						return (status = InternalServerError, requestIscomplete = true,
-							std::remove(_pathTmpFile.c_str()), void());
-					_body.erase(0, _body.find("\r\n\r\n") + 4);
-				}
-				else
-					return (status = InternalServerError, requestIscomplete = true,
-						std::remove(_pathTmpFile.c_str()), void());
-			}
+			if (!getBoundaryName(startBoundary, file))
+				return;
 		}
-		if (_body.find(endBoundary) != String::npos)
-		{
-			write(file, _body.c_str(), _body.find(endBoundary) - 2);
-			close(file);
-			close(fd);
-			file = -1;
-			tmpFile = -1;
-			boundaryName.clear();
-			requestIscomplete = true;
-			_body.clear();
-			break;
-		}
-		else if (_body.find(startBoundary) != String::npos)
-		{
-			write(file, _body.c_str(), _body.find(startBoundary) - 2);
-			_body.erase(0, _body.find(startBoundary));
-			close(file);
-			file = -1;
-			boundaryName.clear();
+		int ret = writeInFile(file, endBoundary, startBoundary);
+		if (!ret)
+			return (close(fd), removeFiles(), void());
+		else if (ret == -1)
 			continue;
-		}
-		write(file, _body.c_str(), _body.size());
-		_body.clear();
 	}
-	removeFiles();
 }
