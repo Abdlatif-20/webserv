@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 18:34:36 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/01 00:41:33 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,10 +88,12 @@ class Response
 
         void resetResponse();
         void prepareResponse();
+		void setHeaderAttr(std::string key, std::string value);
 
         std::map<std::string, std::string>& getHeaders();
         std::string headersToString();
 
+		std::ifstream&	getIfs();
 		ServerContext&	getServerCtx();
 		LocationContext&	getLocationCtx();
 

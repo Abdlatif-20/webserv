@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/30 22:35:17 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/01 00:23:53 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,12 +58,31 @@ std::string CGI::getBinPath(void)
 
 std::string CGI::prepareResponse(std::string &out)
 {
-	std::ifstream	output;
+	std::string	key;
+	std::string	line;
+	std::string	value;
+	std::ifstream	&output = response->getIfs();
 	std::stringstream	ss;
+	Map	&headers = response->getHeaders();
 
 	output.open(out);
 	if (!output.good())
 		throw ResponseErrorException(InternalServerError);
+	std::cout << "headers \n";
+	while (std::getline(output, line))
+	{
+		if (line.back() == '\r')
+			line.pop_back();
+		if (line.empty())
+			break;
+		ss.str(line);
+		std::getline(ss, key, ':');
+		std::getline(ss, value, ':');
+		Utils::toLower(key);
+		headers[key] = value;
+		std::cout << "[" << key << "] ==  [" << Utils::strTrim(value,' ') << "]"<< std::endl;
+		ss.clear();
+	}
 	return (out);
 }
 

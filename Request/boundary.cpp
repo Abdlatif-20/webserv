@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   boundary.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/29 17:03:30 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/31 21:00:02 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ void Request::parseBoundary()
 	}
 	if (!this->_BoundaryComplete)
 		return(receivecount++, void());
+		//CHECK IF CGI ON
 	if (bodySize != contentLength && !multipart)
 		return (status = BadRequest, requestIscomplete = true, std::remove(_pathTmpFile.c_str()), void());
 	int fd = open(this->_pathTmpFile.c_str(), O_RDONLY);

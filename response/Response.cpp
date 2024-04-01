@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 23:03:03 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/01 00:45:23 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -189,26 +189,28 @@ void Response::prepareHeaders()
     if (headersSent)
         return;
     statusLine = std::string(HTTP_VERSION) + SPACE + Utils::intToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
-    headers["Connection"] = request->getHeaderByName("connection");
-    headers["Server"] = std::string(SERVER) + " (" + OS_MAC + ")";
-    headers["Date"] = Utils::getCurrentTime();
-    headers["Content-Length"] = (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath)));
-    headers["Content-Type"] = (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath)));
+    setHeaderAttr("connection", request->getHeaderByName("connection"));
+    setHeaderAttr("server", std::string(SERVER) + " (" + OS_MAC + ")");
+    setHeaderAttr("date", Utils::getCurrentTime());
+    setHeaderAttr("content-length", (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))));
+    setHeaderAttr("content-type", (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath))));
     if (!bodyPath.empty())
-        headers["Last-Modified"] = Utils::get_last_modified_date(bodyPath);
+        setHeaderAttr("last-modified", Utils::get_last_modified_date(bodyPath));
     if (isRedirection)
-        headers["Location"] = location;
+        setHeaderAttr("location", location);
     if (isRanged)
     {
-        headers["Accept-Ranges"] = "bytes";
-        headers["Content-Length"] = Utils::longlongToString((endOffset - startOffset) + 1);
-        headers["Content-Range"] = "bytes " + Utils::longlongToString(startOffset) + "-" + Utils::longlongToString(endOffset) + "/" + Utils::longlongToString(Utils::getFileSize(bodyPath));
+        setHeaderAttr("accept-ranges", "bytes");
+        setHeaderAttr("content-length", Utils::longlongToString((endOffset - startOffset) + 1));
+        setHeaderAttr("content-range", "bytes " + Utils::longlongToString(startOffset) + "-" + Utils::longlongToString(endOffset) + "/" + Utils::longlongToString(Utils::getFileSize(bodyPath)));
     }
 }
 
+
+
 void Response::prepareBody()
 {
-	if (locationCTX.hasCGI() || bodyPath.find_first_of('.') != std::string::npos)
+	if (statusCode == 200 && locationCTX.hasCGI() && bodyPath.find_last_of('.') != std::string::npos)
 		runCGI();
     if (bodyPath.empty())
     {
@@ -335,7 +337,8 @@ void Response::runCGI()
 	CGI cgi(this, request);
 
 	cgi.setupEnv(bodyPath);
-	ifs.open(cgi.execute());
+	cgi.execute();
+	responseDone =true; // TMP
 }
 
 void Response::prepareRanged()
@@ -443,11 +446,19 @@ void Response::prepareResponse()
     }
 	catch (...)
 	{
+		isRanged = false;
 		statusCode = InternalServerError;
 		generateResponseError();
 		prepareBody();
 		prepareHeaders();
 	}
+}
+
+void Response::setHeaderAttr(std::string key, std::string value)
+{
+	Utils::toLower(key);
+	if (headers[key].empty())
+		headers[key] = value;
 }
 
 void Response::resetResponse()
@@ -483,6 +494,11 @@ std::string Response::headersToString()
     }
     headers_str += CRLF;
     return headers_str;
+}
+
+std::ifstream &Response::getIfs()
+{
+	return (ifs);
 }
 
 ServerContext &Response::getServerCtx()
