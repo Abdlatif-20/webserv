@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/29 17:07:55 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/03 17:24:41 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ void	Request::parseContentLength()
 //function to parse the content length and write the body to a file
 void	Request::ContentLength()
 {
-	String randomStr = Utils::intToString(std::rand() % 1000);
+	String randomStr = Utils::numberToString(std::rand() % 1000);
 	std::ofstream file;
 	String path = requestLine["path"];
 	String extension = "";

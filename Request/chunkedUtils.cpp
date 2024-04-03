@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:40:48 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/29 16:49:38 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/03 17:24:41 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ int Request::preparName()
 
 	while (true)
 	{
-		this->_chunkedName = this->_path + "chunked_" + Utils::intToString(rand() % 1000);
+		this->_chunkedName = this->_path + "chunked_" + Utils::numberToString(rand() % 1000);
 		if (!fileExists(this->_chunkedName))
 		{
 			file = open(this->_chunkedName.c_str(), O_CREAT | O_EXCL | O_RDWR, 0666);
@@ -67,7 +67,7 @@ int Request::preparName()
 void Request::createChunkedTmpFile()
 {
 	if (_pathTmpFile.empty())
-		_pathTmpFile = "/goinfre/chunked_" + Utils::intToString(rand() % 1000);
+		_pathTmpFile = "/goinfre/chunked_" + Utils::numberToString(rand() % 1000);
 	if (tmpFile < 0)
 	{
 		while (true)
@@ -78,7 +78,7 @@ void Request::createChunkedTmpFile()
 				break;
 			}
 			else
-				_pathTmpFile = "/goinfre/chunked_" + Utils::intToString(rand() % 1000);
+				_pathTmpFile = "/goinfre/chunked_" + Utils::numberToString(rand() % 1000);
 		}
 		tmpFiles.push_back(_pathTmpFile);
 	}

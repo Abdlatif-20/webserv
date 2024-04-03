@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/31 02:37:10 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/03 17:24:41 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,14 @@
 
 namespace Utils
 {
+	template <typename T>
+	std::string numberToString(T num)
+	{
+		std::stringstream ss;
+		ss << num;
+		return ss.str();
+	}
+	
 	std::string envName(std::string str);
 	std::string strTrim(const std::string& str, char c);
 	std::vector<std::string> splitRequest(const std::string& str, const char *sep);
@@ -46,7 +54,7 @@ namespace Utils
 	void		toLower(std::string& str);
 	void		toUpper(std::string& str);
 	void		printFile(std::string filename);
-	std::string intToString(int number);
+	std::string numberToString(int number);
 	t_directive getDirectiveFromTokenName(const std::string& tokenName);
 	std::string getTokenNameFromDirective(t_directive d);
 	std::string getDefaultErrorPage(const std::string& status);
@@ -61,9 +69,7 @@ namespace Utils
 	std::string getFileExtension(const std::string& filePath);
 	long long getFileSize(const std::string& filePath);
 	std::string bytesToHuman(long long bytes);
-	std::string longlongToString(long long number);
 	long long strToll(const std::string& str);
-	std::string floatToString(float f);
 	std::string replaceAll(std::string str, const std::string& s1, const std::string& s2);
 	std::string get_last_modified_date(const std::string& path);
 	std::string intToHex(int i);

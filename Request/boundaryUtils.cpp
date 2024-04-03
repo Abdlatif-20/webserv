@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:12:18 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/29 17:03:39 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/03 17:24:41 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ String Request::prepareFileName(String line)
 	extension = Utils::getFileExtension(filename);
 	int random = std::rand() % 1000;
 	filename = filename.substr(0, filename.find_last_of("."));
-	filename = this->_path + filename + "_" + Utils::intToString(random) + extension;
+	filename = this->_path + filename + "_" + Utils::numberToString(random) + extension;
 	return (filename);
 }
 
@@ -64,7 +64,7 @@ String Request::prepareFileName(String line)
 void Request::createBoundaryTmpFile()
 {
 	if (_pathTmpFile.empty())
-		_pathTmpFile = "/goinfre/boundary_" + Utils::intToString(rand() % 1000);
+		_pathTmpFile = "/goinfre/boundary_" + Utils::numberToString(rand() % 1000);
 	if (tmpFile < 0)
 	{
 		while (true)
@@ -75,7 +75,7 @@ void Request::createBoundaryTmpFile()
 				break;
 			}
 			else
-				_pathTmpFile = "/goinfre/boundary_" + Utils::intToString(rand() % 1000);
+				_pathTmpFile = "/goinfre/boundary_" + Utils::numberToString(rand() % 1000);
 		}
 		tmpFiles.push_back(_pathTmpFile);
 	}

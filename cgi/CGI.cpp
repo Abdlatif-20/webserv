@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGI.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/30 22:35:17 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/03 17:24:41 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,7 +150,7 @@ void CGI::setupEnv(std::string bodyPath)
 		env.push_back("DOCUMENT_ROOT=" + path);
 		env.push_back("CONTENT_TYPE=" + request->getHeaderByName("content-type"));
 		env.push_back("CONTENT_LENGTH=" + request->getHeaderByName("content-length"));
-		env.push_back("REDIRECT_STATUS=" + Utils::intToString(request->getStatus()));
+		env.push_back("REDIRECT_STATUS=" + Utils::numberToString(request->getStatus()));
 		env.push_back("PATH=" + PATH);
 		Map m = request->getHeaders();
 		for (Map::iterator it = m.begin(); it != m.end(); it++)

@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/31 23:27:36 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/03 17:32:55 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,14 +123,14 @@ bool Response::responseIsDone() const
 
 std::string Response::generateHtmlResponsePage()
 {
-    return Utils::replaceAll(HTML_RESPONSE_PAGE, "$title$", reasonPhrases[statusCode]) + Utils::intToString(statusCode) + " - "
+    return Utils::replaceAll(HTML_RESPONSE_PAGE, "$title$", reasonPhrases[statusCode]) + Utils::numberToString(statusCode) + " - "
         + reasonPhrases[statusCode] + "</h2><hr><h4>WebServer 1.0</h4></body></html>\n";
 }
 
 void Response::generateResponseError()
 {
     Label:
-    std::string errorPage = locationCTX.getErrorPage(Utils::intToString(statusCode));
+    std::string errorPage = locationCTX.getErrorPage(Utils::numberToString(statusCode));
     if (errorPage.empty())
     {
         bodyPath.clear();
@@ -161,11 +161,11 @@ void Response::prepareHeaders()
 {
     if (headersSent)
         return;
-    statusLine = std::string(HTTP_VERSION) + SPACE + Utils::intToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
+    statusLine = std::string(HTTP_VERSION) + SPACE + Utils::numberToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
     headers["Connection"] = request->getHeaderByName("connection");
     headers["Server"] = std::string(SERVER) + " (" + OS_MAC + ")";
     headers["Date"] = Utils::getCurrentTime();
-    headers["Content-Length"] = (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath)));
+    headers["Content-Length"] = (bodyPath.empty() ? Utils::numberToString(body.size()) : Utils::numberToString(Utils::getFileSize(bodyPath)));
     headers["Content-Type"] = (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath)));
     if (!bodyPath.empty())
         headers["Last-Modified"] = Utils::get_last_modified_date(bodyPath);
@@ -174,8 +174,8 @@ void Response::prepareHeaders()
     if (isRanged)
     {
         headers["Accept-Ranges"] = "bytes";
-        headers["Content-Length"] = Utils::longlongToString((endOffset - startOffset) + 1);
-        headers["Content-Range"] = "bytes " + Utils::longlongToString(startOffset) + "-" + Utils::longlongToString(endOffset) + "/" + Utils::longlongToString(Utils::getFileSize(bodyPath));
+        headers["Content-Length"] = Utils::numberToString((endOffset - startOffset) + 1);
+        headers["Content-Range"] = "bytes " + Utils::numberToString(startOffset) + "-" + Utils::numberToString(endOffset) + "/" + Utils::numberToString(Utils::getFileSize(bodyPath));
     }
 }
 
@@ -335,6 +335,7 @@ void Response::prepareRanged()
 
 void Response::preparePOST()
 {
+    std::cout << statusCode << std::endl;
     if (!locationCTX.getUploadStore().empty())
     {
         statusCode = Created;
@@ -358,6 +359,8 @@ void Response::preparePOST()
                     if (index.empty() || !locationCTX.hasCGI())
                         throw Utils::FilePermissionDenied();
                     /* Request BODY goes to CGI !! */
+                    bodyPath = resource + index;
+                    statusCode = OK;
                 }
                 catch (const std::exception& e)
                 {
