@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/01 18:20:35 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/04 14:34:26 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ void	Request::setUploadingPath()
 	try
 	{
 		this->_path = locationCTX.getUploadStore();
+		if (this->_path.empty())
+			this->_path = "/tmp/";
 	}
 	catch (std::exception& e)
 	{

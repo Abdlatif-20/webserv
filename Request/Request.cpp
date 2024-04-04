@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/01 18:21:38 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/04 14:17:25 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -327,7 +327,6 @@ void	Request::parseRequest(const std::string& receivedRequest, ServerContext ser
 	if (receivedRequest.empty())
 		return;
 	this->serverCTX = serverCTX;
-	std::cout << receivedRequest << std::endl;
 	std::srand(time(NULL));
 	if (!this->requestLineDone || !this->headersDone || !this->_requestIsWellFormed)
 	{

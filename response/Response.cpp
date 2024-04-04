@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/01 18:00:54 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/04 14:30:08 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -273,7 +273,6 @@ void Response::prepareGET()
                         throw ResponseErrorException(FORBIDDEN);
                     return;
                 }
-				// hasCGI = true;
                 bodyPath = resource + index;
                 statusCode = OK;
             }
@@ -386,9 +385,13 @@ void Response::preparePOST()
                 try
                 {
                     std::string index = locationCTX.getIndex(resource);
-                    if (index.empty() )//|| !locationCTX.hasCGI(index))
+                    if (index.empty() )
                         throw Utils::FilePermissionDenied();
                     /* Request BODY goes to CGI !! */
+					if (!locationCTX.hasCGI(index))
+						headers["content-type"] = "text/plain";
+					bodyPath = resource + index;
+                	statusCode = OK;
                 }
                 catch (const std::exception& e)
                 {
@@ -398,17 +401,49 @@ void Response::preparePOST()
         }
         else
         {
-            // if (!locationCTX.hasCGI())
-            //     throw ResponseErrorException(FORBIDDEN);
+            if (!locationCTX.hasCGI(resource))
+				headers["content-type"] = "text/plain";
+			bodyPath = resource;
+            statusCode = OK;
         }
     }
 }
 
 void Response::prepareDELETE()
 {
-    // if (!locationCTX.hasCGI())
-    //     throw ResponseErrorException(MethodNotAllowed);
-    /*CGI job*/
+        std::string resource = locationCTX.getRoot() + Utils::urlDecoding(request->getRequestPath());
+        if (!Utils::checkIfPathExists(resource))
+            throw ResponseErrorException(NotFound);
+        if (Utils::isDirectory(resource))
+        {
+            if (!Utils::stringEndsWith(resource, "/"))
+                prepareRedirection(MovedPermanently, request->getRequestPath() + "/");
+            else
+            {
+                try
+                {
+                    std::string index = locationCTX.getIndex(resource);
+                    if (index.empty() )
+                        throw Utils::FilePermissionDenied();
+                    /* Request BODY goes to CGI !! */
+					if (!locationCTX.hasCGI(index))
+						headers["content-type"] = "text/plain";
+					bodyPath = resource + index;
+                	statusCode = OK;
+                }
+                catch (const std::exception& e)
+                {
+                    throw ResponseErrorException(FORBIDDEN);
+                }
+            }
+        }
+        else
+        {
+            if (!locationCTX.hasCGI(resource))
+				headers["content-type"] = "text/plain";
+			bodyPath = resource;
+            statusCode = OK;
+        }
 }
 
 void Response::prepareResponse()
