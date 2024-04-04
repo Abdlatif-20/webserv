@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/04 21:30:44 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/04 21:47:29 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,8 +126,8 @@ void CGI::traceCGIProcess(pid_t pid)
 
 pid_t CGI::runCGIProcess(std::string &bin, std::string __unused &out)
 {
-	int	_in;
-	int	_out;
+	int	_in = -1337;
+	int	_out = -1337;
 	pid_t	pid;
 	std::vector<char *>	envv;
 
@@ -136,7 +136,6 @@ pid_t CGI::runCGIProcess(std::string &bin, std::string __unused &out)
 	envv.push_back(NULL);
 	if ((pid = fork()) < 0 || access(bin.c_str(), F_OK | X_OK) != 0)
 		return (-1); // err
-	std::cout << request->getBodyPath() << std::endl;
 	if (!pid)
 	{
 		char *args[3] = {(char *)bin.c_str(), (char *)script.c_str(), NULL};
@@ -144,13 +143,14 @@ pid_t CGI::runCGIProcess(std::string &bin, std::string __unused &out)
 			args[1] = NULL;
 		if ((_out = open(out.c_str(), O_CREAT|O_TRUNC|O_WRONLY, 0644)) < 0)
 			exit(2);
-		if ((_in = open(request->getBodyPath().c_str(), O_RDONLY, 0644)) < 0)
+		if (!request->getBodyPath().empty() && (_in = open(request->getBodyPath().c_str(), O_RDONLY, 0644)) < 0)
 		{
 			close(_out);
 			exit(2);
 		}
 		dup2(_out, 1);
-		dup2(_in, 0);
+		if (_in != -1337)
+			dup2(_in, 0);
 		close(_out);
 		close(_in);
 		if (chdir(dir.c_str()) != 0)
