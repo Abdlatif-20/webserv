@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/03 21:04:36 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/04 00:23:17 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,6 @@ void	Client::sendResponse(void)
 {
 	if (requestDone && !responseDone)
 	{
-
 		response.setRequest(&request);
 		response.setServerCTX(request.getServerCTX());
 		response.setLocationCTX(request.getLocationCtx());
@@ -77,7 +76,7 @@ void	Client::sendResponse(void)
 		responseDone = response.responseIsDone();
 		last_update_time = std::time(NULL);
 	}
-	reset();
+	// reset();
 }
 
 void	Client::setServerCTX(const ServerContext& serverCTX)

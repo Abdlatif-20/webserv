@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/03 21:00:01 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/04 00:19:47 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,8 @@ void	Core::traceEvents(void)
 				clients.erase(checklist[i].fd);
 				checklist.erase(checklist.begin() + i--);
 			}
+			else
+				clients[checklist[i].fd].reset();
 		}
 	}
 }
