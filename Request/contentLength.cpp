@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/01 18:19:37 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/04 21:25:37 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ void	Request::ContentLength()
 				path = generatePath(path);
 				file.open(path, std::ios::app);
 			}
+			_pathTmpFile = path;
 		}
 		if (!file.is_open())
 			return (status = InternalServerError, requestIscomplete = true, void());

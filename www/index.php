@@ -14,5 +14,5 @@
 // echo "REDIRECT_STATUS : ".getenv("REDIRECT_STATUS")."</br>\n";
 // echo "PATH : ".getenv("PATH")."</br>\n";
 // phpinfo();
-echo "hello</br >\n";
+echo "hello ".$_POST["user"]."<br/>";
 ?>

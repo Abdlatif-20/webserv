@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/01 14:54:43 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/04 21:30:44 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,7 +124,7 @@ void CGI::traceCGIProcess(pid_t pid)
 	std::cout << "\nDONE" << std::endl;;
 }
 
-pid_t CGI::runCGIProcess(std::string &bin, std::string &out)
+pid_t CGI::runCGIProcess(std::string &bin, std::string __unused &out)
 {
 	int	_in;
 	int	_out;
@@ -136,11 +136,19 @@ pid_t CGI::runCGIProcess(std::string &bin, std::string &out)
 	envv.push_back(NULL);
 	if ((pid = fork()) < 0 || access(bin.c_str(), F_OK | X_OK) != 0)
 		return (-1); // err
+	std::cout << request->getBodyPath() << std::endl;
 	if (!pid)
 	{
 		char *args[3] = {(char *)bin.c_str(), (char *)script.c_str(), NULL};
-		_out = open(out.c_str(), O_CREAT|O_TRUNC|O_WRONLY, 0644);
-		_in = open(request->getBodyPath().c_str(), O_RDONLY, 0644);
+		if (Utils::stringEndsWith(script, ".php"))
+			args[1] = NULL;
+		if ((_out = open(out.c_str(), O_CREAT|O_TRUNC|O_WRONLY, 0644)) < 0)
+			exit(2);
+		if ((_in = open(request->getBodyPath().c_str(), O_RDONLY, 0644)) < 0)
+		{
+			close(_out);
+			exit(2);
+		}
 		dup2(_out, 1);
 		dup2(_in, 0);
 		close(_out);

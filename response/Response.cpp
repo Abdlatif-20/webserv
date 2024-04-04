@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/04 14:30:08 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/04 20:26:20 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -337,7 +337,6 @@ void Response::runCGI()
 
 	cgi.setupEnv(bodyPath);
 	cgi.execute();
-	responseDone =true; // TMP
 }
 
 void Response::prepareRanged()
