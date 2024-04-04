@@ -14,5 +14,12 @@
 // echo "REDIRECT_STATUS : ".getenv("REDIRECT_STATUS")."</br>\n";
 // echo "PATH : ".getenv("PATH")."</br>\n";
 // phpinfo();
-echo "hello</br >\n";
+if(isset($_COOKIE["user"]))
+{
+	setcookie("user", $_POST["user"], time()+3600);
+	echo "here => ".$_COOKIE["user"];
+}
+else
+	echo "not setting"
+
 ?>

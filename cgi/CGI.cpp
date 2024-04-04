@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/03 17:24:41 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/04 23:41:31 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,15 +56,34 @@ std::string CGI::getBinPath(void)
 	return (locationctx.getCGI()[script.substr(pos)]);
 }
 
-std::string CGI::prepareResponse(std::string &out)
+void CGI::prepareResponse(std::string &out)
 {
-	std::ifstream	output;
+	std::string	key;
+	std::string	line;
+	std::string	value;
+	std::ifstream	&output = response->getIfs();
 	std::stringstream	ss;
+	Map	&headers = response->getHeaders();
 
 	output.open(out);
 	if (!output.good())
 		throw ResponseErrorException(InternalServerError);
-	return (out);
+	std::cout << "headers \n";
+	while (std::getline(output, line))
+	{
+		if (line.back() == '\r')
+			line.pop_back();
+		if (line.empty())
+			break;
+		ss.str(line);
+		std::getline(ss, key, ':');
+		std::getline(ss, value, ':');
+		Utils::toLower(key);
+		headers[key] = value;
+		std::cout << "[" << key << "] ==  [" << Utils::strTrim(value,' ') << "]"<< std::endl;
+		ss.clear();
+	}
+	headers["content-length"] = Utils::numberToString(Utils::getFileSize("/tmp/output") - output.tellg());
 }
 
 void g(int s)
@@ -74,19 +93,19 @@ void g(int s)
 }
 
 
-std::string CGI::execute(void)
+void CGI::execute(void)
 {
 	pid_t	pid;
 	std::string	bin;
 	std::string	out;
 
-	out = "output";
+	out = "/tmp/output";
 	bin = getBinPath();
 	pid = runCGIProcess(bin, out);
 	if (pid < 0)
 		throw ResponseErrorException(InternalServerError);
 	traceCGIProcess(pid);
-	return (prepareResponse(out));
+	prepareResponse(out);
 }
 
 void CGI::traceCGIProcess(pid_t pid)
@@ -105,9 +124,10 @@ void CGI::traceCGIProcess(pid_t pid)
 	std::cout << "\nDONE" << std::endl;;
 }
 
-pid_t CGI::runCGIProcess(std::string &bin, std::string &out)
+pid_t CGI::runCGIProcess(std::string &bin, std::string __unused &out)
 {
-	int	fd;
+	int	_in = -1337;
+	int	_out = -1337;
 	pid_t	pid;
 	std::vector<char *>	envv;
 
@@ -119,10 +139,20 @@ pid_t CGI::runCGIProcess(std::string &bin, std::string &out)
 	if (!pid)
 	{
 		char *args[3] = {(char *)bin.c_str(), (char *)script.c_str(), NULL};
-		std::cout << args[0] << " " << args[1] << std::endl;
-		fd = open(out.c_str(), O_CREAT|O_TRUNC|O_WRONLY, 0644);
-		dup2(fd, 1);
-		close(fd);
+		if (Utils::stringEndsWith(script, ".php"))
+			args[1] = NULL;
+		if ((_out = open(out.c_str(), O_CREAT|O_TRUNC|O_WRONLY, 0644)) < 0)
+			exit(2);
+		if (!request->getBodyPath().empty() && (_in = open(request->getBodyPath().c_str(), O_RDONLY, 0644)) < 0)
+		{
+			close(_out);
+			exit(2);
+		}
+		dup2(_out, 1);
+		if (_in != -1337)
+			dup2(_in, 0);
+		close(_out);
+		close(_in);
 		if (chdir(dir.c_str()) != 0)
 			exit(1);
 		if (execve(args[0], args, envv.data()) != 0)
@@ -160,8 +190,6 @@ void CGI::setupEnv(std::string bodyPath)
 			if (first != "content-length" && first != "content-type")
 				env.push_back(Utils::envName(it->first) + "=" + it->second);
 		}
-		for (size_t i = 0; i < env.size(); i++)
-			std::cout << env[i] << std::endl;
 	}
 	catch(const std::exception& e)
 	{

@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/04 16:31:26 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/04 23:41:50 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,27 +163,29 @@ void Response::prepareHeaders()
     if (headersSent)
         return;
     statusLine = std::string(HTTP_VERSION) + SPACE + Utils::numberToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
-    headers["Connection"] = request->getHeaderByName("connection");
-    headers["Server"] = std::string(SERVER) + " (" + OS_MAC + ")";
-    headers["Date"] = Utils::getCurrentTime();
-    headers["Content-Length"] = (bodyPath.empty() ? Utils::numberToString(body.size()) : Utils::numberToString(Utils::getFileSize(bodyPath)));
-    headers["Content-Type"] = (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath)));
+    setHeaderAttr("connection", request->getHeaderByName("connection"));
+    setHeaderAttr("server", std::string(SERVER) + " (" + OS_MAC + ")");
+    setHeaderAttr("date", Utils::getCurrentTime());
+    setHeaderAttr("content-length", (bodyPath.empty() ? Utils::numberToString(body.size()) : Utils::numberToString(Utils::getFileSize(bodyPath))));
+    setHeaderAttr("content-type", (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath))));
     if (!bodyPath.empty())
-        headers["Last-Modified"] = Utils::get_last_modified_date(bodyPath);
+        setHeaderAttr("last-modified", Utils::get_last_modified_date(bodyPath));
     if (isRedirection)
-        headers["Location"] = location;
+        setHeaderAttr("location", location);
     if (isRanged)
     {
-        headers["Accept-Ranges"] = "bytes";
-        headers["Content-Length"] = Utils::numberToString((endOffset - startOffset) + 1);
-        headers["Content-Range"] = "bytes " + Utils::numberToString(startOffset) + "-" + Utils::numberToString(endOffset) + "/" + Utils::numberToString(Utils::getFileSize(bodyPath));
+        setHeaderAttr("accept-ranges", "bytes");
+        setHeaderAttr("content-length", Utils::numberToString((endOffset - startOffset) + 1));
+        setHeaderAttr("content-range", "bytes " + Utils::numberToString(startOffset) + "-" + Utils::numberToString(endOffset) + "/" + Utils::numberToString(Utils::getFileSize(bodyPath)));
     }
 }
 
+
+
 void Response::prepareBody()
 {
-	// if (locationCTX.hasCGI() || bodyPath.find_first_of('.') != std::string::npos)
-	// 	runCGI();
+	if (statusCode == 200 && locationCTX.hasCGI(bodyPath))
+		runCGI();
     if (bodyPath.empty())
     {
         responseDone = true;
@@ -246,7 +248,6 @@ void Response::prepareGET()
                         throw ResponseErrorException(FORBIDDEN);
                     return;
                 }
-				// hasCGI = true;
                 bodyPath = resource + index;
                 statusCode = OK;
             }
@@ -310,7 +311,7 @@ void Response::runCGI()
 	CGI cgi(this, request);
 
 	cgi.setupEnv(bodyPath);
-	ifs.open(cgi.execute());
+	cgi.execute();
 }
 
 void Response::prepareRanged()
@@ -359,11 +360,13 @@ void Response::preparePOST()
                 try
                 {
                     std::string index = locationCTX.getIndex(resource);
-                    if (index.empty() || !locationCTX.hasCGI())
+                    if (index.empty() )
                         throw Utils::FilePermissionDenied();
                     /* Request BODY goes to CGI !! */
-                    bodyPath = resource + index;
-                    statusCode = OK;
+					if (!locationCTX.hasCGI(index))
+						headers["content-type"] = "text/plain";
+					bodyPath = resource + index;
+                	statusCode = OK;
                 }
                 catch (const std::exception& e)
                 {
@@ -373,17 +376,49 @@ void Response::preparePOST()
         }
         else
         {
-            if (!locationCTX.hasCGI())
-                throw ResponseErrorException(FORBIDDEN);
+            if (!locationCTX.hasCGI(resource))
+				headers["content-type"] = "text/plain";
+			bodyPath = resource;
+            statusCode = OK;
         }
     }
 }
 
 void Response::prepareDELETE()
 {
-    if (!locationCTX.hasCGI())
-        throw ResponseErrorException(MethodNotAllowed);
-    /*CGI job*/
+        std::string resource = locationCTX.getRoot() + Utils::urlDecoding(request->getRequestPath());
+        if (!Utils::checkIfPathExists(resource))
+            throw ResponseErrorException(NotFound);
+        if (Utils::isDirectory(resource))
+        {
+            if (!Utils::stringEndsWith(resource, "/"))
+                prepareRedirection(MovedPermanently, request->getRequestPath() + "/");
+            else
+            {
+                try
+                {
+                    std::string index = locationCTX.getIndex(resource);
+                    if (index.empty() )
+                        throw Utils::FilePermissionDenied();
+                    /* Request BODY goes to CGI !! */
+					if (!locationCTX.hasCGI(index))
+						headers["content-type"] = "text/plain";
+					bodyPath = resource + index;
+                	statusCode = OK;
+                }
+                catch (const std::exception& e)
+                {
+                    throw ResponseErrorException(FORBIDDEN);
+                }
+            }
+        }
+        else
+        {
+            if (!locationCTX.hasCGI(resource))
+				headers["content-type"] = "text/plain";
+			bodyPath = resource;
+            statusCode = OK;
+        }
 }
 
 void Response::prepareResponse()
@@ -419,14 +454,21 @@ void Response::prepareResponse()
         prepareBody();
         prepareHeaders();
     }
-    catch (...)
-    {
-        isRanged = false;
-        statusCode = InternalServerError;
-        generateResponseError();
-        prepareBody();
-        prepareHeaders();
-    }
+	catch (...)
+	{
+		isRanged = false;
+		statusCode = InternalServerError;
+		generateResponseError();
+		prepareBody();
+		prepareHeaders();
+	}
+}
+
+void Response::setHeaderAttr(std::string key, std::string value)
+{
+	Utils::toLower(key);
+	if (headers[key].empty())
+		headers[key] = value;
 }
 
 void Response::resetResponse()
@@ -462,6 +504,11 @@ std::string Response::headersToString()
     }
     headers_str += CRLF;
     return headers_str;
+}
+
+std::ifstream &Response::getIfs()
+{
+	return (ifs);
 }
 
 ServerContext &Response::getServerCtx()

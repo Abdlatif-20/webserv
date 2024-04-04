@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/03/28 19:51:10 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/04/04 14:34:26 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ void	Request::setUploadingPath()
 	try
 	{
 		this->_path = locationCTX.getUploadStore();
+		if (this->_path.empty())
+			this->_path = "/tmp/";
 	}
 	catch (std::exception& e)
 	{
@@ -50,7 +52,11 @@ void	Request::requestIsWellFormed()
 		return (this->status = RequestURITooLong, requestIscomplete = true, void());
 	if (this->requestLine["method"] == "POST")
 	{
-		if (_headers.find("content-type") != _headers.end()
+		if (_headers.find("content-length") != _headers.end()
+			&& _headers.find("transfer-encoding") == _headers.end()
+			&& _headers["content-type"].find("chunkedBoundary/form-data") == String::npos)
+			parseContentLength();
+		else if (_headers.find("content-type") != _headers.end()
 				&& _headers.find("transfer-encoding") == _headers.end())
 			parseContentType();
 		else if (_headers.find("content-type") != _headers.end()
@@ -59,10 +65,9 @@ void	Request::requestIsWellFormed()
 			parseContentType();
 			parseTransferEncoding();
 		}
-		else if (_headers.find("transfer-encoding") != _headers.end())
+		else if (_headers.find("transfer-encoding") != _headers.end()
+				&& _headers.find("content-type") == _headers.end())
 			parseTransferEncoding();
-		else if (_headers.find("content-length") != _headers.end())
-			parseContentLength();
 		else
 			return (this->status = BadRequest, requestIscomplete = true, void());
 	}
@@ -137,6 +142,11 @@ void	Request::parseUri()
 void	Request::parseBody()
 {
 	if (this->requestLine["method"] == "POST"
+			&& _headers.find("content-length") != _headers.end()
+			&& _headers.find("transfer-encoding") == _headers.end()
+			&& _headers["content-type"].find("chunkedBoundary/form-data") == String::npos)
+				ContentLength();
+	else if (this->requestLine["method"] == "POST"
 			&& _headers.find("transfer-encoding") != _headers.end()
 			&& _headers.find("content-type") == _headers.end())
 			parseChunkedBody();
@@ -148,15 +158,12 @@ void	Request::parseBody()
 		&& _headers.find("content-type") != _headers.end()
 		&& _headers.find("transfer-encoding") != _headers.end())
 		{
-			multipart = true;
+			chunkedBoundary = true;
 			parseChunkedBody();
 			if (requestIscomplete)
 				parseBoundary();
-			multipart = false;
+			chunkedBoundary = false;
 		}
-	else if (this->requestLine["method"] == "POST"
-			&& _headers.find("content-length") != _headers.end())
-				ContentLength();
 }
 
 //function to parse the request line and fill it to the map and return 1 if the request line is separated
