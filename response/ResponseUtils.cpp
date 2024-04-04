@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:38:30 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/31 23:39:15 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/04 15:36:51 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,10 @@ ssize_t myRead(std::ifstream& ifs, char* buff, size_t sz)
     size_t i = 0;
     char c;
     while (i < sz && ifs.get(c))
+    {
+        if (ifs.fail())
+            return -1;
         buff[i++] = c;
+    }
     return i;
 }

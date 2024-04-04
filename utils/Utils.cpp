@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/03 17:24:41 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/04 16:28:47 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,13 +137,6 @@ void		Utils::printFile(std::string filename)
 		std::cout << "Unable to open file" << std::endl;
 }
 
-std::string Utils::numberToString(int number)
-{
-	std::ostringstream oss;
-	oss << number;
-	return oss.str();
-}
-
 int Utils::stringToInt(const std::string& str)
 {
 	std::istringstream iss(str);
@@ -234,14 +227,18 @@ bool Utils::checkIfPathExists(const std::string& path)
 {
 	struct stat statBuff;
 	if (stat(path.c_str(), &statBuff) < 0)
+	{
+		if (errno == EACCES)
+			throw FilePermissionDenied();
 		return false;
+	}
 	return true;
 }
 
 bool Utils::isDirectory(const std::string& path)
 {
 	struct stat statBuff;
-	if (stat(path.c_str(), &statBuff) >= 0 && S_ISDIR(statBuff.st_mode))
+	if (!stat(path.c_str(), &statBuff) && S_ISDIR(statBuff.st_mode))
 		return true;
 	return false;
 }
@@ -249,7 +246,7 @@ bool Utils::isDirectory(const std::string& path)
 bool Utils::isReadableFile(const std::string& path)
 {
 	struct stat statBuff;
-	if (stat(path.c_str(), &statBuff) >= 0 && (statBuff.st_mode & S_IRUSR))
+	if (!stat(path.c_str(), &statBuff) && (statBuff.st_mode & S_IRUSR))
 		return true;
 	return false;
 }

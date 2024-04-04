@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/31 02:33:35 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/04 16:06:59 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,12 +124,12 @@ std::string Context::getIndex(const std::string& path)
     }
     if (getRoot() == "www/")
     {
-        indexPath = getRoot() + "index.html";
+        indexPath = getRoot() + "html/index.html";
         if (!Utils::checkIfPathExists(indexPath))
             throw Utils::FileNotFoundException();
         if (Utils::isDirectory(indexPath) || !Utils::isReadableFile(indexPath))
             throw Utils::FilePermissionDenied();
-        return "index.html";
+        return "html/index.html";
     }
     return "";
 }

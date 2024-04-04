@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/03 17:24:41 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/04 14:45:59 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@ namespace Utils
 		ss << num;
 		return ss.str();
 	}
-	
 	std::string envName(std::string str);
 	std::string strTrim(const std::string& str, char c);
 	std::vector<std::string> splitRequest(const std::string& str, const char *sep);
@@ -54,7 +53,6 @@ namespace Utils
 	void		toLower(std::string& str);
 	void		toUpper(std::string& str);
 	void		printFile(std::string filename);
-	std::string numberToString(int number);
 	t_directive getDirectiveFromTokenName(const std::string& tokenName);
 	std::string getTokenNameFromDirective(t_directive d);
 	std::string getDefaultErrorPage(const std::string& status);

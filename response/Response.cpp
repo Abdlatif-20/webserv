@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/03 17:32:55 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/04 16:31:26 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,6 +131,7 @@ void Response::generateResponseError()
 {
     Label:
     std::string errorPage = locationCTX.getErrorPage(Utils::numberToString(statusCode));
+    std::cout << errorPage << std::endl;
     if (errorPage.empty())
     {
         bodyPath.clear();
@@ -207,6 +208,8 @@ void Response::prepareBody()
             readSize = contentLength;
     }
     ssize_t readedBytes = myRead(ifs, buffer, readSize);
+    if (readedBytes == -1)
+        throw ResponseErrorException(InternalServerError);
     if (!readedBytes || (isRanged && sendedBytes >= endOffset - startOffset))
     {
         body.clear();
