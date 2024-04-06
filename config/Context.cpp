@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/04 23:37:56 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/06 21:05:04 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,9 +59,9 @@ void Context::appendDirective(Directive _directive)
 add an error page to the `errorPages` member variable. It takes a `StringVector` containing the
 error page information as a parameter and adds it to the `errorPages` vector in the `Context` class.
 The `errorPages` vector stores multiple error pages, each represented as a vector of strings. */
-void Context::addErrorPage(StringVector error_page)
+void Context::addErrorPage(std::string key, std::string value)
 {
-    errorPages.push_back(error_page);
+    errorPages[key] = value;
 }
 
 void Context::addCGI(std::pair<std::string, std::string>_pair)
@@ -80,7 +80,7 @@ DirectivesMap& Context::getDirectives()
 /* The `getErrorPages()` function in the `Context`
 class is a const member function that returns a constant reference to the `errorPages` member
 variable of the `Context` class.*/
-std::vector<StringVector>& Context::getErrorPages()
+std::map<std::string, std::string>& Context::getErrorPages()
 {
     return errorPages;
 }
@@ -228,21 +228,7 @@ class is a const member function that retrieves the error page associated with a
 status code. */
 std::string Context::getErrorPage(const std::string& status)
 {
-    std::vector<StringVector>::iterator it = errorPages.begin();
-    StringVector vec;
-    while (it != errorPages.end())
-    {
-        vec = *it;
-        StringVector::iterator vec_it = std::find(vec.begin(), vec.end(), status);
-        if (vec_it != vec.end())
-        {
-            while (vec_it != (vec.end() - 1))
-                vec_it++;
-            return *vec_it;
-        }
-        it++;
-    }
-    return "";
+    return errorPages[status];
 }
 
 StringVector Context::getHttpRedirection()

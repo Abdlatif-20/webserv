@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/06 20:14:02 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/06 22:12:23 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,13 +129,9 @@ void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context
     {
         tok_iter++;
         if (d == CGI_ASSIGN)
-        {
             ctx.addCGI(std::pair<std::string, std::string>(tok_iter->getContent(), (++tok_iter)->getContent()));
-            return;
-        }
-        while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)
-            value.push_back((tok_iter++)->getContent());
-        ctx.addErrorPage(std::vector<std::string>(value));
+        else
+            ctx.addErrorPage(tok_iter->getContent(), (++tok_iter)->getContent());
     }
 }
 
@@ -211,6 +207,13 @@ void Config::inheritServerDirectives()
         LocationsVector::iterator location_it = serv_it->getLocations().begin();
         while (location_it != serv_it->getLocations().end())
         {
+            std::map<std::string, std::string>::iterator map_it = serv_it->getErrorPages().begin();
+            while (map_it != serv_it->getErrorPages().end())
+            {
+                if (location_it->getErrorPages().find(map_it->first) == location_it->getErrorPages().end())
+                    location_it->addErrorPage(map_it->first, map_it->second);
+                map_it++;
+            }
             DirectivesMap::iterator it = serv_it->getDirectives().begin();
             while (it != serv_it->getDirectives().end())
             {

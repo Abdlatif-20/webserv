@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/04 23:37:27 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/06 22:16:53 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ int main(int argc, char **argv, char  **env)
 	}
 	catch(const std::exception& e)
 	{
-		std::cerr << "ERROR : " << e.what() << '\n';
+		std::cerr << e.what() << '\n';
 	}
 	return 0;
 }

@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/04 23:41:50 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/06 22:17:32 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,6 @@ void Response::generateResponseError()
 {
     Label:
     std::string errorPage = locationCTX.getErrorPage(Utils::numberToString(statusCode));
-    std::cout << errorPage << std::endl;
     if (errorPage.empty())
     {
         bodyPath.clear();
@@ -339,7 +338,6 @@ void Response::prepareRanged()
 
 void Response::preparePOST()
 {
-    std::cout << statusCode << std::endl;
     if (!locationCTX.getUploadStore().empty())
     {
         statusCode = Created;

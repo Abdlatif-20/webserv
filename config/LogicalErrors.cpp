@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/16 15:14:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/31 02:11:24 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/06 21:12:49 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,20 +133,16 @@ static void checkErrorPages(Context& ctx)
 {
     if (ctx.getErrorPages().size() > 0)
     {
-        std::vector<StringVector>::iterator it = ctx.getErrorPages().begin();
+        std::map<std::string, std::string>::iterator it = ctx.getErrorPages().begin();
         while (it != ctx.getErrorPages().end())
         {
-            StringVector::iterator vec_it = it->begin();
-            while (vec_it != it->end() && isNumber(*vec_it))
+            if (isNumber(it->first))
             {
-                std::string value = *vec_it;
-                int status = std::atoi(value.c_str());
-                if (checkIntOverflow(value) || status < 400 || status > 507)
+                std::string key = it->first;
+                int status = std::atoi(key.c_str());
+                if (checkIntOverflow(key) || status < 400 || status > 507)
                     throw LogicalErrorException("invalid value status code `error_page` directive");
-                vec_it++;
             }
-            if (vec_it != it->end() && ++vec_it != it->end())
-                throw LogicalErrorException("invalid value for `error_page` directive");
             it++;
         }
     }
