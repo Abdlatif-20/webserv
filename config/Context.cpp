@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/06 21:05:04 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/16 12:15:11 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,9 +64,9 @@ void Context::addErrorPage(std::string key, std::string value)
     errorPages[key] = value;
 }
 
-void Context::addCGI(std::pair<std::string, std::string>_pair)
+void Context::addCGI(std::string key, std::string value)
 {
-    cgi[_pair.first] = _pair.second;
+    cgi[key] = value;
 }
 
 /* The `getDirectives()` function in the `Context` class is a const
@@ -239,7 +239,7 @@ StringVector Context::getHttpRedirection()
     return StringVector(0);
 }
 
-std::map<std::string, std::string> Context::getCGI()
+std::map<std::string, std::string>& Context::getCGI()
 {
     return cgi;
 }

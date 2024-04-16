@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/06 21:03:41 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/16 12:15:19 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ class Context
         void addDirective(Directive _directive);
         void appendDirective(Directive _directive);
         void addErrorPage(std::string key, std::string value);
-        void addCGI(std::pair<std::string, std::string>_pair);
+        void addCGI(std::string key, std::string value);
 
         /*Useful getters for request*/
         DirectivesMap& getDirectives();
@@ -47,7 +47,7 @@ class Context
         std::string getUploadStore();
         std::string getErrorPage(const std::string& status);
         StringVector getHttpRedirection();
-        std::map<std::string, std::string> getCGI();
+        std::map<std::string, std::string>& getCGI();
         bool hasCGI(std::string filename);
         unsigned int getCGI_timeout();
 };

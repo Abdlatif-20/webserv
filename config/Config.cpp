@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/06 22:12:23 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/16 12:17:56 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,7 +129,7 @@ void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context
     {
         tok_iter++;
         if (d == CGI_ASSIGN)
-            ctx.addCGI(std::pair<std::string, std::string>(tok_iter->getContent(), (++tok_iter)->getContent()));
+            ctx.addCGI(tok_iter->getContent(), (++tok_iter)->getContent());
         else
             ctx.addErrorPage(tok_iter->getContent(), (++tok_iter)->getContent());
     }
@@ -212,6 +212,13 @@ void Config::inheritServerDirectives()
             {
                 if (location_it->getErrorPages().find(map_it->first) == location_it->getErrorPages().end())
                     location_it->addErrorPage(map_it->first, map_it->second);
+                map_it++;
+            }
+            map_it = serv_it->getCGI().begin();
+            while (map_it != serv_it->getCGI().end())
+            {
+                if (location_it->getCGI().find(map_it->first) == location_it->getCGI().end())
+                    location_it->addCGI(map_it->first, map_it->second);
                 map_it++;
             }
             DirectivesMap::iterator it = serv_it->getDirectives().begin();
