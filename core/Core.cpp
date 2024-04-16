@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/04 00:19:47 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/16 13:07:35 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ void	Core::run(void)
 
 	binded = 0;
 	size = servers.size();
+	std::cout << "Listening on: " << std::endl;
 	for(int i = 0; i < size; i++)
 	{
 		p = std::find(ports.begin(), ports.end(), servers[i].getHostPort());
@@ -69,7 +70,7 @@ void	Core::run(void)
 	if (binded > 0)
 		traceEvents();
 	else
-		std::cout << "info: no servers to bind !" << std::endl;
+		std::cout << "Info: no servers to bind !" << std::endl;
 }
 
 void	Core::traceEvents(void)

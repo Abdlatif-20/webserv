@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:55:56 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/25 17:06:52 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/06 23:22:29 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void Server::setupServer(void)
 		throw(Fail("Failed to bind with any address"));
 	if (listen(sockID, INT_MAX) == -1)
 		throw(Fail(strerror(errno)));
-	std::cout << "hosting " << host << ":" << port << " ...\n";
+	std::cout << "[" << host << ":" << port << "]" << std::endl;
 }
 
 const std::string& Server::getHost(void) const
