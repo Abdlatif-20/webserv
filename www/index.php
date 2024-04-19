@@ -1,25 +1,25 @@
 <?php
-// header("Status: 200");
-// echo "GATEWAY_INTERFACE : ".getenv("GATEWAY_INTERFACE")."</br>\n";
-// echo "SERVER_SOFTWARE : ".getenv("SERVER_SOFTWARE")."</br>\n";
-// echo "SERVER_PROTOCOL : ".getenv("SERVER_PROTOCOL")."</br>\n";
-// echo "SERVER_PORT : ".getenv("SERVER_PORT")."</br>\n";
-// echo "REQUEST_METHOD : ".getenv("REQUEST_METHOD")."</br>\n";
-// echo "PATH_INFO : ".getenv("PATH_INFO")."</br>\n";
-// echo "SCRIPT_NAME : ".getenv("SCRIPT_NAME")."</br>\n";
-// echo "DOCUMENT_ROOT : ".getenv("DOCUMENT_ROOT")."</br>\n";
-// echo "QUERY_STRING : ".getenv("QUERY_STRING")."</br>\n";
-// echo "CONTENT_TYPE : ".getenv("CONTENT_TYPE")."</br>\n";
-// echo "CONTENT_LENGTH : ".getenv("CONTENT_LENGTH")."</br>\n";
-// echo "REDIRECT_STATUS : ".getenv("REDIRECT_STATUS")."</br>\n";
-// echo "PATH : ".getenv("PATH")."</br>\n";
-// phpinfo();
-if(isset($_COOKIE["user"]))
-{
-	setcookie("user", $_POST["user"], time()+3600);
-	echo "here => ".$_COOKIE["user"];
-}
-else
-	echo "not setting"
-
+	if (isset($_POST) && isset($_POST['value']))
+	{
+		setcookie('value', $_POST['value'], time() + (86400 * 30), "/"); // 86400 = 1 day
+		header("Refresh:0");
+	}
 ?>
+
+<html>
+<body>
+	<?php
+		if(!isset($_COOKIE['value'])) {
+			echo "Cookie named 'value' is not set!, please fill it:";
+			echo '<form action="/index.php" method="post">';
+			echo '		<label for="fname">value:</label>';
+			echo '		<input type="text" id="fname" name="value"><br><br>';
+			echo '		<input type="submit" value="Submit">';
+			echo '</form>';
+		} else {
+		  echo "Cookie 'value' is set!<br>";
+		  echo "Value is: " . $_COOKIE['value'];
+		}
+	?>
+</body>
+</html>

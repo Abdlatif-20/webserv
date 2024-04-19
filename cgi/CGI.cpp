@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/04 21:47:29 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/16 14:54:49 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,16 +71,19 @@ void CGI::prepareResponse(std::string &out)
 	std::cout << "headers \n";
 	while (std::getline(output, line))
 	{
-		if (line.back() == '\r')
-			line.pop_back();
 		if (line.empty())
 			break;
+		if (line.back() == '\r')
+		{
+			line.pop_back();
+			if (line.empty())
+				break;
+		}
 		ss.str(line);
 		std::getline(ss, key, ':');
 		std::getline(ss, value, ':');
 		Utils::toLower(key);
 		headers[key] = value;
-		std::cout << "[" << key << "] ==  [" << Utils::strTrim(value,' ') << "]"<< std::endl;
 		ss.clear();
 	}
 	headers["content-length"] = Utils::intToString(Utils::getFileSize("/tmp/output") - output.tellg());

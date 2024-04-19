@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/04 20:26:20 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/19 18:07:26 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ Response::Response()
     alreadySeeked = false;
     sendedBytes = 0;
     readSize = sizeof(buffer);
+	CGIWorking = false;
 }
 
 Response::Response(const Response &obj)
@@ -42,6 +43,7 @@ Response& Response::operator=(const Response& obj)
     if (this == &obj)
         return *this;
 	env = obj.env;
+	CGIWorking = obj.CGIWorking;
     request = obj.request;
     serverCTX = obj.serverCTX;
     locationCTX = obj.locationCTX;
@@ -188,7 +190,8 @@ void Response::prepareHeaders()
 {
     if (headersSent)
         return;
-    statusLine = std::string(HTTP_VERSION) + SPACE + Utils::intToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
+	if (statusLine.empty())
+		statusLine = std::string(HTTP_VERSION) + SPACE + Utils::intToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
     setHeaderAttr("connection", request->getHeaderByName("connection"));
     setHeaderAttr("server", std::string(SERVER) + " (" + OS_MAC + ")");
     setHeaderAttr("date", Utils::getCurrentTime());
@@ -210,7 +213,7 @@ void Response::prepareHeaders()
 
 void Response::prepareBody()
 {
-	if (statusCode == 200 && locationCTX.hasCGI(bodyPath))
+	if (statusCode == 200 && locationCTX.hasCGI(bodyPath) && !CGIWorking)
 		runCGI();
     if (bodyPath.empty())
     {
@@ -337,6 +340,7 @@ void Response::runCGI()
 
 	cgi.setupEnv(bodyPath);
 	cgi.execute();
+	CGIWorking = true;
 }
 
 void Response::prepareRanged()
@@ -500,6 +504,7 @@ void Response::resetResponse()
     request = NULL;
     statusCode = 200;
     isWorking = false;
+	CGIWorking = false;
     headersSent = false;
     responseDone = false;
     isRedirection = false;

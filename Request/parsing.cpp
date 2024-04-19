@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/04 14:34:26 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/05 00:31:05 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,7 +144,7 @@ void	Request::parseBody()
 	if (this->requestLine["method"] == "POST"
 			&& _headers.find("content-length") != _headers.end()
 			&& _headers.find("transfer-encoding") == _headers.end()
-			&& _headers["content-type"].find("chunkedBoundary/form-data") == String::npos)
+			&& _headers["content-type"].find("multipart/form-data") == String::npos)
 				ContentLength();
 	else if (this->requestLine["method"] == "POST"
 			&& _headers.find("transfer-encoding") != _headers.end()

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/01 00:41:33 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/17 12:15:42 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ class Response
         bool headersSent;
         bool responseDone;
         bool isWorking;
+        bool CGIWorking;
         bool isRedirection;
         std::string location;
 

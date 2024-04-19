@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 18:32:42 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/16 17:00:12 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,6 @@ void	Client::sendResponse(void)
 		responseDone = response.responseIsDone();
 		last_update_time = std::time(NULL);
 	}
-	reset();
 }
 
 void	Client::setServerCTX(const ServerContext& serverCTX)

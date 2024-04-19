@@ -7,7 +7,6 @@ form = cgi.FieldStorage()
 # Get data from fields
 first_name = form.getvalue('user')
 
-
 print ("Status: 200 OK")
 print ("Content-type:text/html")
 print()
