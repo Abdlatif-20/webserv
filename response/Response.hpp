@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/17 12:15:42 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/19 19:08:12 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,6 +89,7 @@ class Response
 
         void resetResponse();
         void prepareResponse();
+		void setStatusLine(std::string val);
 		void setHeaderAttr(std::string key, std::string value);
 
         std::map<std::string, std::string>& getHeaders();

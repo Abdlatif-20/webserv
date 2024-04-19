@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/19 18:07:26 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/19 22:01:48 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -490,6 +490,11 @@ void Response::prepareResponse()
 		prepareBody();
 		prepareHeaders();
 	}
+}
+
+void Response::setStatusLine(std::string val)
+{
+	statusLine = val;
 }
 
 void Response::setHeaderAttr(std::string key, std::string value)

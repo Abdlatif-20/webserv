@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/16 14:54:49 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/19 22:00:08 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,6 @@ void CGI::prepareResponse(std::string &out)
 	output.open(out);
 	if (!output.good())
 		throw ResponseErrorException(InternalServerError);
-	std::cout << "headers \n";
 	while (std::getline(output, line))
 	{
 		if (line.empty())
@@ -83,18 +82,14 @@ void CGI::prepareResponse(std::string &out)
 		std::getline(ss, key, ':');
 		std::getline(ss, value, ':');
 		Utils::toLower(key);
-		headers[key] = value;
+		if (key != "status")
+			headers[key] = value;
+		else
+			response->setStatusLine(HTTP_VERSION + value + CRLF);
 		ss.clear();
 	}
 	headers["content-length"] = Utils::intToString(Utils::getFileSize("/tmp/output") - output.tellg());
 }
-
-void g(int s)
-{
-	if (s == SIGSEGV)
-		std::cout << "segv"  << std::endl;
-}
-
 
 void CGI::execute(void)
 {
@@ -122,9 +117,7 @@ void CGI::traceCGIProcess(pid_t pid)
 		if (std::difftime(std::time(NULL), start) > 60)
 			kill(pid, SIGKILL);
 	}
-	if (WIFEXITED(status))
-		std::cout << "exited " << WEXITSTATUS(status) << "\n";
-	std::cout << "\nDONE" << std::endl;;
+	// if (WIFEXITED(status))
 }
 
 pid_t CGI::runCGIProcess(std::string &bin, std::string __unused &out)
@@ -177,7 +170,7 @@ void CGI::setupEnv(std::string bodyPath)
 		env.push_back("REQUEST_METHOD=" + request->getMethod());
 		env.push_back("QUERY_STRING=" + request->getQueryString());
 		env.push_back("SERVER_PROTOCOL=" + request->getProtocol());
-		env.push_back("PATH_INFO=" +  path.substr(0, path.find_last_of('/')));
+		// env.push_back("PATH_INFO=" +  path.substr(0, path.find_last_of('/')));
 		env.push_back("SCRIPT_FILENAME=" + path);
 		env.push_back("SCRIPT_NAME=" + script);
 		env.push_back("DOCUMENT_ROOT=" + path);
