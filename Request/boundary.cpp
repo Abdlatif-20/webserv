@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/22 23:26:02 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/23 00:33:57 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void Request::parseContentType()
 		return (this->status = BadRequest, requestIscomplete = true, void());
 	if (isExist(_headers, "content-length") == "")
 		return (this->status = LengthRequired, requestIscomplete = true, void());
-	contentLength = std::stol(_headers["content-length"]);
+	contentLength = std::strtol(_headers["content-length"].c_str(), NULL, 10);
 }
 
 bool	Request::getBoundaryName(String startBoundary, int &file)

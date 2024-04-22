@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/22 23:40:36 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/23 00:37:34 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,14 +46,11 @@ ssize_t Client::recvRequest(void)
 {
 	std::memset(buff, 0, sizeof(buff));
 	len = recv(sockId, buff, sizeof(buff) - 1, 0);
-	if (len > 0)
-	{
-		request.parseRequest(std::string(buff, len), serverCTX);
-		last_update_time = std::time(NULL); // to think about later
-		requestDone = request.isDone();
-	}
-	else
-		requestDone = true;
+	if (len < 0)
+		throw (Fail("send fails"));
+	request.parseRequest(std::string(buff, len), serverCTX);
+	last_update_time = std::time(NULL); // to think about later
+	requestDone = request.isDone();
 	responseDone = false;
 	return (len);
 }
@@ -69,15 +66,15 @@ void	Client::sendResponse(void)
 		if (!response.getHeadersSent())
 		{
 			std::string headers = response.headersToString();
-			std::cout << headers << std::endl;
 			len = send(sockId, headers.c_str(), headers.size(), 0);
+			if (len < 0)
+				throw (Fail("send fails"));
 			response.setHeadersSent(true);
 		}
-		std::string y = response.getBody();
-		std::cout << y << y.size() << std::endl;
-		len = send(sockId, y.c_str(), y.size(), 0);// when fail? we should remove the client and continue :) // ok
+		len = send(sockId, response.getBody().c_str(), response.getBody().size(), 0);// when fail? we should remove the client and continue :) // ok
+		if (len < 0)
+			throw (Fail("send fails"));
 		responseDone = response.responseIsDone();
-		std::cout << responseDone << std::endl;
 		last_update_time = std::time(NULL);
 	}
 }

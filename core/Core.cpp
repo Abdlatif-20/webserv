@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/22 23:41:31 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/23 00:38:33 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,11 +124,11 @@ void	Core::traceEvents(void)
 				else
 					clients[checklist[i].fd].reset();
 			}
-			catch(const std::exception& e)
+			catch(const Fail &e)
 			{
-				 // whenn some failing ...
 				clients.erase(checklist[i].fd);
 				checklist.erase(checklist.begin() + i--);
+				std::cerr << "something went wrong: " << e.what() << std::endl;
 			}
 		}
 	}
