@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/01 18:21:50 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/21 22:26:07 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,6 +166,7 @@ class Request
 		const bool& 			getRequestIsWellFormed(void) const;
 		const String 			getHeaderByName(const String& name) const;
 
+		bool			hasCgi(void);
 		String			getProtocol(void);
 		String			getBodyPath(void);
 		String			getQueryString(void);

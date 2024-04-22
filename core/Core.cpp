@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/16 17:01:47 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/22 03:47:19 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,7 @@ void	Core::traceEvents(void)
 			{
 				if (checklist[i].revents & POLLIN)
 					clients[checklist[i].fd].recvRequest();
+				// std::cout << clients[checklist[i].fd].isRequestDone() << std::endl;
 				if ((checklist[i].revents & POLLOUT) && clients[checklist[i].fd].isRequestDone())
 					clients[checklist[i].fd].sendResponse();
 				if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].timeout()

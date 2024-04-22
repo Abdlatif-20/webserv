@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/04 14:17:25 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/22 00:48:40 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,6 +172,38 @@ const String Request::getHeaderByName(const String& name) const
 			return "";
 	}
 	return ("");
+}
+
+bool Request::hasCgi()
+{
+	std::string	resource = locationCTX.getRoot() + Utils::urlDecoding(getRequestPath());
+	std::cout << resource << std::endl;
+	if (!Utils::checkIfPathExists(resource))
+		return (false);
+	if (Utils::isDirectory(resource))
+	{
+		try
+		{
+			std::string index = locationCTX.getIndex(resource);
+			if (index.empty())
+				return (false);
+			if (locationCTX.hasCGI(Utils::getFileExtension(index)))
+			{
+				std::cout << "haz" << std::endl;
+				return true;
+			}
+		}
+		catch (...)
+		{
+			return (false);
+		}
+	}
+	if (locationCTX.hasCGI(Utils::getFileExtension(resource)))
+	{
+		std::cout << "haz" << std::endl;
+		return true;
+	}
+	return false;
 }
 
 String Request::getProtocol(void)

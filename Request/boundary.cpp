@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/01 18:18:52 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/22 03:46:31 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,8 @@ void Request::parseBoundary()
 	}
 	if (!this->_BoundaryComplete)
 		return(receivecount++, void());
-		// has cgi
+	// if (hasCgi())
+	// 	return ;
 	if (bodySize != contentLength && !chunkedBoundary)
 		return (status = BadRequest, requestIscomplete = true,
 			std::remove(_pathTmpFile.c_str()), void());

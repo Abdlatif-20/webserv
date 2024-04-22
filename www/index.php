@@ -2,7 +2,7 @@
 	if (isset($_POST) && isset($_POST['value']))
 	{
 		setcookie('value', $_POST['value'], time() + (86400 * 30), "/"); // 86400 = 1 day
-		header("Refresh:0");
+		// header("Refresh:0");
 	}
 ?>
 
