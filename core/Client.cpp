@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/16 17:00:12 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/22 23:33:14 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,11 +70,15 @@ void	Client::sendResponse(void)
 		if (!response.getHeadersSent())
 		{
 			std::string headers = response.headersToString();
+			std::cout << headers << std::endl;
 			len = send(sockId, headers.c_str(), headers.size(), 0);
 			response.setHeadersSent(true);
 		}
-		len = send(sockId, response.getBody().c_str(), response.getBody().size(), 0);// when fail? we should remove the client and continue :) // ok
+		std::string y = response.getBody();
+		std::cout << y << y.size() << std::endl;
+		len = send(sockId, y.c_str(), y.size(), 0);// when fail? we should remove the client and continue :) // ok
 		responseDone = response.responseIsDone();
+		std::cout << responseDone << std::endl;
 		last_update_time = std::time(NULL);
 	}
 }
