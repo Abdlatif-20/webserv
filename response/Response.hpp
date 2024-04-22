@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/19 19:08:12 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/22 23:42:27 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ class Response
 
         /*Attributes for handling Ranged Request*/
         bool isRanged;
-        ssize_t startOffset;
-        ssize_t endOffset;
+        long long startOffset;
+        long long endOffset;
         bool alreadySeeked;
         ssize_t sendedBytes;
         size_t readSize;
@@ -51,7 +51,7 @@ class Response
 
         std::vector<std::string> env;
 
-        std::string generateHtmlErrorPage();
+        std::string generateHtmlResponsePage();
         bool checkErrorPage(const std::string& path);
 
         void generateResponseError();
@@ -69,9 +69,7 @@ class Response
 
         static std::map<int, std::string> reasonPhrases;
         static std::map<std::string, std::string> mimeTypes;
-
     public:
-
         Response();
         Response(const Response& obj);
         Response& operator=(const Response& obj);

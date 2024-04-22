@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:38:30 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 17:20:04 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/04 15:36:51 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ std::string getRangeBytes(const std::string& rangeHeader)
     return "";
 }
 
-ssize_t getStartOffset(const std::string& range)
+long long getStartOffset(const std::string& range)
 {
     size_t i = range.find('-');
     std::string startOffset;
@@ -37,13 +37,13 @@ ssize_t getStartOffset(const std::string& range)
         startOffset = range.substr(0, i);
         if (startOffset.find_first_not_of("0123456789") != std::string::npos)
             throw ResponseErrorException(RequestedRangeNotSatisfiable);
-        return std::atoll(startOffset.c_str());
+        return Utils::strToll(startOffset);
     }
     throw ResponseErrorException(RequestedRangeNotSatisfiable); 
     return 0;
 }
 
-ssize_t getEndOffset(const std::string& range)
+long long getEndOffset(const std::string& range)
 {
     size_t i = range.find('-');
     std::string endOffset;
@@ -54,7 +54,7 @@ ssize_t getEndOffset(const std::string& range)
             return -1;
         if (endOffset.find_first_not_of("0123456789") != std::string::npos)
             throw ResponseErrorException(RequestedRangeNotSatisfiable);
-        return std::atoll(endOffset.c_str());
+        return Utils::strToll(endOffset);
     }
     return -1;
 }
@@ -64,8 +64,10 @@ ssize_t myRead(std::ifstream& ifs, char* buff, size_t sz)
     size_t i = 0;
     char c;
     while (i < sz && ifs.get(c))
+    {
+        if (ifs.fail())
+            return -1;
         buff[i++] = c;
-    if (ifs.fail())
-        return -1;
+    }
     return i;
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   chunkedUtils.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:40:48 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/01 02:01:36 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/04/04 23:41:09 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,11 +72,11 @@ String Request::generatePath(String fileName)
 			{
 				String extension = fileName.substr(pos);
 				fileName = fileName.substr(0, pos) + "_";
-				fileName += Utils::intToString(rand() % 1000);
+				fileName += Utils::numberToString(rand() % 1000);
 				fileName += extension;
 			}
 			else
-				fileName += "_" + Utils::intToString(rand() % 1000);
+				fileName += "_" + Utils::numberToString(rand() % 1000);
 		}
 	}
 	return fileName;
@@ -86,7 +86,7 @@ String Request::generatePath(String fileName)
 void Request::createChunkedTmpFile()
 {
 	if (_pathTmpFile.empty())
-		_pathTmpFile = "/goinfre/chunked_" + Utils::intToString(rand() % 1000);
+		_pathTmpFile = "/goinfre/chunked_" + Utils::numberToString(rand() % 1000);
 	if (tmpFile < 0)
 	{
 		_pathTmpFile = generatePath(_pathTmpFile);

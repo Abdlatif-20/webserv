@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/22 03:47:19 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/22 23:41:31 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,7 @@ void	Core::run(void)
 
 	binded = 0;
 	size = servers.size();
+	std::cout << "Listening on: " << std::endl;
 	for(int i = 0; i < size; i++)
 	{
 		p = std::find(ports.begin(), ports.end(), servers[i].getHostPort());
@@ -69,7 +70,7 @@ void	Core::run(void)
 	if (binded > 0)
 		traceEvents();
 	else
-		std::cout << "info: no servers to bind !" << std::endl;
+		std::cout << "Info: no servers to bind !" << std::endl;
 }
 
 void	Core::traceEvents(void)
@@ -129,7 +130,6 @@ void	Core::traceEvents(void)
 				clients.erase(checklist[i].fd);
 				checklist.erase(checklist.begin() + i--);
 			}
-			
 		}
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/22 23:33:14 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/22 23:40:36 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,7 @@ ssize_t Client::recvRequest(void)
 		requestDone = request.isDone();
 	}
 	else
-		requestDone = true;;
+		requestDone = true;
 	responseDone = false;
 	return (len);
 }
@@ -62,7 +62,6 @@ void	Client::sendResponse(void)
 {
 	if (requestDone && !responseDone)
 	{
-
 		response.setRequest(&request);
 		response.setServerCTX(request.getServerCTX());
 		response.setLocationCTX(request.getLocationCtx());

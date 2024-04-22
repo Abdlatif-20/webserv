@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/19 22:00:08 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/22 23:40:17 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ void CGI::prepareResponse(std::string &out)
 			response->setStatusLine(HTTP_VERSION + value + CRLF);
 		ss.clear();
 	}
-	headers["content-length"] = Utils::intToString(Utils::getFileSize("/tmp/output") - output.tellg());
+	headers["content-length"] = Utils::numberToString(Utils::getFileSize("/tmp/output") - output.tellg());
 }
 
 void CGI::execute(void)
@@ -176,7 +176,7 @@ void CGI::setupEnv(std::string bodyPath)
 		env.push_back("DOCUMENT_ROOT=" + path);
 		env.push_back("CONTENT_TYPE=" + request->getHeaderByName("content-type"));
 		env.push_back("CONTENT_LENGTH=" + request->getHeaderByName("content-length"));
-		env.push_back("REDIRECT_STATUS=" + Utils::intToString(request->getStatus()));
+		env.push_back("REDIRECT_STATUS=" + Utils::numberToString(request->getStatus()));
 		env.push_back("PATH=" + PATH);
 		Map m = request->getHeaders();
 		for (Map::iterator it = m.begin(); it != m.end(); it++)

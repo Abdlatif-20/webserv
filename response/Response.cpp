@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/19 22:01:48 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/22 23:44:28 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,39 +123,20 @@ bool Response::responseIsDone() const
     return responseDone;
 }
 
-std::string Response::generateHtmlErrorPage()
+std::string Response::generateHtmlResponsePage()
 {
-    return Utils::replaceAll(HTML_RESPONSE_PAGE, "$title$", reasonPhrases[statusCode]) + Utils::intToString(statusCode) + " - "
+    return Utils::replaceAll(HTML_RESPONSE_PAGE, "$title$", reasonPhrases[statusCode]) + Utils::numberToString(statusCode) + " - "
         + reasonPhrases[statusCode] + "</h2><hr><h4>WebServer 1.0</h4></body></html>\n";
-}
-
-bool Response::checkErrorPage(const std::string& path)
-{
-    if (!Utils::checkIfPathExists(path))
-    {
-        bodyPath.clear();
-        statusCode = NotFound;
-        body = generateHtmlErrorPage();
-        return false;
-    }
-    if (Utils::isDirectory(path) || !Utils::isReadableFile(path))
-    {
-        bodyPath.clear();
-        statusCode = FORBIDDEN;
-        body = generateHtmlErrorPage();
-        return false;
-    }
-    return true;
 }
 
 void Response::generateResponseError()
 {
-    LABEL_00:
-    std::string errorPage = locationCTX.getErrorPage(Utils::intToString(statusCode));
+    Label:
+    std::string errorPage = locationCTX.getErrorPage(Utils::numberToString(statusCode));
     if (errorPage.empty())
     {
         bodyPath.clear();
-        body = generateHtmlErrorPage();
+        body = generateHtmlResponsePage();
     }
     else
     {
@@ -163,24 +144,16 @@ void Response::generateResponseError()
         if (!Utils::checkIfPathExists(path))
         {
             if (statusCode == NotFound)
-            {
-                bodyPath.clear();
-                body = generateHtmlErrorPage();
-                return;
-            }
+                return (bodyPath.clear(), body = generateHtmlResponsePage(), void());
             statusCode = NotFound;
-            goto LABEL_00;
+            goto Label;
         }
         if (Utils::isDirectory(path) || !Utils::isReadableFile(path))
         {
             if (statusCode == FORBIDDEN)
-            {
-                bodyPath.clear();
-                body = generateHtmlErrorPage();
-                return;
-            }
+                return (bodyPath.clear(), body = generateHtmlResponsePage(), void());
             statusCode = FORBIDDEN;
-            goto LABEL_00;
+            goto Label;
         }
         bodyPath = path;
     }
@@ -191,11 +164,11 @@ void Response::prepareHeaders()
     if (headersSent)
         return;
 	if (statusLine.empty())
-		statusLine = std::string(HTTP_VERSION) + SPACE + Utils::intToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
+		statusLine = std::string(HTTP_VERSION) + SPACE + Utils::numberToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
     setHeaderAttr("connection", request->getHeaderByName("connection"));
     setHeaderAttr("server", std::string(SERVER) + " (" + OS_MAC + ")");
     setHeaderAttr("date", Utils::getCurrentTime());
-    setHeaderAttr("content-length", (bodyPath.empty() ? Utils::intToString(body.size()) : Utils::longlongToString(Utils::getFileSize(bodyPath))));
+    setHeaderAttr("content-length", (bodyPath.empty() ? Utils::numberToString(body.size()) : Utils::numberToString(Utils::getFileSize(bodyPath))));
     setHeaderAttr("content-type", (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath))));
     if (!bodyPath.empty())
         setHeaderAttr("last-modified", Utils::get_last_modified_date(bodyPath));
@@ -204,8 +177,8 @@ void Response::prepareHeaders()
     if (isRanged)
     {
         setHeaderAttr("accept-ranges", "bytes");
-        setHeaderAttr("content-length", Utils::longlongToString((endOffset - startOffset) + 1));
-        setHeaderAttr("content-range", "bytes " + Utils::longlongToString(startOffset) + "-" + Utils::longlongToString(endOffset) + "/" + Utils::longlongToString(Utils::getFileSize(bodyPath)));
+        setHeaderAttr("content-length", Utils::numberToString((endOffset - startOffset) + 1));
+        setHeaderAttr("content-range", "bytes " + Utils::numberToString(startOffset) + "-" + Utils::numberToString(endOffset) + "/" + Utils::numberToString(Utils::getFileSize(bodyPath)));
     }
 }
 
@@ -226,7 +199,6 @@ void Response::prepareBody()
         if (!ifs.is_open())
             throw ResponseErrorException(InternalServerError);
     }
-
     std::memset(buffer, 0, sizeof(buffer));
     if (isRanged)
     {
@@ -240,6 +212,8 @@ void Response::prepareBody()
             readSize = contentLength;
     }
     ssize_t readedBytes = myRead(ifs, buffer, readSize);
+    if (readedBytes == -1)
+        throw ResponseErrorException(InternalServerError);
     if (!readedBytes || (isRanged && sendedBytes >= endOffset - startOffset))
     {
         body.clear();
@@ -359,8 +333,8 @@ void Response::prepareRanged()
             endOffset = getEndOffset(range);
             if (endOffset == -1 || endOffset >= contentLength)
                 endOffset = contentLength - 1;
-            if (startOffset >= contentLength || endOffset < startOffset)
-                throw ResponseErrorException(RequestedRangeNotSatisfiable);
+            if (startOffset > contentLength || endOffset < startOffset)
+                    throw ResponseErrorException(RequestedRangeNotSatisfiable);
             statusCode = PartialContent;
         }
     }
@@ -371,7 +345,7 @@ void Response::preparePOST()
     if (!locationCTX.getUploadStore().empty())
     {
         statusCode = Created;
-        body = generateHtmlErrorPage();
+        body = generateHtmlResponsePage();
         bodyPath.clear();
     }
     else

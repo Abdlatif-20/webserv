@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Config.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 22:34:31 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/16 12:17:56 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ Config::Config(const std::string& configPath)
     setupDefaultServer();
     setupDefaultLocation();
     checkLogicalErrors(servers);
+    inheritServerDirectives();
 }
 
 Config::Config(const Config& obj)
@@ -78,14 +79,6 @@ void Config::parseLocation(TokensVector::iterator& tok_iter, ServerContext& serv
             d = Utils::getDirectiveFromTokenName(tok_iter->getContent());
             parseDirective(tok_iter, locationCtx);
             tok_iter++;
-        }
-        DirectivesMap::iterator it = serverCtx.getDirectives().begin();
-        while (it != serverCtx.getDirectives().end())
-        {
-            if (it->first != "listen" && it->first != "server_name"
-                && locationCtx.getDirectives().count(it->first) == 0)
-                locationCtx.addDirective(*it);
-            it++;
         }
         serverCtx.addLocation(locationCtx);
     }
@@ -136,13 +129,9 @@ void Config::parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context
     {
         tok_iter++;
         if (d == CGI_ASSIGN)
-        {
-            ctx.addCGI(std::pair<std::string, std::string>(tok_iter->getContent(), (++tok_iter)->getContent()));
-            return;
-        }
-        while (tok_iter != tokens.end() && tok_iter->getType() != SEMICOLON)
-            value.push_back((tok_iter++)->getContent());
-        ctx.addErrorPage(std::vector<std::string>(value));
+            ctx.addCGI(tok_iter->getContent(), (++tok_iter)->getContent());
+        else
+            ctx.addErrorPage(tok_iter->getContent(), (++tok_iter)->getContent());
     }
 }
 
@@ -206,6 +195,41 @@ void Config::setupDefaultLocation()
     {
         if (serv_it->getLocations().empty())
             serv_it->addLocation(LocationContext("/"));
+        serv_it++;
+    }
+}
+
+void Config::inheritServerDirectives()
+{
+    ServersVector::iterator serv_it = servers.begin();
+    while (serv_it != servers.end())
+    {
+        LocationsVector::iterator location_it = serv_it->getLocations().begin();
+        while (location_it != serv_it->getLocations().end())
+        {
+            std::map<std::string, std::string>::iterator map_it = serv_it->getErrorPages().begin();
+            while (map_it != serv_it->getErrorPages().end())
+            {
+                if (location_it->getErrorPages().find(map_it->first) == location_it->getErrorPages().end())
+                    location_it->addErrorPage(map_it->first, map_it->second);
+                map_it++;
+            }
+            map_it = serv_it->getCGI().begin();
+            while (map_it != serv_it->getCGI().end())
+            {
+                if (location_it->getCGI().find(map_it->first) == location_it->getCGI().end())
+                    location_it->addCGI(map_it->first, map_it->second);
+                map_it++;
+            }
+            DirectivesMap::iterator it = serv_it->getDirectives().begin();
+            while (it != serv_it->getDirectives().end())
+            {
+                if (it->first != "listen" && it->first != "server_name" && !location_it->getDirectives().count(it->first))
+                        location_it->addDirective(*it);
+                it++;
+            }
+            location_it++;
+        }
         serv_it++;
     }
 }

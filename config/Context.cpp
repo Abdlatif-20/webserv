@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Context.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/01 18:02:18 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/16 12:15:11 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,14 +59,14 @@ void Context::appendDirective(Directive _directive)
 add an error page to the `errorPages` member variable. It takes a `StringVector` containing the
 error page information as a parameter and adds it to the `errorPages` vector in the `Context` class.
 The `errorPages` vector stores multiple error pages, each represented as a vector of strings. */
-void Context::addErrorPage(StringVector error_page)
+void Context::addErrorPage(std::string key, std::string value)
 {
-    errorPages.push_back(error_page);
+    errorPages[key] = value;
 }
 
-void Context::addCGI(std::pair<std::string, std::string>_pair)
+void Context::addCGI(std::string key, std::string value)
 {
-    cgi[_pair.first] = _pair.second;
+    cgi[key] = value;
 }
 
 /* The `getDirectives()` function in the `Context` class is a const
@@ -80,7 +80,7 @@ DirectivesMap& Context::getDirectives()
 /* The `getErrorPages()` function in the `Context`
 class is a const member function that returns a constant reference to the `errorPages` member
 variable of the `Context` class.*/
-std::vector<StringVector>& Context::getErrorPages()
+std::map<std::string, std::string>& Context::getErrorPages()
 {
     return errorPages;
 }
@@ -123,7 +123,14 @@ std::string Context::getIndex(const std::string& path)
             throw Utils::FilePermissionDenied();
     }
     if (getRoot() == "www/")
+    {
+        indexPath = getRoot() + "html/index.html";
+        if (!Utils::checkIfPathExists(indexPath))
+            throw Utils::FileNotFoundException();
+        if (Utils::isDirectory(indexPath) || !Utils::isReadableFile(indexPath))
+            throw Utils::FilePermissionDenied();
         return "html/index.html";
+    }
     return "";
 }
 
@@ -163,8 +170,9 @@ long long Context::getClientMaxBodySize()
         else
             clientMaxBodySize = Utils::strToll(value.c_str());
     }
+    
     if (clientMaxBodySize > 9223372036854775806)
-        return 9223372036854775806;
+        return (9223372036854775806);
     return clientMaxBodySize;
 }
 
@@ -220,21 +228,7 @@ class is a const member function that retrieves the error page associated with a
 status code. */
 std::string Context::getErrorPage(const std::string& status)
 {
-    std::vector<StringVector>::iterator it = errorPages.begin();
-    StringVector vec;
-    while (it != errorPages.end())
-    {
-        vec = *it;
-        StringVector::iterator vec_it = std::find(vec.begin(), vec.end(), status);
-        if (vec_it != vec.end())
-        {
-            while (vec_it != (vec.end() - 1))
-                vec_it++;
-            return *vec_it;
-        }
-        it++;
-    }
-    return "";
+    return errorPages[status];
 }
 
 StringVector Context::getHttpRedirection()
@@ -245,7 +239,7 @@ StringVector Context::getHttpRedirection()
     return StringVector(0);
 }
 
-std::map<std::string, std::string> Context::getCGI()
+std::map<std::string, std::string>& Context::getCGI()
 {
     return cgi;
 }
@@ -269,6 +263,11 @@ unsigned int Context::getCGI_timeout()
 {
     DirectivesMap::iterator it = directives.find("cgi_max_timeout");
     if (it != directives.end())
-        return std::atoi(it->second.begin()->c_str());
+    {
+        int t = std::atoi(it->second.begin()->c_str());
+        if (t < 30)
+            t = 30;
+        return t;
+    }
     return 60;
 }

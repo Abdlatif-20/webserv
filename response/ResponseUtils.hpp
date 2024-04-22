@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:38:28 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 18:01:06 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/03/31 23:38:25 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 #include "Defs.hpp"
 #include <fstream>
+#include "Utils.hpp"
 
 class ResponseErrorException : public std::exception
 {
@@ -29,6 +30,6 @@ class ResponseErrorException : public std::exception
 
 std::string getRangeUnit(const std::string& rangeHeader);
 std::string getRangeBytes(const std::string& rangeHeader);
-ssize_t getStartOffset(const std::string& range);
-ssize_t getEndOffset(const std::string& range);
+long long getStartOffset(const std::string& range);
+long long getEndOffset(const std::string& range);
 ssize_t myRead(std::ifstream& ifs, char* buff, size_t sz);

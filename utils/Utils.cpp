@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 22:34:43 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/04 16:28:47 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,13 +137,6 @@ void		Utils::printFile(std::string filename)
 		std::cout << "Unable to open file" << std::endl;
 }
 
-std::string Utils::intToString(int number)
-{
-	std::ostringstream oss;
-	oss << number;
-	return oss.str();
-}
-
 int Utils::stringToInt(const std::string& str)
 {
 	std::istringstream iss(str);
@@ -234,14 +227,18 @@ bool Utils::checkIfPathExists(const std::string& path)
 {
 	struct stat statBuff;
 	if (stat(path.c_str(), &statBuff) < 0)
+	{
+		if (errno == EACCES)
+			throw FilePermissionDenied();
 		return false;
+	}
 	return true;
 }
 
 bool Utils::isDirectory(const std::string& path)
 {
 	struct stat statBuff;
-	if (stat(path.c_str(), &statBuff) >= 0 && S_ISDIR(statBuff.st_mode))
+	if (!stat(path.c_str(), &statBuff) && S_ISDIR(statBuff.st_mode))
 		return true;
 	return false;
 }
@@ -249,7 +246,7 @@ bool Utils::isDirectory(const std::string& path)
 bool Utils::isReadableFile(const std::string& path)
 {
 	struct stat statBuff;
-	if (stat(path.c_str(), &statBuff) >= 0 && (statBuff.st_mode & S_IRUSR))
+	if (!stat(path.c_str(), &statBuff) && (statBuff.st_mode & S_IRUSR))
 		return true;
 	return false;
 }
@@ -283,21 +280,14 @@ std::string Utils::bytesToHuman(long long bytes)
 {
 	std::string str;
 	if (bytes < 1000)
-		str = formatFloat(floatToString(bytes)) + " B";
+		str = formatFloat(numberToString(bytes)) + " B";
 	else if (bytes < 1000000)
-		str = formatFloat(floatToString((float)bytes * 0.001)) + " KB";
+		str = formatFloat(numberToString((float)bytes * 0.001)) + " KB";
 	else if (bytes < 1000000000)
-		str = formatFloat(floatToString((float)bytes * 0.000001)) + " MB";
+		str = formatFloat(numberToString((float)bytes * 0.000001)) + " MB";
 	else
-		str = formatFloat(floatToString((float)bytes * 0.000000001)) + " GB";
+		str = formatFloat(numberToString((float)bytes * 0.000000001)) + " GB";
 	return str;
-}
-
-std::string Utils::longlongToString(long long number)
-{
-	std::stringstream ss;
-	ss << number;
-	return ss.str();
 }
 
 long long Utils::strToll(const std::string& str)
@@ -307,13 +297,6 @@ long long Utils::strToll(const std::string& str)
 	ss << str;
 	ss >> num;
 	return num;
-}
-
-std::string Utils::floatToString(float f)
-{
-	std::stringstream ss;
-	ss << f;
-	return ss.str();
 }
 
 std::string Utils::replaceAll(std::string str, const std::string& s1, const std::string& s2)

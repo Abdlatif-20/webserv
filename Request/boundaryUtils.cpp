@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   boundaryUtils.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/29 20:12:18 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/01 02:01:39 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/04/04 23:38:32 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,7 +66,7 @@ String Request::prepareFileName(String line)
 void Request::createBoundaryTmpFile()
 {
 	if (_pathTmpFile.empty())
-		_pathTmpFile = "/goinfre/boundary_" + Utils::intToString(rand() % 1000);
+		_pathTmpFile = "/goinfre/boundary_" + Utils::numberToString(rand() % 1000);
 	if (tmpFile < 0)
 	{
 		_pathTmpFile = generatePath(_pathTmpFile);
