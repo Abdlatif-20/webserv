@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>WebServer</title>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="../css/style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <h1 id="website-title">WebServer - سرباي الويب</h1>
+        <div class="webserv-description">
+            <h2>What is a Webserver ?</h2>
+            <p>A web server is essentially a behind-the-scenes program that delivers content you see on the web. Imagine you typing a website address into your browser. That triggers a request to the web server, which then fetches and sends the website's files (text, images, etc.) back to your device.
+                In simpler terms, it's like a waiter in a restaurant. You (the customer) ask for a dish (webpage), the waiter (web server) gets it from the kitchen (where the website files are stored) and brings it to you.</p>
+            <img src="../assets/what_is_webserv.png"></img>
+        </div>
+        <div class="video">
+            <video width="720" height="400" controls loop>
+                <source type="video/mp4" src="../assets/عزف مقدمة دراغون بول - (Piano Cover).mp4">
+            </video>
+        </div>
+        <form id="upload" enctype="multipart/form-data" method="POST" action="/upload">
+            <input id="fileupload" name="myfile" type="file" multiple="multiple"/>
+            <br>
+            <input type="submit" value="Upload" id="submit"/>
+        </form>
+    </body>
+</html>

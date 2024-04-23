@@ -6,53 +6,47 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/01/29 20:26:57 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/16 12:29:03 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "Lexer.hpp"
+#include "Response.hpp"
+#include "Utils.hpp"
+#include "Config.hpp"
+#include "CGI.hpp"
+#include "Core.hpp"
 
-int main(int argc, char **argv)
+void	printBanner()
 {
-    std::string configPath = "webserv.conf";
-    try
-    {
-        if (argc == 2)
-            configPath = argv[1];
-        else if (argc > 2)
-            throw "Error: invalid number of args";
-        std::list<Token> tokens = Lexer::tokenize(configPath);
+	std::cout << "\n\033[94m";
+	std::cout << "██╗    ██╗███████╗██████╗ ███████╗███████╗██████╗ ██╗   ██╗" << std::endl;
+	std::cout << "██║    ██║██╔════╝██╔══██╗██╔════╝██╔════╝██╔══██╗██║   ██║" << std::endl;
+	std::cout << "██║ █╗ ██║█████╗  ██████╔╝███████╗█████╗  ██████╔╝██║   ██║" << std::endl;
+	std::cout << "██║███╗██║██╔══╝  ██╔══██╗╚════██║██╔══╝  ██╔══██╗╚██╗ ██╔╝" << std::endl;
+	std::cout << "╚███╔███╔╝███████╗██████╔╝███████║███████╗██║  ██║ ╚████╔╝ " << std::endl;
+	std::cout << " ╚══╝╚══╝ ╚══════╝╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝  " << std::endl;
+	std::cout << "\033[0m";
+	std::cout << "\033[94mCopyright (c) 2024 \033[0m \033[92m[aben-nei - mel-yous - houmanso]\033[0m\n" << std::endl;
+}
 
-        std::list<Token>::iterator iter = tokens.begin();
-        while (iter != tokens.end())
-        {
-            switch (iter->getType())
-            {
-            case WORD:
-                std::cout << "WORD =>\t\t\t" + iter->getContent() << std::endl;
-                break;
-            case SEMICOLON:
-                std::cout << "SEMICOLON =>\t\t\t" + iter->getContent() << std::endl;
-                break;           
-            case OPEN_BRACKET:
-                std::cout << "OPEN_BRACKET =>\t" + iter->getContent() << std::endl;
-                break;           
-            case CLOSED_BRACKET:
-                std::cout << "CLOSED_BRACKET =>\t" + iter->getContent() << std::endl;
-                break;           
-            default:
-                break;
-            }
-            iter++;
-        }
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-    }
-    catch(const char* msg)
-    {
-        std::cerr << msg << std::endl;
-    }
-    return 0;
+int main(int argc, char **argv, char  **env)
+{
+	printBanner();
+	std::string configPath = "webserv.conf";
+	try
+	{
+		CGI::setPath(env);
+		if (argc == 2)
+			configPath = argv[1];
+		else if (argc > 2)
+			throw Fail("invalid number of args");
+		Config	_config(configPath);
+		Core core(_config);
+		core.run();
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+	return 0;
 }

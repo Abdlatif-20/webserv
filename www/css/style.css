@@ -1,0 +1,53 @@
+body {
+    font-family: "Ubuntu", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    background-color: #222831;
+    color: whitesmoke;
+}
+
+#website-title {
+    padding-bottom: 50px;
+    text-align: center;
+}
+
+.webserv-description {
+    text-align: center;
+}
+
+.webserv-description p {
+    font-size: 15px;
+    margin-bottom: 20px;
+}
+
+.webserv-description img {
+    width: 400px;
+    border: 1px solid white;
+    border-radius: 2px;
+}
+
+.video {
+    margin-top: 20px;
+    text-align: center;
+}
+
+#upload {
+    margin-top: 30px;
+    text-align: center;
+}
+
+#submit {
+    width: 250px;
+    height: 40px;
+    margin-top: 10px;
+    border: 1px solid whitesmoke;
+    border-radius: 30px;
+    background-color: #333A73;
+    color: whitesmoke;
+}
+
+#submit:hover {
+    cursor: pointer;
+    background-color:#222831;
+    transition: 0.7s;
+}
