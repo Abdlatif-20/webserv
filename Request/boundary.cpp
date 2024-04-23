@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   boundary.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/23 00:33:57 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/23 04:15:50 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,10 +91,7 @@ void Request::parseBoundary()
 	if (!this->_BoundaryComplete)
 		return(receivecount++, void());
 	if (hasCgi())
-	{
-		requestIscomplete = true;
-		return ;
-	}
+		return (requestIscomplete = true, void());
 	if (bodySize != contentLength && !chunkedBoundary)
 		return (status = BadRequest, requestIscomplete = true,
 			std::remove(_pathTmpFile.c_str()), void());

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/22 23:41:54 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/23 04:23:24 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -387,7 +387,7 @@ void	Request::parseRequest(const std::string& receivedRequest, ServerContext ser
 		}
 		if (!this->_body.empty())
 			parseBody();
-		if (receivecount == 1)
-			receivecount++;
+		receivecount == 1 ? receivecount++ : 0;
+		!contentLength ? this->bodyDone = true, this->requestIscomplete = true : 0;
 	}
 }
