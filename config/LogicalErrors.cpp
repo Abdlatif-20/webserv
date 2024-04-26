@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/16 15:14:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/06 21:12:49 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/21 13:12:12 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,7 @@ static void checkErrorPages(Context& ctx)
                 std::string key = it->first;
                 int status = std::atoi(key.c_str());
                 if (checkIntOverflow(key) || status < 400 || status > 507)
-                    throw LogicalErrorException("invalid value status code `error_page` directive");
+                    throw LogicalErrorException("invalid status code for `error_page` directive");
             }
             it++;
         }

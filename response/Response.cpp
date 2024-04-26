@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/06 22:17:32 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/21 13:18:10 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -545,7 +545,7 @@ void Response::initReasonPhrases()
     reasonPhrases[402] = "Payment Required";
     reasonPhrases[403] = "Forbidden";
     reasonPhrases[404] = "Not Found";
-    reasonPhrases[405] = "Not Allowed";
+    reasonPhrases[405] = "Method Not Allowed";
     reasonPhrases[406] = "Not Acceptable";
     reasonPhrases[407] = "Proxy Authentication Required";
     reasonPhrases[408] = "Request Timeout";
