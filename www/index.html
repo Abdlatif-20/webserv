@@ -4,11 +4,21 @@
         <title>WebServer</title>
         <meta charset="UTF-8">
     </head>
-    <body>
-		<form action="/index.php" method="post">
+	<body>
+		<div>
+				<form action="upload.php" method="post" enctype="multipart/form-data">
+			Select image to upload:
+			<input type="file" name="fileToUpload" id="fileToUpload">
+			<input type="submit" value="Upload Image" name="submit">
+			</form>
+		</div>
+		<div>
+			<form action="/index.php" method="post">
 			<label for="fname">First name:</label>
 			<input type="text" id="fname" name="user"><br><br>
 			<input type="submit" value="Submit">
-		  </form>
-    </body>
+		</form>
+		</div>
+		
+	</body>
 </html>
