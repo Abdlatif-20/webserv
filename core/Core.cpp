@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/26 20:35:18 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/27 13:20:39 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ void	Core::traceEvents(void)
 			{
 				clients.erase(checklist[i].fd);
 				checklist.erase(checklist.begin() + i--);
-				std::cerr << "something went wrong: " << e.what() << std::endl;
+				// std::cerr << "something went wrong: " << e.what() << std::endl;
 			}
 		}
 	}

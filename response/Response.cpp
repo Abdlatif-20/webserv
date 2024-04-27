@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/26 19:14:46 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/27 18:11:47 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ Response& Response::operator=(const Response& obj)
     serverCTX = obj.serverCTX;
     locationCTX = obj.locationCTX;
     statusCode = obj.statusCode;
+    statusLine = obj.statusLine;
     responseDone = obj.responseDone;
     headers = obj.headers;
     headersSent = obj.headersSent;
@@ -187,9 +188,7 @@ void Response::prepareHeaders()
 void Response::prepareBody()
 {
 	if (statusCode == 200 && locationCTX.hasCGI(bodyPath) && !CGIWorking)
-    {
 		runCGI();
-    }
     if (bodyPath.empty())
     {
         responseDone = true;
@@ -224,7 +223,7 @@ void Response::prepareBody()
         return;
     }
     body.clear();
-    body.append(buffer, readSize);
+    body.append(buffer, readedBytes);
     sendedBytes += readedBytes;
 }
 
@@ -344,7 +343,7 @@ void Response::prepareRanged()
 
 void Response::preparePOST()
 {
-    if (!locationCTX.getUploadStore().empty())
+    if (!locationCTX.getUploadStore().empty() && !locationCTX.getCGI().size())
     {
         statusCode = Created;
         body = generateHtmlResponsePage();
@@ -366,7 +365,6 @@ void Response::preparePOST()
                     std::string index = locationCTX.getIndex(resource);
                     if (index.empty())
                         throw Utils::FilePermissionDenied();
-                    /* Request BODY goes to CGI !! */
 					if (!locationCTX.hasCGI(index))
 						headers["content-type"] = "text/plain";
 					bodyPath = resource + index;
@@ -404,7 +402,6 @@ void Response::prepareDELETE()
                     std::string index = locationCTX.getIndex(resource);
                     if (index.empty() )
                         throw Utils::FilePermissionDenied();
-                    /* Request BODY goes to CGI !! */
 					if (!locationCTX.hasCGI(index))
 						headers["content-type"] = "text/plain";
 					bodyPath = resource + index;
@@ -489,6 +486,7 @@ void Response::resetResponse()
     headersSent = false;
     responseDone = false;
     isRedirection = false;
+    statusLine.clear();
 	env.clear();
     body.clear();
     headers.clear();

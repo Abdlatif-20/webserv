@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/26 20:45:28 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/27 12:31:05 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,10 +64,6 @@ void	Request::ContentLength()
 		_body.erase(pos);
 	if (contentLength > locationCTX.getClientMaxBodySize())
 		return (status = RequestEntityTooLarge, requestIscomplete = true, void());
-	std::cout << "Content-Length: " << contentLength << std::endl;
-	std::cout << "Body: {" << _body <<"}"<< std::endl;
-	std::cout << "Body Size: {" << _body.size() <<"}"<< std::endl;
-	std::cout << "Status: " << status << std::endl;
 	if (contentLength != (long long)_body.size())
 		return (status = BadRequest, requestIscomplete = true, void());
 	if (!file.is_open())

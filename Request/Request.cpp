@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/26 20:29:05 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/27 12:41:42 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -177,7 +177,6 @@ const String Request::getHeaderByName(const String& name) const
 bool Request::hasCgi()
 {
 	std::string	resource = locationCTX.getRoot() + Utils::urlDecoding(getRequestPath());
-	std::cout << resource << std::endl;
 	if (!Utils::checkIfPathExists(resource))
 		return (false);
 	if (Utils::isDirectory(resource))
@@ -188,10 +187,7 @@ bool Request::hasCgi()
 			if (index.empty())
 				return (false);
 			if (locationCTX.hasCGI(Utils::getFileExtension(index)))
-			{
-				std::cout << "haz" << std::endl;
 				return true;
-			}
 		}
 		catch (...)
 		{
@@ -199,10 +195,7 @@ bool Request::hasCgi()
 		}
 	}
 	if (locationCTX.hasCGI(Utils::getFileExtension(resource)))
-	{
-		std::cout << "haz" << std::endl;
 		return true;
-	}
 	return false;
 }
 
@@ -337,7 +330,7 @@ void	Request::selectServerContext(const String& host)
 		if (name != hosts.end())
 		{
 			serverCTX = it->getServerCTX();
-			break;
+			return;
 		}
 		it++;
 	}
@@ -358,7 +351,6 @@ void	Request::parseRequest(const std::string& receivedRequest, ServerContext ser
 {
 	if (receivedRequest.empty())
 		return;
-	std::cout << "Received Request: " << receivedRequest << "======================" << std::endl;
 	this->serverCTX = serverCTX;
 	std::srand(time(NULL));
 	if (!this->requestLineDone || !this->headersDone || !this->_requestIsWellFormed)
@@ -380,14 +372,11 @@ void	Request::parseRequest(const std::string& receivedRequest, ServerContext ser
 		setUploadingPath();
 		if (status != 200)
 			return;
-		// std::cout << this->status << std::endl;
 		if (this->receivecount > 1)
 		{
 			if (receivedRequest.front() == CR && this->requestInProgress)
 				return;
-			this->_body.clear();
-			// this->_body = receivedRequest;
-			this->_body.append(receivedRequest);
+			this->_body = receivedRequest;
 		}
 		if (!this->_body.empty())
 			parseBody();
