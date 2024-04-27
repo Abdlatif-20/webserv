@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/26 12:59:08 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/27 21:12:18 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,10 +114,10 @@ void CGI::traceCGIProcess(pid_t pid)
 	start = std::time(NULL);
 	while (!waitpid(pid, &status, WNOHANG))
 	{
-		if (std::difftime(std::time(NULL), start) > 60)
+		if (std::difftime(std::time(NULL), start) > locationctx.getCGI_timeout())
 			kill(pid, SIGKILL);
 	}
-	// if (WIFEXITED(status))
+	std::remove(request->getBodyPath().c_str());
 }
 
 pid_t CGI::runCGIProcess(std::string &bin, std::string __unused &out)
@@ -144,11 +144,25 @@ pid_t CGI::runCGIProcess(std::string &bin, std::string __unused &out)
 			close(_out);
 			exit(2);
 		}
-		dup2(_out, 1);
+		if (dup2(_out, 1) < 0)
+		{
+			close(_in);
+			close(_out);
+			exit(2);
+		}
 		if (_in != -1337)
-			dup2(_in, 0);
+		{
+			if (dup2(_in, 0) < 0)
+			{
+				close(_in);
+				close(_out);
+				exit(2);
+			}
+			close(_in);
+		}
+		else
+			close(0);
 		close(_out);
-		close(_in);
 		if (chdir(dir.c_str()) != 0)
 			exit(1);
 		if (execve(args[0], args, envv.data()) != 0)
@@ -170,7 +184,7 @@ void CGI::setupEnv(std::string bodyPath)
 		env.push_back("REQUEST_METHOD=" + request->getMethod());
 		env.push_back("QUERY_STRING=" + request->getQueryString());
 		env.push_back("SERVER_PROTOCOL=" + request->getProtocol());
-		// env.push_back("PATH_INFO=" +  path.substr(0, path.find_last_of('/')));
+		env.push_back("PATH_INFO=" +  path.substr(0, path.find_last_of('/')));
 		env.push_back("SCRIPT_FILENAME=" + path);
 		env.push_back("SCRIPT_NAME=" + script);
 		env.push_back("DOCUMENT_ROOT=" + path);

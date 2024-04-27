@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Context.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/16 12:15:11 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/27 15:20:52 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -264,10 +264,7 @@ unsigned int Context::getCGI_timeout()
     DirectivesMap::iterator it = directives.find("cgi_max_timeout");
     if (it != directives.end())
     {
-        int t = std::atoi(it->second.begin()->c_str());
-        if (t < 30)
-            t = 30;
-        return t;
+        return std::atoi(it->second.begin()->c_str());
     }
-    return 60;
+    return 30;
 }

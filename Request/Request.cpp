@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/27 12:41:42 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/27 21:12:26 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,7 @@ Request& Request::operator=(const Request& obj)
 
 Request::~Request()
 {
+	std::remove(this->_pathTmpFile.c_str());
 }
 
 /* *************************** getters *************************** */
@@ -294,6 +295,7 @@ void	Request::resetRequest()
 	this->lastTime = std::time(NULL);
 	this->_requestIsWellFormed = false;
 	this->requestLineInProgress = false;
+	std::remove(this->_pathTmpFile.c_str());
 	this->_path.clear();
 	this->_body.clear();
 	this->queryString.clear();
