@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/16 13:12:11 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/26 20:35:58 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,14 +46,12 @@ ssize_t Client::recvRequest(void)
 {
 	std::memset(buff, 0, sizeof(buff));
 	len = recv(sockId, buff, sizeof(buff) - 1, 0);
-	if (len > 0)
-	{
-		request.parseRequest(std::string(buff, len), serverCTX);
-		last_update_time = std::time(NULL); // to think about later
-		requestDone = request.isDone();
-	}
-	else
-		requestDone = true;
+	std::cout << "Recv Len: " << len << std::endl;
+	if (len < 0)
+		throw (Fail("send fails"));
+	request.parseRequest(std::string(buff, len), serverCTX);
+	last_update_time = std::time(NULL); // to think about later
+	requestDone = request.isDone();
 	responseDone = false;
 	return (len);
 }
@@ -70,13 +68,17 @@ void	Client::sendResponse(void)
 		{
 			std::string headers = response.headersToString();
 			len = send(sockId, headers.c_str(), headers.size(), 0);
+			if (len < 0)
+				throw (Fail("send fails"));
 			response.setHeadersSent(true);
 		}
 		len = send(sockId, response.getBody().c_str(), response.getBody().size(), 0);// when fail? we should remove the client and continue :) // ok
+		std::cout << "Response here" << std::endl;
+		if (len < 0)
+			throw (Fail("send fails"));
 		responseDone = response.responseIsDone();
 		last_update_time = std::time(NULL);
 	}
-	// reset();
 }
 
 void	Client::setServerCTX(const ServerContext& serverCTX)

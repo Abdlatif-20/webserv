@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/04 14:34:26 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/24 16:34:29 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ void	Request::isMethodAllowedInLocation()
 	Vector allowedMethods = locationCTX.getAllowedMethods();
 	if (std::find(allowedMethods.begin(), allowedMethods.end(), requestLine["method"]) == allowedMethods.end())
 		return (this->status = MethodNotAllowed, requestIscomplete = true, void());
-	_requestIsWellFormed = true;
 }
 
 //function to check if the request Line is well formed And Set the status To true If all is well
@@ -54,7 +53,7 @@ void	Request::requestIsWellFormed()
 	{
 		if (_headers.find("content-length") != _headers.end()
 			&& _headers.find("transfer-encoding") == _headers.end()
-			&& _headers["content-type"].find("chunkedBoundary/form-data") == String::npos)
+			&& _headers["content-type"].find("multipart/form-data") == String::npos)
 			parseContentLength();
 		else if (_headers.find("content-type") != _headers.end()
 				&& _headers.find("transfer-encoding") == _headers.end())
@@ -72,6 +71,7 @@ void	Request::requestIsWellFormed()
 			return (this->status = BadRequest, requestIscomplete = true, void());
 	}
 	isMethodAllowedInLocation();
+	status == 200? _requestIsWellFormed = true : _requestIsWellFormed = false;
 	if (this->requestLine["method"] != "POST" && this->_requestIsWellFormed
 			&& this->headersDone && this->requestLineDone)
 		this->requestIscomplete = true;
@@ -144,7 +144,7 @@ void	Request::parseBody()
 	if (this->requestLine["method"] == "POST"
 			&& _headers.find("content-length") != _headers.end()
 			&& _headers.find("transfer-encoding") == _headers.end()
-			&& _headers["content-type"].find("chunkedBoundary/form-data") == String::npos)
+			&& _headers["content-type"].find("multipart/form-data") == String::npos)
 				ContentLength();
 	else if (this->requestLine["method"] == "POST"
 			&& _headers.find("transfer-encoding") != _headers.end()

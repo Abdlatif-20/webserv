@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:55:56 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/06 23:22:29 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/22 23:41:43 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void Server::setupServer(void)
 		throw(Fail("Failed to bind with any address"));
 	if (listen(sockID, INT_MAX) == -1)
 		throw(Fail(strerror(errno)));
-	std::cout << "[" << host << ":" << port << "]" << std::endl;
+	std::cout << "hosting http://" << host << ":" << port << " ...\n";
 }
 
 const std::string& Server::getHost(void) const

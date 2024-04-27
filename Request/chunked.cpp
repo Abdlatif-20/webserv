@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   chunked.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 16:42:03 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/01 18:19:27 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/23 04:16:08 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,8 @@ void	Request::parseChunkedBody()
 	createChunkedTmpFile();
 	if (!_chunkedComplete)
 		return(receivecount++, void());
-	// CHECK CGI ON
+	if (hasCgi())
+		return (requestIscomplete = true, void());
 	int fd = open(this->_pathTmpFile.c_str(), O_RDONLY);
 	if (fd == -1)
 		return (status = InternalServerError, requestIscomplete = true, void());

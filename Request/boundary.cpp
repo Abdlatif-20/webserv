@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   boundary.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/01 18:18:52 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/23 04:15:50 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ void Request::parseContentType()
 		return (this->status = BadRequest, requestIscomplete = true, void());
 	if (isExist(_headers, "content-length") == "")
 		return (this->status = LengthRequired, requestIscomplete = true, void());
-	contentLength = std::stol(_headers["content-length"]);
+	contentLength = std::strtol(_headers["content-length"].c_str(), NULL, 10);
 }
 
 bool	Request::getBoundaryName(String startBoundary, int &file)
@@ -90,7 +90,8 @@ void Request::parseBoundary()
 	}
 	if (!this->_BoundaryComplete)
 		return(receivecount++, void());
-		// has cgi
+	if (hasCgi())
+		return (requestIscomplete = true, void());
 	if (bodySize != contentLength && !chunkedBoundary)
 		return (status = BadRequest, requestIscomplete = true,
 			std::remove(_pathTmpFile.c_str()), void());

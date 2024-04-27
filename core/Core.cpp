@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/16 13:07:35 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/26 20:35:18 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,18 +108,30 @@ void	Core::traceEvents(void)
 		hooks = poll(checklist.data(), checklist.size(), 0);
 		for (i = 0; i < checklist.size(); i++)
 		{
-			if (checklist[i].revents & POLLIN)
-				clients[checklist[i].fd].recvRequest();
-			if ((checklist[i].revents & POLLOUT) && clients[checklist[i].fd].isRequestDone())
-				clients[checklist[i].fd].sendResponse();
-			if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].timeout()
-				|| (clients[checklist[i].fd].isResponseDone() && !clients[checklist[i].fd].isALive()))
+			try
+			{
+				if (checklist[i].revents & POLLIN)
+				{
+					clients[checklist[i].fd].recvRequest();
+				}
+				// std::cout << clients[checklist[i].fd].isRequestDone() << std::endl;
+				if ((checklist[i].revents & POLLOUT) && clients[checklist[i].fd].isRequestDone())
+					clients[checklist[i].fd].sendResponse();
+				if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].timeout()
+					|| (clients[checklist[i].fd].isResponseDone() && !clients[checklist[i].fd].isALive()))
+				{
+					clients.erase(checklist[i].fd);
+					checklist.erase(checklist.begin() + i--);
+				}
+				else
+					clients[checklist[i].fd].reset();
+			}
+			catch(const Fail &e)
 			{
 				clients.erase(checklist[i].fd);
 				checklist.erase(checklist.begin() + i--);
+				std::cerr << "something went wrong: " << e.what() << std::endl;
 			}
-			else
-				clients[checklist[i].fd].reset();
 		}
 	}
 }

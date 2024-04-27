@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/21 13:18:10 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/26 19:14:46 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ Response::Response()
     alreadySeeked = false;
     sendedBytes = 0;
     readSize = sizeof(buffer);
+	CGIWorking = false;
 }
 
 Response::Response(const Response &obj)
@@ -42,6 +43,7 @@ Response& Response::operator=(const Response& obj)
     if (this == &obj)
         return *this;
 	env = obj.env;
+	CGIWorking = obj.CGIWorking;
     request = obj.request;
     serverCTX = obj.serverCTX;
     locationCTX = obj.locationCTX;
@@ -161,7 +163,8 @@ void Response::prepareHeaders()
 {
     if (headersSent)
         return;
-    statusLine = std::string(HTTP_VERSION) + SPACE + Utils::numberToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
+	if (statusLine.empty())
+		statusLine = std::string(HTTP_VERSION) + SPACE + Utils::numberToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
     setHeaderAttr("connection", request->getHeaderByName("connection"));
     setHeaderAttr("server", std::string(SERVER) + " (" + OS_MAC + ")");
     setHeaderAttr("date", Utils::getCurrentTime());
@@ -183,8 +186,10 @@ void Response::prepareHeaders()
 
 void Response::prepareBody()
 {
-	if (statusCode == 200 && locationCTX.hasCGI(bodyPath))
+	if (statusCode == 200 && locationCTX.hasCGI(bodyPath) && !CGIWorking)
+    {
 		runCGI();
+    }
     if (bodyPath.empty())
     {
         responseDone = true;
@@ -311,6 +316,7 @@ void Response::runCGI()
 
 	cgi.setupEnv(bodyPath);
 	cgi.execute();
+	CGIWorking = true;
 }
 
 void Response::prepareRanged()
@@ -358,7 +364,7 @@ void Response::preparePOST()
                 try
                 {
                     std::string index = locationCTX.getIndex(resource);
-                    if (index.empty() )
+                    if (index.empty())
                         throw Utils::FilePermissionDenied();
                     /* Request BODY goes to CGI !! */
 					if (!locationCTX.hasCGI(index))
@@ -462,6 +468,11 @@ void Response::prepareResponse()
 	}
 }
 
+void Response::setStatusLine(std::string val)
+{
+	statusLine = val;
+}
+
 void Response::setHeaderAttr(std::string key, std::string value)
 {
 	Utils::toLower(key);
@@ -474,6 +485,7 @@ void Response::resetResponse()
     request = NULL;
     statusCode = 200;
     isWorking = false;
+	CGIWorking = false;
     headersSent = false;
     responseDone = false;
     isRedirection = false;

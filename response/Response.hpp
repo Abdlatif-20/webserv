@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/04 23:40:18 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/22 23:42:27 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ class Response
         bool headersSent;
         bool responseDone;
         bool isWorking;
+        bool CGIWorking;
         bool isRedirection;
         std::string location;
 
@@ -86,6 +87,7 @@ class Response
 
         void resetResponse();
         void prepareResponse();
+		void setStatusLine(std::string val);
 		void setHeaderAttr(std::string key, std::string value);
 
         std::map<std::string, std::string>& getHeaders();
