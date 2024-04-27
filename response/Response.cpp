@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/22 23:44:28 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/27 11:37:35 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,7 +222,7 @@ void Response::prepareBody()
         return;
     }
     body.clear();
-    body.append(buffer, readSize);
+    body.append(buffer, readedBytes);
     sendedBytes += readedBytes;
 }
 
