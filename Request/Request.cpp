@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/23 04:23:24 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/04/27 17:15:59 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,7 @@ Request& Request::operator=(const Request& obj)
 
 Request::~Request()
 {
+	std::remove(this->_pathTmpFile.c_str());
 }
 
 /* *************************** getters *************************** */
@@ -177,7 +178,6 @@ const String Request::getHeaderByName(const String& name) const
 bool Request::hasCgi()
 {
 	std::string	resource = locationCTX.getRoot() + Utils::urlDecoding(getRequestPath());
-	std::cout << resource << std::endl;
 	if (!Utils::checkIfPathExists(resource))
 		return (false);
 	if (Utils::isDirectory(resource))
@@ -188,10 +188,7 @@ bool Request::hasCgi()
 			if (index.empty())
 				return (false);
 			if (locationCTX.hasCGI(Utils::getFileExtension(index)))
-			{
-				std::cout << "haz" << std::endl;
 				return true;
-			}
 		}
 		catch (...)
 		{
@@ -199,10 +196,7 @@ bool Request::hasCgi()
 		}
 	}
 	if (locationCTX.hasCGI(Utils::getFileExtension(resource)))
-	{
-		std::cout << "haz" << std::endl;
 		return true;
-	}
 	return false;
 }
 
@@ -301,6 +295,7 @@ void	Request::resetRequest()
 	this->lastTime = std::time(NULL);
 	this->_requestIsWellFormed = false;
 	this->requestLineInProgress = false;
+	std::remove(this->_pathTmpFile.c_str());
 	this->_path.clear();
 	this->_body.clear();
 	this->queryString.clear();
