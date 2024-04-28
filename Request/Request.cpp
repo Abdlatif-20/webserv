@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/27 21:12:26 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/28 10:52:47 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,11 @@ const String Request::getHeaderByName(const String& name) const
 			return "";
 	}
 	return ("");
+}
+
+std::string Request::getParams()
+{
+	return _params;
 }
 
 bool Request::hasCgi()

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:57:14 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/21 22:26:07 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/28 10:52:17 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,6 +165,7 @@ class Request
 		const bool& 			getRequestLineDone(void) const;
 		const bool& 			getRequestIsWellFormed(void) const;
 		const String 			getHeaderByName(const String& name) const;
+		std::string 			getParams();
 
 		bool			hasCgi(void);
 		String			getProtocol(void);
