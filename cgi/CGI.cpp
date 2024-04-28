@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/28 10:53:01 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/28 12:54:53 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,7 +182,7 @@ void CGI::setupEnv(std::string bodyPath)
 		env.push_back("SERVER_SOFTWARE=webserv/1.0");
 		env.push_back("SERVER_PORT=" + serverctx.getPort());
 		env.push_back("REQUEST_METHOD=" + request->getMethod());
-		env.push_back("QUERY_STRING=" + request->getParams());
+		env.push_back("QUERY_STRING=" + request->getQueryString());
 		env.push_back("SERVER_PROTOCOL=" + request->getProtocol());
 		env.push_back("PATH_INFO=" +  path.substr(0, path.find_last_of('/')));
 		env.push_back("SCRIPT_FILENAME=" + path);

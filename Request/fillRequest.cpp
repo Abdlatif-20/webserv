@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:26:57 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/27 12:26:45 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/28 12:54:12 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,5 +100,5 @@ void	Request::fillParams()
 	sepPath = Utils::split(path, '?');
 	this->requestLine["path"] = sepPath[0];
 	if (sepPath.size() > 1)
-		this->_params = sepPath[1];
+		this->queryString = sepPath[1];
 }
