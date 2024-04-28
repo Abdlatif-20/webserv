@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/28 12:54:53 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/28 19:05:43 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,6 +178,7 @@ void CGI::setupEnv(std::string bodyPath)
 		if (!request || !response)
 			throw ResponseErrorException(InternalServerError);
 		processFilePath(bodyPath);
+		std::cout << bodyPath << std::endl;
 		env.push_back("GATEWAY_INTERFACE=CGI/1.1");
 		env.push_back("SERVER_SOFTWARE=webserv/1.0");
 		env.push_back("SERVER_PORT=" + serverctx.getPort());
@@ -185,9 +186,9 @@ void CGI::setupEnv(std::string bodyPath)
 		env.push_back("QUERY_STRING=" + request->getQueryString());
 		env.push_back("SERVER_PROTOCOL=" + request->getProtocol());
 		env.push_back("PATH_INFO=" +  path.substr(0, path.find_last_of('/')));
-		env.push_back("SCRIPT_FILENAME=" + path);
+		env.push_back("SCRIPT_FILENAME=" + script);
 		env.push_back("SCRIPT_NAME=" + script);
-		env.push_back("DOCUMENT_ROOT=" + path);
+		env.push_back("DOCUMENT_ROOT=" + dir);
 		env.push_back("CONTENT_TYPE=" + request->getHeaderByName("content-type"));
 		env.push_back("CONTENT_LENGTH=" + request->getHeaderByName("content-length"));
 		env.push_back("REDIRECT_STATUS=" + Utils::numberToString(request->getStatus()));
@@ -212,6 +213,8 @@ void CGI::processFilePath(std::string &str)
 	std::stringstream ss(str);
 	std::string	name;
 
+	if (str[0] != '/')
+		path = '.';
 	while (std::getline(ss,name, '/'))
 	{
 		if (name.empty())
