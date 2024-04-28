@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/28 19:05:43 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/28 19:24:20 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,7 +178,6 @@ void CGI::setupEnv(std::string bodyPath)
 		if (!request || !response)
 			throw ResponseErrorException(InternalServerError);
 		processFilePath(bodyPath);
-		std::cout << bodyPath << std::endl;
 		env.push_back("GATEWAY_INTERFACE=CGI/1.1");
 		env.push_back("SERVER_SOFTWARE=webserv/1.0");
 		env.push_back("SERVER_PORT=" + serverctx.getPort());

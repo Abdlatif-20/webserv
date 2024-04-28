@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:06 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/28 12:04:48 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/28 19:23:51 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,20 @@ Config::Config()
 */
 Config::Config(const std::string& configPath)
 {
-    tokens = Lexer::tokenize(configPath);    
+    try
+    {
+        tokens = Lexer::tokenize(configPath);
+    }
+    catch(const std::exception& e)
+    {
+        if (configPath == "webserv.conf")
+            goto LABEL;
+        std::cerr << e.what() << std::endl;
+        std::exit(1);
+    }
     checkSyntax(tokens);
     parseServers();
+    LABEL:
     setupDefaultServer();
     setupDefaultLocation();
     checkLogicalErrors(servers);

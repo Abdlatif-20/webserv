@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Context.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/27 15:20:52 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/28 19:19:52 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,12 +124,12 @@ std::string Context::getIndex(const std::string& path)
     }
     if (getRoot() == "www/")
     {
-        indexPath = getRoot() + "html/index.html";
+        indexPath = getRoot() + "index.html";
         if (!Utils::checkIfPathExists(indexPath))
             throw Utils::FileNotFoundException();
         if (Utils::isDirectory(indexPath) || !Utils::isReadableFile(indexPath))
             throw Utils::FilePermissionDenied();
-        return "html/index.html";
+        return "index.html";
     }
     return "";
 }
