@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/27 18:11:47 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/29 13:02:19 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -388,38 +388,41 @@ void Response::preparePOST()
 
 void Response::prepareDELETE()
 {
-        std::string resource = locationCTX.getRoot() + Utils::urlDecoding(request->getRequestPath());
-        if (!Utils::checkIfPathExists(resource))
-            throw ResponseErrorException(NotFound);
-        if (Utils::isDirectory(resource))
-        {
-            if (!Utils::stringEndsWith(resource, "/"))
-                prepareRedirection(MovedPermanently, request->getRequestPath() + "/");
-            else
-            {
-                try
-                {
-                    std::string index = locationCTX.getIndex(resource);
-                    if (index.empty() )
-                        throw Utils::FilePermissionDenied();
-					if (!locationCTX.hasCGI(index))
-						headers["content-type"] = "text/plain";
-					bodyPath = resource + index;
-                	statusCode = OK;
-                }
-                catch (const std::exception& e)
-                {
-                    throw ResponseErrorException(FORBIDDEN);
-                }
-            }
-        }
+    std::string resource = locationCTX.getRoot() + Utils::urlDecoding(request->getRequestPath());
+    if (!Utils::checkIfPathExists(resource))
+        throw ResponseErrorException(NotFound);
+    if (Utils::isDirectory(resource))
+    {
+        if (!Utils::stringEndsWith(resource, "/"))
+            prepareRedirection(MovedPermanently, request->getRequestPath() + "/");
         else
         {
-            if (!locationCTX.hasCGI(resource))
-				headers["content-type"] = "text/plain";
-			bodyPath = resource;
-            statusCode = OK;
+            try
+            {
+                std::string index = locationCTX.getIndex(resource);
+                if (index.empty() && locationCTX.hasCGI(index))
+                    throw ResponseErrorException(FORBIDDEN);
+				bodyPath = resource + index;
+                statusCode = OK;
+            }
+            catch (const std::exception& e)
+            {
+                throw ResponseErrorException(FORBIDDEN);
+            }
         }
+    }
+    else
+    {
+		bodyPath = resource;
+        statusCode = OK;
+    }
+    if (!locationCTX.hasCGI(bodyPath))
+    {
+        clear_folder_or_file(resource);
+        statusCode = NoContent;
+        body = generateHtmlResponsePage();
+        bodyPath.clear();
+    }
 }
 
 void Response::prepareResponse()
