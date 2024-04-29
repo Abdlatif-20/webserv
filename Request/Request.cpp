@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/28 10:52:47 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/29 16:38:29 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -362,7 +362,6 @@ void	Request::parseRequest(const std::string& receivedRequest, ServerContext ser
 	std::srand(time(NULL));
 	if (!this->requestLineDone || !this->headersDone || !this->_requestIsWellFormed)
 	{
-		/* L body i9dar ikoun f GET wla delete 3la 7ssab CGI !!! */
 		if (takingRequests(receivedRequest))
 		{
 			if (detectHost > 1)
