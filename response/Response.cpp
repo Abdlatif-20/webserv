@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/29 18:00:43 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/29 18:06:57 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -536,9 +536,9 @@ std::string Response::requestTimeoutResponse()
 {
 	std::string resp;
 	statusCode = RequestTimeout;
+	body = generateHtmlResponsePage();
 	prepareHeaders();
-	resp = headersToString();
-	resp += generateHtmlResponsePage();
+	resp = headersToString() + body;
 	return (resp);
 }
 
