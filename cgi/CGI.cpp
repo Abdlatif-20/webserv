@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/29 13:47:09 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/29 14:51:57 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ void CGI::execute(void)
 
 	out = "/tmp/output";
 	bin = getBinPath();
-	if (!access(bin.c_str(), X_OK | F_OK))
+	if (access(bin.c_str(), F_OK | X_OK))
 		throw ResponseErrorException(BadGateway);
 	pid = runCGIProcess(bin, out);
 	if (pid < 0)
