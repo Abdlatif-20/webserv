@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/29 17:56:15 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/29 18:00:34 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,9 +66,7 @@ void	Client::sendResponse(void)
 		if (!response.getHeadersSent())
 		{
 			std::string headers = response.headersToString();
-			len = send(sockId, headers.c_str(), headers.size(), 0);
-			if (len < 0)
-				throw (Fail("send fails"));
+			response.getBody().insert(0, headers);
 			response.setHeadersSent(true);
 		}
 		len = send(sockId, response.getBody().c_str(), response.getBody().size(), 0);// when fail? we should remove the client and continue :) // ok

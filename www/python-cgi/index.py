@@ -1,22 +1,23 @@
 #Import modules for CGI handling
 import cgi, cgitb
-
-# Create instance of FieldStorage
 form = cgi.FieldStorage()
-
-# Get data from fields
 first_name = form.getvalue('user')
-
 print ("Status: 200 OK")
 print ("Content-type:text/html")
 print()
-print ("<html>")
-print ('<head>')
-print ("<title>Hello - Second CGI Program</title>")
-print ('</head>')
-print ('<body>')
-print ("<h2>Hello %s </h2>" % (first_name))
-print ('</body>')
-print ('</html>')
-# while True:
-# 	print("KJJJJJJ")
+print('<!DOCTYPE html>')
+print('<html lang="en">')
+print('<head>')
+print('	<meta charset="UTF-8">')
+print('	<meta name="viewport" content="width=device-width, initial-scale=1.0">')
+print('	<title>PHP examples</title>')
+print('	<link rel="stylesheet" href="/css/style.css">')
+print('</head>')
+print('<body>')
+print('	<div class="diva">')
+print('		<h2>Python example</h2>')
+print('		<h3>hello world</h3>')
+print('		<a href="/"> go back </a>')
+print('	</div>')
+print('</body>')
+print('</html>')

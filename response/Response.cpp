@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/29 16:33:45 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/29 18:06:57 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ std::string Response::getMimeType(const std::string& extension)
     return it->second;
 }
 
-const std::string& Response::getBody() const
+std::string& Response::getBody()
 {
     return body;
 }
@@ -536,9 +536,9 @@ std::string Response::requestTimeoutResponse()
 {
 	std::string resp;
 	statusCode = RequestTimeout;
+	body = generateHtmlResponsePage();
 	prepareHeaders();
-	resp = headersToString();
-	resp += generateHtmlResponsePage();
+	resp = headersToString() + body;
 	return (resp);
 }
 
