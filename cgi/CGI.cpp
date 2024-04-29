@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   CGI.cpp                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/29 14:51:57 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/29 15:46:36 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,14 +112,21 @@ void CGI::traceCGIProcess(pid_t pid)
 {
 	int	status;
 	time_t	start;
+	bool	killed = false;
 
 	start = std::time(NULL);
 	while (!waitpid(pid, &status, WNOHANG))
 	{
 		if (std::difftime(std::time(NULL), start) > locationctx.getCGI_timeout())
-			kill(pid, SIGKILL);
+		{
+			if (kill(pid, SIGKILL))
+				throw ResponseErrorException(InternalServerError);
+			killed = true;
+		}
 	}
 	std::remove(request->getBodyPath().c_str());
+	if (killed)
+		throw ResponseErrorException(GetwayTimeout);
 }
 
 pid_t CGI::runCGIProcess(std::string &bin, std::string __unused &out)
@@ -247,4 +254,5 @@ void CGI::setPath(char **_env)
 
 CGI::~CGI(void)
 {
+	std::remove(request->getBodyPath().c_str());
 }

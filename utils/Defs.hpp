@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Defs.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 14:36:15 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/29 13:46:52 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/29 15:52:28 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,6 +81,8 @@ enum StatusCodes
     FORBIDDEN = 403,
     BadGateway = 502,
 	BadRequest = 400,
+	GetwayTimeout = 504,
+	RequestTimeout = 408,
 	LengthRequired = 411,
     PartialContent = 206,
 	NotImplemented = 501,

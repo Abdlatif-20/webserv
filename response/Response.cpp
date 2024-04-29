@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/29 17:46:40 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/29 18:00:43 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -530,6 +530,16 @@ ServerContext &Response::getServerCtx()
 LocationContext &Response::getLocationCtx()
 {
 	return (locationCTX);
+}
+
+std::string Response::requestTimeoutResponse()
+{
+	std::string resp;
+	statusCode = RequestTimeout;
+	prepareHeaders();
+	resp = headersToString();
+	resp += generateHtmlResponsePage();
+	return (resp);
 }
 
 void Response::initReasonPhrases()

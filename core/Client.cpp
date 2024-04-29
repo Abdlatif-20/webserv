@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/29 17:55:17 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/29 18:00:34 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ bool	Client::isALive(void) const
 
 bool Client::timeout(void) const
 {
-	if (std::difftime(std::time(NULL), last_update_time) > 60)
+	if (std::difftime(std::time(NULL), last_update_time) > 59)
 		return (true);
 	return (false);
 }
@@ -133,6 +133,19 @@ const Response &Client::getResponse(void) const
 time_t Client::getLastUpdateTime(void) const
 {
 	return (last_update_time);
+}
+
+void Client::requestTimeout(void)
+{
+	response.setRequest(&request);
+	response.setServerCTX(request.getServerCTX());
+	response.setLocationCTX(request.getLocationCtx());
+	std::string	resp = response.requestTimeoutResponse();
+	len = send(sockId, resp.c_str(), resp.size(), 0);
+	if (len < 0)
+		throw (Fail("send fails"));
+	responseDone = response.responseIsDone();
+	last_update_time = std::time(NULL);
 }
 
 void	Client::setSockId(int sock)
