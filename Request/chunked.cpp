@@ -6,7 +6,7 @@
 /*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 16:42:03 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/23 04:16:08 by aben-nei         ###   ########.fr       */
+/*   Updated: 2024/04/29 15:47:36 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ bool	Request::writeInfile(int fdFile)
 		}
 		else
 		{
+			std::string tmp = _body.substr(0, remainingChunkLength);
 			write(fdFile, _body.c_str(), remainingChunkLength);
 			_body.erase(0, remainingChunkLength + 2);
 			remainingChunkLength = 0;
