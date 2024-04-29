@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/29 18:00:55 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/30 00:09:15 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ class Response
         std::map<std::string, std::string> headers;
         std::string body;
         std::string bodyPath;
+		std::string cgiOutputPath;
         bool headersSent;
         bool responseDone;
         bool isWorking;

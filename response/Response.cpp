@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/29 18:06:57 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/30 00:11:43 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ Response& Response::operator=(const Response& obj)
     if (this == &obj)
         return *this;
 	env = obj.env;
+	cgiOutputPath = obj.cgiOutputPath;
 	CGIWorking = obj.CGIWorking;
     request = obj.request;
     serverCTX = obj.serverCTX;
@@ -69,6 +70,7 @@ Response& Response::operator=(const Response& obj)
 Response::~Response()
 {
     ifs.close();
+	std::remove(cgiOutputPath.c_str());
 }
 
 void Response::setRequest(Request* request)
@@ -217,9 +219,11 @@ void Response::prepareBody()
         throw ResponseErrorException(InternalServerError);
     if (!readedBytes || (isRanged && sendedBytes >= endOffset - startOffset))
     {
+		
         body.clear();
         ifs.close();
         responseDone = true;
+		std::remove(cgiOutputPath.c_str());
         return;
     }
     body.clear();
@@ -313,9 +317,9 @@ void Response::runCGI()
 {
 	CGI cgi(this, request);
 
-	cgi.setupEnv(bodyPath);
-	cgi.execute();
 	CGIWorking = true;
+	cgi.setupEnv(bodyPath);
+	cgiOutputPath = cgi.execute();
 }
 
 void Response::prepareRanged()
@@ -495,6 +499,7 @@ void Response::resetResponse()
     headers.clear();
     bodyPath.clear();
     location.clear();
+	cgiOutputPath.clear();
     isRanged = false;
     startOffset = 0;
     endOffset = 0;

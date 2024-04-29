@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/29 23:53:27 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/30 00:05:54 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,10 +91,9 @@ void CGI::prepareResponse(std::string &out)
 	headers["content-length"] = Utils::numberToString(Utils::getFileSize(tmp) - output.tellg());
 }
 
-void CGI::execute(void)
+std::string CGI::execute(void)
 {
 	std::string	bin;
-	// std::string	out;
 
 	std::srand(std::time(NULL));
 	tmp = "/tmp/output-" + Utils::numberToString(rand());
@@ -106,6 +105,7 @@ void CGI::execute(void)
 		throw ResponseErrorException(InternalServerError);
 	traceCGIProcess(pid);
 	prepareResponse(tmp);
+	return (tmp);
 }
 
 void CGI::traceCGIProcess(pid_t pid)
