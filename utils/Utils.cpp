@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/04 16:28:47 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/28 22:25:43 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -358,4 +358,26 @@ std::string Utils::urlEncoding(const std::string& str)
 			encodedStr += str[i];
 	}
 	return encodedStr;
+}
+
+void Utils::deleteFolderContent(const std::string& path)
+{
+	DIR* currentDir = opendir(path.c_str());
+	dirent* dp;
+	std::string targetFile;
+	if (!isReadableFile(path))
+		throw FilePermissionDenied();
+	if (!currentDir)
+		return;
+	while ((dp = readdir(currentDir)))
+	{
+		targetFile = path + "/" + dp->d_name;
+		if (stringEndsWith(targetFile, ".") || stringEndsWith(targetFile, ".."))
+			continue;
+		if (!isDirectory(targetFile))
+			std::remove(targetFile.c_str());
+		else
+			deleteFolderContent(targetFile);
+	}
+	closedir(currentDir);
 }

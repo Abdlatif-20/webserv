@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/26 17:38:30 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/04 15:36:51 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/28 22:55:41 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,4 +70,31 @@ ssize_t myRead(std::ifstream& ifs, char* buff, size_t sz)
         buff[i++] = c;
     }
     return i;
+}
+
+void clear_folder_or_file(const std::string& path)
+{
+    if (!Utils::isReadableFile(path))
+        throw ResponseErrorException(FORBIDDEN);
+    if (!Utils::isDirectory(path))
+        std::remove(path.c_str());
+    else
+    {
+        DIR* currentDir = opendir(path.c_str());
+        dirent* dp;
+        std::string targetFile;
+        if (!currentDir)
+            throw ResponseErrorException(InternalServerError);
+        while ((dp = readdir(currentDir)))
+        {
+            if (dp->d_name == std::string(".") || dp->d_name == std::string(".."))
+                continue;
+            targetFile = path + "/" + dp->d_name;
+            if (!Utils::isDirectory(targetFile))
+                std::remove(targetFile.c_str());
+            else
+                Utils::deleteFolderContent(targetFile);
+        }
+        closedir(currentDir);
+    }
 }
