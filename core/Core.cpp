@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Core.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/27 13:20:39 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/29 16:06:45 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,6 +120,8 @@ void	Core::traceEvents(void)
 				if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].timeout()
 					|| (clients[checklist[i].fd].isResponseDone() && !clients[checklist[i].fd].isALive()))
 				{
+					if (clients[checklist[i].fd].timeout())
+						clients[checklist[i].fd].requestTimeout();
 					clients.erase(checklist[i].fd);
 					checklist.erase(checklist.begin() + i--);
 				}
@@ -130,7 +132,6 @@ void	Core::traceEvents(void)
 			{
 				clients.erase(checklist[i].fd);
 				checklist.erase(checklist.begin() + i--);
-				// std::cerr << "something went wrong: " << e.what() << std::endl;
 			}
 		}
 	}
