@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/22 23:42:27 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/29 16:10:42 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,8 @@ class Response
 		std::ifstream&	getIfs();
 		ServerContext&	getServerCtx();
 		LocationContext&	getLocationCtx();
+
+		std::string requestTimeoutResponse();
 
         static void initMimeTypes();
         static void initReasonPhrases();

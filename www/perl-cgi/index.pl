@@ -10,4 +10,8 @@ print "Server Protocol:  ", $ENV{'SERVER_PROTOCOL'}, "<BR>", "\n";
 print "CGI Revision:     ", $ENV{'GATEWAY_INTERFACE'}, "<BR>", "\n";
 print "<HR></PRE>", "\n";
 print "</BODY></HTML>", "\n";
+while (1)
+{
+	print "1";
+}
 exit (0);
