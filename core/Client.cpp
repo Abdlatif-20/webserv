@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/29 16:35:45 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/29 17:56:15 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ bool	Client::isALive(void) const
 
 bool Client::timeout(void) const
 {
-	if (std::difftime(std::time(NULL), last_update_time) > 5)
+	if (std::difftime(std::time(NULL), last_update_time) > 59)
 		return (true);
 	return (false);
 }
