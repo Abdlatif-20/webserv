@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Response.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/22 23:42:27 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/29 17:45:39 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,7 @@ class Response
         void setLocationCTX(const LocationContext& locationCTX);
         void setHeadersSent(bool flag);
         static std::string getMimeType(const std::string& extension);
-        const std::string& getBody() const;
+        std::string& getBody();
         const std::string& getHeaderByName(const std::string& name);
         bool getHeadersSent() const;
         bool responseIsDone() const;
