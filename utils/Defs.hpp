@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 14:36:15 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/28 22:34:19 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/29 13:46:52 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ enum StatusCodes
 	NotFound = 404,
     NoContent = 204,
     FORBIDDEN = 403,
+    BadGateway = 502,
 	BadRequest = 400,
 	LengthRequired = 411,
     PartialContent = 206,

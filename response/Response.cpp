@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/29 13:02:19 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/29 13:21:15 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -418,7 +418,7 @@ void Response::prepareDELETE()
     }
     if (!locationCTX.hasCGI(bodyPath))
     {
-        clear_folder_or_file(resource);
+        clear_folder_or_file(bodyPath);
         statusCode = NoContent;
         body = generateHtmlResponsePage();
         bodyPath.clear();
