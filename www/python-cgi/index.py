@@ -1,7 +1,7 @@
 #Import modules for CGI handling
-import cgi, cgitb
-form = cgi.FieldStorage()
-first_name = form.getvalue('user')
+# import cgi, cgitb
+# form = cgi.FieldStorage()
+# first_name = form.getvalue('user')
 print ("Status: 200 OK")
 print ("Content-type:text/html")
 print()
