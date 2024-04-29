@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:05 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/01 14:24:38 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/29 23:16:47 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,9 @@ class CGI
 		Request		*request;
 		Response	*response;
 
+		pid_t	pid;
 		Map	headers;
+		std::string		tmp;
 		std::string		dir;
 		std::string		path;
 		std::string		script;

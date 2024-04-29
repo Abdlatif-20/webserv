@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/29 15:46:36 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/29 23:53:27 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,24 +88,24 @@ void CGI::prepareResponse(std::string &out)
 			response->setStatusLine(HTTP_VERSION + value + CRLF);
 		ss.clear();
 	}
-	headers["content-length"] = Utils::numberToString(Utils::getFileSize("/tmp/output") - output.tellg());
+	headers["content-length"] = Utils::numberToString(Utils::getFileSize(tmp) - output.tellg());
 }
 
 void CGI::execute(void)
 {
-	pid_t	pid;
 	std::string	bin;
-	std::string	out;
+	// std::string	out;
 
-	out = "/tmp/output";
+	std::srand(std::time(NULL));
+	tmp = "/tmp/output-" + Utils::numberToString(rand());
 	bin = getBinPath();
 	if (access(bin.c_str(), F_OK | X_OK))
 		throw ResponseErrorException(BadGateway);
-	pid = runCGIProcess(bin, out);
+	pid = runCGIProcess(bin, tmp);
 	if (pid < 0)
 		throw ResponseErrorException(InternalServerError);
 	traceCGIProcess(pid);
-	prepareResponse(out);
+	prepareResponse(tmp);
 }
 
 void CGI::traceCGIProcess(pid_t pid)
@@ -255,4 +255,5 @@ void CGI::setPath(char **_env)
 CGI::~CGI(void)
 {
 	std::remove(request->getBodyPath().c_str());
+	kill(pid, SIGKILL);
 }

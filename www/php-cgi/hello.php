@@ -11,7 +11,7 @@
 		<?php
 			echo "hello world";
 		?>
+		<a href="/"> go back </a>
 	</div>
-	
 </body>
 </html>
