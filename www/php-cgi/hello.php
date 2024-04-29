@@ -3,20 +3,15 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
 	<link rel="stylesheet" href="/css/style.css">
+	<title>Document</title>
 </head>
 <body>
 	<div class="diva">
 		<?php
-			echo "<h2>PHP example</h2>";
+			echo "hello world";
 		?>
-		<div class="div">
-			<a href="hello.php">HelloWorld</a>
-			<a href="cookies.php">Cookies</a>
-			<a href="session.php">Session</a>
-		</div>
 	</div>
-
+	
 </body>
 </html>

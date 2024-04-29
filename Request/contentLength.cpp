@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   contentLength.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:44:54 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/27 12:31:05 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/29 21:53:00 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,6 @@ void	Request::ContentLength()
 	String randomStr = Utils::numberToString(std::rand() % 1000);
 	std::ofstream file;
 	String path = requestLine["path"];
-	String extension = "";
 	size_t pos = _body.find(CRLF);
 
 	if (pos != std::string::npos)
@@ -73,10 +72,10 @@ void	Request::ContentLength()
 		else
 		{
 			path = path.substr(1);
-			pos = path.find_last_of(".");
-			if (pos != String::npos)
-				extension = path.substr(pos + 1);
-			path = this->_path + path.substr(0, pos) + "." + extension;
+			size_t findSlash = path.find_last_of("/");
+			if (findSlash == std::string::npos)
+				return;
+			path = this->_path + path.substr(findSlash + 1);
 			if (!fileExists(path))
 				file.open(path, std::ios::app);
 			else
