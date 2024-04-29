@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/29 16:06:45 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/29 17:55:48 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,6 @@ void	Core::traceEvents(void)
 	size_t	i;
 	servers_it	it;
 
-	std::cout << "Server is running ..." << std::endl;
 	while (true)
 	{
 		for (it = servers.begin(); it !=  servers.end(); it++)
@@ -110,23 +109,21 @@ void	Core::traceEvents(void)
 		{
 			try
 			{
+				Client &client = clients[checklist[i].fd];
 				if (checklist[i].revents & POLLIN)
+					client.recvRequest();
+				if ((checklist[i].revents & POLLOUT) && client.isRequestDone())
+					client.sendResponse();
+				if (checklist[i].revents & POLLHUP || client.timeout()
+					|| (client.isResponseDone() && !client.isALive()))
 				{
-					clients[checklist[i].fd].recvRequest();
-				}
-				// std::cout << clients[checklist[i].fd].isRequestDone() << std::endl;
-				if ((checklist[i].revents & POLLOUT) && clients[checklist[i].fd].isRequestDone())
-					clients[checklist[i].fd].sendResponse();
-				if (checklist[i].revents & POLLHUP || clients[checklist[i].fd].timeout()
-					|| (clients[checklist[i].fd].isResponseDone() && !clients[checklist[i].fd].isALive()))
-				{
-					if (clients[checklist[i].fd].timeout())
-						clients[checklist[i].fd].requestTimeout();
+					if (client.timeout())
+						client.requestTimeout();
 					clients.erase(checklist[i].fd);
 					checklist.erase(checklist.begin() + i--);
 				}
 				else
-					clients[checklist[i].fd].reset();
+					client.reset();
 			}
 			catch(const Fail &e)
 			{
