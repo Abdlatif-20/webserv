@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/30 00:11:43 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/30 12:17:27 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -499,6 +499,7 @@ void Response::resetResponse()
     headers.clear();
     bodyPath.clear();
     location.clear();
+	std::remove(cgiOutputPath.c_str());
 	cgiOutputPath.clear();
     isRanged = false;
     startOffset = 0;

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/16 15:14:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/29 21:55:50 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/30 12:10:40 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,9 @@ static void isValidPort(const std::string& str)
         throw LogicalErrorException("no port in `listen` directive");
     if (!isNumber(str))
             throw LogicalErrorException("invalid port `" + str + "` of the listen directive");
-    // int port = std::atoi(str.c_str());
-    // if (port < 1024 || port > 65536)
-    //     throw LogicalErrorException("the port is registred or out of range");
+    long long port = Utils::strToll(str);
+    if (port <= 0 || port > 65536)
+        throw LogicalErrorException("the port is out of range");
 }
 
 static void checkListen(const std::string& str)
