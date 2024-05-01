@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:16:42 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/28 21:28:07 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/05/01 13:11:08 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,7 @@ namespace Utils
 	unsigned int hexToInt(const std::string& hex);
 	void deleteFolderContent(const std::string& path);
 	std::string urlEncoding(const std::string& str);
+	std::string getOperatingSystem();
 	class FileNotFoundException : public std::exception {};
 	class FilePermissionDenied : public std::exception {};
 	class PathIsDirectory : public std::exception {};

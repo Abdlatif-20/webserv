@@ -6,11 +6,13 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 13:17:03 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/28 22:25:43 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/05/01 13:11:02 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
+
+std::string OS = "macOS";
 
 std::string Utils::envName(std::string str)
 {
@@ -380,4 +382,16 @@ void Utils::deleteFolderContent(const std::string& path)
 			deleteFolderContent(targetFile);
 	}
 	closedir(currentDir);
+}
+
+std::string Utils::getOperatingSystem()
+{
+	#ifdef __APPLE__
+		return "macOS";
+	#elif defined(__linux__)
+		return "Linux";
+	#elif defined(_WIN32)
+		return "Windows";
+	#endif
+	return "Unix";
 }
