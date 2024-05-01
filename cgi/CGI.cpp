@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:20 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/22 23:40:17 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/30 00:05:54 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,36 +88,45 @@ void CGI::prepareResponse(std::string &out)
 			response->setStatusLine(HTTP_VERSION + value + CRLF);
 		ss.clear();
 	}
-	headers["content-length"] = Utils::numberToString(Utils::getFileSize("/tmp/output") - output.tellg());
+	headers["content-length"] = Utils::numberToString(Utils::getFileSize(tmp) - output.tellg());
 }
 
-void CGI::execute(void)
+std::string CGI::execute(void)
 {
-	pid_t	pid;
 	std::string	bin;
-	std::string	out;
 
-	out = "/tmp/output";
+	std::srand(std::time(NULL));
+	tmp = "/tmp/output-" + Utils::numberToString(rand());
 	bin = getBinPath();
-	pid = runCGIProcess(bin, out);
+	if (access(bin.c_str(), F_OK | X_OK))
+		throw ResponseErrorException(BadGateway);
+	pid = runCGIProcess(bin, tmp);
 	if (pid < 0)
 		throw ResponseErrorException(InternalServerError);
 	traceCGIProcess(pid);
-	prepareResponse(out);
+	prepareResponse(tmp);
+	return (tmp);
 }
 
 void CGI::traceCGIProcess(pid_t pid)
 {
 	int	status;
 	time_t	start;
+	bool	killed = false;
 
 	start = std::time(NULL);
 	while (!waitpid(pid, &status, WNOHANG))
 	{
-		if (std::difftime(std::time(NULL), start) > 60)
-			kill(pid, SIGKILL);
+		if (std::difftime(std::time(NULL), start) > locationctx.getCGI_timeout())
+		{
+			if (kill(pid, SIGKILL))
+				throw ResponseErrorException(InternalServerError);
+			killed = true;
+		}
 	}
-	// if (WIFEXITED(status))
+	std::remove(request->getBodyPath().c_str());
+	if (killed)
+		throw ResponseErrorException(GetwayTimeout);
 }
 
 pid_t CGI::runCGIProcess(std::string &bin, std::string __unused &out)
@@ -144,11 +153,25 @@ pid_t CGI::runCGIProcess(std::string &bin, std::string __unused &out)
 			close(_out);
 			exit(2);
 		}
-		dup2(_out, 1);
+		if (dup2(_out, 1) < 0)
+		{
+			close(_in);
+			close(_out);
+			exit(2);
+		}
 		if (_in != -1337)
-			dup2(_in, 0);
+		{
+			if (dup2(_in, 0) < 0)
+			{
+				close(_in);
+				close(_out);
+				exit(2);
+			}
+			close(_in);
+		}
+		else
+			close(0);
 		close(_out);
-		close(_in);
 		if (chdir(dir.c_str()) != 0)
 			exit(1);
 		if (execve(args[0], args, envv.data()) != 0)
@@ -170,10 +193,10 @@ void CGI::setupEnv(std::string bodyPath)
 		env.push_back("REQUEST_METHOD=" + request->getMethod());
 		env.push_back("QUERY_STRING=" + request->getQueryString());
 		env.push_back("SERVER_PROTOCOL=" + request->getProtocol());
-		// env.push_back("PATH_INFO=" +  path.substr(0, path.find_last_of('/')));
-		env.push_back("SCRIPT_FILENAME=" + path);
+		env.push_back("PATH_INFO=" +  path.substr(0, path.find_last_of('/')));
+		env.push_back("SCRIPT_FILENAME=" + script);
 		env.push_back("SCRIPT_NAME=" + script);
-		env.push_back("DOCUMENT_ROOT=" + path);
+		env.push_back("DOCUMENT_ROOT=" + dir);
 		env.push_back("CONTENT_TYPE=" + request->getHeaderByName("content-type"));
 		env.push_back("CONTENT_LENGTH=" + request->getHeaderByName("content-length"));
 		env.push_back("REDIRECT_STATUS=" + Utils::numberToString(request->getStatus()));
@@ -198,6 +221,8 @@ void CGI::processFilePath(std::string &str)
 	std::stringstream ss(str);
 	std::string	name;
 
+	if (str[0] != '/')
+		path = '.';
 	while (std::getline(ss,name, '/'))
 	{
 		if (name.empty())
@@ -229,4 +254,6 @@ void CGI::setPath(char **_env)
 
 CGI::~CGI(void)
 {
+	std::remove(request->getBodyPath().c_str());
+	kill(pid, SIGKILL);
 }

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/01 21:56:37 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/22 23:41:54 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/29 16:38:29 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,6 +108,7 @@ Request& Request::operator=(const Request& obj)
 
 Request::~Request()
 {
+	std::remove(this->_pathTmpFile.c_str());
 }
 
 /* *************************** getters *************************** */
@@ -174,10 +175,14 @@ const String Request::getHeaderByName(const String& name) const
 	return ("");
 }
 
+std::string Request::getParams()
+{
+	return _params;
+}
+
 bool Request::hasCgi()
 {
 	std::string	resource = locationCTX.getRoot() + Utils::urlDecoding(getRequestPath());
-	std::cout << resource << std::endl;
 	if (!Utils::checkIfPathExists(resource))
 		return (false);
 	if (Utils::isDirectory(resource))
@@ -188,10 +193,7 @@ bool Request::hasCgi()
 			if (index.empty())
 				return (false);
 			if (locationCTX.hasCGI(Utils::getFileExtension(index)))
-			{
-				std::cout << "haz" << std::endl;
 				return true;
-			}
 		}
 		catch (...)
 		{
@@ -199,10 +201,7 @@ bool Request::hasCgi()
 		}
 	}
 	if (locationCTX.hasCGI(Utils::getFileExtension(resource)))
-	{
-		std::cout << "haz" << std::endl;
 		return true;
-	}
 	return false;
 }
 
@@ -301,6 +300,7 @@ void	Request::resetRequest()
 	this->lastTime = std::time(NULL);
 	this->_requestIsWellFormed = false;
 	this->requestLineInProgress = false;
+	std::remove(this->_pathTmpFile.c_str());
 	this->_path.clear();
 	this->_body.clear();
 	this->queryString.clear();
@@ -337,7 +337,7 @@ void	Request::selectServerContext(const String& host)
 		if (name != hosts.end())
 		{
 			serverCTX = it->getServerCTX();
-			break;
+			return;
 		}
 		it++;
 	}
@@ -362,7 +362,6 @@ void	Request::parseRequest(const std::string& receivedRequest, ServerContext ser
 	std::srand(time(NULL));
 	if (!this->requestLineDone || !this->headersDone || !this->_requestIsWellFormed)
 	{
-		/* L body i9dar ikoun f GET wla delete 3la 7ssab CGI !!! */
 		if (takingRequests(receivedRequest))
 		{
 			if (detectHost > 1)
@@ -387,7 +386,7 @@ void	Request::parseRequest(const std::string& receivedRequest, ServerContext ser
 		}
 		if (!this->_body.empty())
 			parseBody();
-		if (receivecount == 1)
-			receivecount++;
+		receivecount == 1 ? receivecount++ : 0;
+		!contentLength ? this->bodyDone = true, this->requestIscomplete = true : 0;
 	}
 }

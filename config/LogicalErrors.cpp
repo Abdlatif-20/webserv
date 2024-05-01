@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   LogicalErrors.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/16 15:14:35 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/06 21:12:49 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/30 12:10:40 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,9 +41,9 @@ static void isValidPort(const std::string& str)
         throw LogicalErrorException("no port in `listen` directive");
     if (!isNumber(str))
             throw LogicalErrorException("invalid port `" + str + "` of the listen directive");
-    int port = std::atoi(str.c_str());
-    if (port < 1024 || port > 65536)
-        throw LogicalErrorException("the port is registred or out of range");
+    long long port = Utils::strToll(str);
+    if (port <= 0 || port > 65536)
+        throw LogicalErrorException("the port is out of range");
 }
 
 static void checkListen(const std::string& str)
@@ -141,7 +141,7 @@ static void checkErrorPages(Context& ctx)
                 std::string key = it->first;
                 int status = std::atoi(key.c_str());
                 if (checkIntOverflow(key) || status < 400 || status > 507)
-                    throw LogicalErrorException("invalid value status code `error_page` directive");
+                    throw LogicalErrorException("invalid status code for `error_page` directive");
             }
             it++;
         }

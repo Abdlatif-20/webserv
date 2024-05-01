@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   boundary.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/10 23:45:02 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/23 00:33:57 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/29 16:25:47 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,13 +88,19 @@ void Request::parseBoundary()
 		tmpFiles.push_back(_pathTmpFile);
 		_BoundaryComplete = true;
 	}
+	
 	if (!this->_BoundaryComplete)
-		return(receivecount++, void());
-	if (hasCgi())
 	{
-		requestIscomplete = true;
-		return ;
+		if (bodySize >= contentLength)
+			return (status = BadRequest, requestIscomplete = true,
+			std::remove(_pathTmpFile.c_str()), void());
+		return(receivecount++, void());
 	}
+	if (bodySize != contentLength && !chunkedBoundary)
+		return (status = BadRequest, requestIscomplete = true,
+			std::remove(_pathTmpFile.c_str()), void());
+	if (hasCgi())
+		return (requestIscomplete = true, void());
 	if (bodySize != contentLength && !chunkedBoundary)
 		return (status = BadRequest, requestIscomplete = true,
 			std::remove(_pathTmpFile.c_str()), void());
@@ -102,7 +108,10 @@ void Request::parseBoundary()
 	if (fd == -1)
 		return (status = InternalServerError, requestIscomplete = true, void());
 	ssize_t bytesRead = 0;
-	String boundary = _headers["content-type"].substr(30);
+	size_t pos = _headers["content-type"].find("boundary=");
+	String boundary = _headers["content-type"].substr(pos + 9);
+	if (boundary.empty())
+		return (status = BadRequest, requestIscomplete = true, void());
 	String startBoundary = "--" + boundary;
 	String endBoundary = startBoundary + "--";
 	int file = -1;

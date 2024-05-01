@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/16 12:15:11 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/04/29 12:59:14 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,12 +124,12 @@ std::string Context::getIndex(const std::string& path)
     }
     if (getRoot() == "www/")
     {
-        indexPath = getRoot() + "html/index.html";
+        indexPath = getRoot() + "index.html";
         if (!Utils::checkIfPathExists(indexPath))
             throw Utils::FileNotFoundException();
         if (Utils::isDirectory(indexPath) || !Utils::isReadableFile(indexPath))
             throw Utils::FilePermissionDenied();
-        return "html/index.html";
+        return "index.html";
     }
     return "";
 }
@@ -264,10 +264,7 @@ unsigned int Context::getCGI_timeout()
     DirectivesMap::iterator it = directives.find("cgi_max_timeout");
     if (it != directives.end())
     {
-        int t = std::atoi(it->second.begin()->c_str());
-        if (t < 30)
-            t = 30;
-        return t;
+        return std::atoi(it->second.begin()->c_str());
     }
-    return 60;
+    return 30;
 }

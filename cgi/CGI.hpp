@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/03/27 16:38:05 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/01 14:24:38 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/30 00:03:25 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,9 @@ class CGI
 		Request		*request;
 		Response	*response;
 
+		pid_t	pid;
 		Map	headers;
+		std::string		tmp;
 		std::string		dir;
 		std::string		path;
 		std::string		script;
@@ -44,11 +46,11 @@ class CGI
 
 		CGI&	operator=(const CGI& cpy);
 
+		std::string	execute(void);
 		std::string	getBinPath(void);
 
 		pid_t	runCGIProcess(std::string &bin, std::string &output);
 
-		void	execute(void);
 		void	traceCGIProcess(pid_t	pid);
 		void	setupEnv(std::string bodyPath);
 		void	prepareResponse(std::string &out);

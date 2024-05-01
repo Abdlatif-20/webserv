@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/11 17:23:29 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/23 00:42:59 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/29 15:56:09 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,10 @@ void	Request::requestIsWellFormed()
 			return (this->status = BadRequest, requestIscomplete = true, void());
 	}
 	isMethodAllowedInLocation();
+	status == 200? _requestIsWellFormed = true : _requestIsWellFormed = false;
 	if (this->requestLine["method"] != "POST" && this->_requestIsWellFormed
 			&& this->headersDone && this->requestLineDone)
 		this->requestIscomplete = true;
-	status == 200? _requestIsWellFormed = true : _requestIsWellFormed = false;
 }
 
 //function to find the uri in the config file and set the status to true if found

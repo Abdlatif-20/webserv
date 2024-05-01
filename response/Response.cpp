@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/22 23:44:28 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/30 12:17:27 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,11 +43,13 @@ Response& Response::operator=(const Response& obj)
     if (this == &obj)
         return *this;
 	env = obj.env;
+	cgiOutputPath = obj.cgiOutputPath;
 	CGIWorking = obj.CGIWorking;
     request = obj.request;
     serverCTX = obj.serverCTX;
     locationCTX = obj.locationCTX;
     statusCode = obj.statusCode;
+    statusLine = obj.statusLine;
     responseDone = obj.responseDone;
     headers = obj.headers;
     headersSent = obj.headersSent;
@@ -68,6 +70,7 @@ Response& Response::operator=(const Response& obj)
 Response::~Response()
 {
     ifs.close();
+	std::remove(cgiOutputPath.c_str());
 }
 
 void Response::setRequest(Request* request)
@@ -98,7 +101,7 @@ std::string Response::getMimeType(const std::string& extension)
     return it->second;
 }
 
-const std::string& Response::getBody() const
+std::string& Response::getBody()
 {
     return body;
 }
@@ -216,13 +219,15 @@ void Response::prepareBody()
         throw ResponseErrorException(InternalServerError);
     if (!readedBytes || (isRanged && sendedBytes >= endOffset - startOffset))
     {
+		
         body.clear();
         ifs.close();
         responseDone = true;
+		std::remove(cgiOutputPath.c_str());
         return;
     }
     body.clear();
-    body.append(buffer, readSize);
+    body.append(buffer, readedBytes);
     sendedBytes += readedBytes;
 }
 
@@ -312,9 +317,9 @@ void Response::runCGI()
 {
 	CGI cgi(this, request);
 
-	cgi.setupEnv(bodyPath);
-	cgi.execute();
 	CGIWorking = true;
+	cgi.setupEnv(bodyPath);
+	cgiOutputPath = cgi.execute();
 }
 
 void Response::prepareRanged()
@@ -342,7 +347,7 @@ void Response::prepareRanged()
 
 void Response::preparePOST()
 {
-    if (!locationCTX.getUploadStore().empty())
+    if (!locationCTX.getUploadStore().empty() && !locationCTX.getCGI().size())
     {
         statusCode = Created;
         body = generateHtmlResponsePage();
@@ -362,9 +367,8 @@ void Response::preparePOST()
                 try
                 {
                     std::string index = locationCTX.getIndex(resource);
-                    if (index.empty() )
+                    if (index.empty())
                         throw Utils::FilePermissionDenied();
-                    /* Request BODY goes to CGI !! */
 					if (!locationCTX.hasCGI(index))
 						headers["content-type"] = "text/plain";
 					bodyPath = resource + index;
@@ -388,39 +392,41 @@ void Response::preparePOST()
 
 void Response::prepareDELETE()
 {
-        std::string resource = locationCTX.getRoot() + Utils::urlDecoding(request->getRequestPath());
-        if (!Utils::checkIfPathExists(resource))
-            throw ResponseErrorException(NotFound);
-        if (Utils::isDirectory(resource))
-        {
-            if (!Utils::stringEndsWith(resource, "/"))
-                prepareRedirection(MovedPermanently, request->getRequestPath() + "/");
-            else
-            {
-                try
-                {
-                    std::string index = locationCTX.getIndex(resource);
-                    if (index.empty() )
-                        throw Utils::FilePermissionDenied();
-                    /* Request BODY goes to CGI !! */
-					if (!locationCTX.hasCGI(index))
-						headers["content-type"] = "text/plain";
-					bodyPath = resource + index;
-                	statusCode = OK;
-                }
-                catch (const std::exception& e)
-                {
-                    throw ResponseErrorException(FORBIDDEN);
-                }
-            }
-        }
+    std::string resource = locationCTX.getRoot() + Utils::urlDecoding(request->getRequestPath());
+    if (!Utils::checkIfPathExists(resource))
+        throw ResponseErrorException(NotFound);
+    if (Utils::isDirectory(resource))
+    {
+        if (!Utils::stringEndsWith(resource, "/"))
+            prepareRedirection(MovedPermanently, request->getRequestPath() + "/");
         else
         {
-            if (!locationCTX.hasCGI(resource))
-				headers["content-type"] = "text/plain";
-			bodyPath = resource;
-            statusCode = OK;
+            try
+            {
+                std::string index = locationCTX.getIndex(resource);
+                if (index.empty() && locationCTX.hasCGI(index))
+                    throw ResponseErrorException(FORBIDDEN);
+				bodyPath = resource + index;
+                statusCode = OK;
+            }
+            catch (const std::exception& e)
+            {
+                throw ResponseErrorException(FORBIDDEN);
+            }
         }
+    }
+    else
+    {
+		bodyPath = resource;
+        statusCode = OK;
+    }
+    if (!locationCTX.hasCGI(bodyPath))
+    {
+        clear_folder_or_file(bodyPath);
+        statusCode = NoContent;
+        body = generateHtmlResponsePage();
+        bodyPath.clear();
+    }
 }
 
 void Response::prepareResponse()
@@ -487,11 +493,14 @@ void Response::resetResponse()
     headersSent = false;
     responseDone = false;
     isRedirection = false;
+    statusLine.clear();
 	env.clear();
     body.clear();
     headers.clear();
     bodyPath.clear();
     location.clear();
+	std::remove(cgiOutputPath.c_str());
+	cgiOutputPath.clear();
     isRanged = false;
     startOffset = 0;
     endOffset = 0;
@@ -529,6 +538,16 @@ LocationContext &Response::getLocationCtx()
 	return (locationCTX);
 }
 
+std::string Response::requestTimeoutResponse()
+{
+	std::string resp;
+	statusCode = RequestTimeout;
+	body = generateHtmlResponsePage();
+	prepareHeaders();
+	resp = headersToString() + body;
+	return (resp);
+}
+
 void Response::initReasonPhrases()
 {
     /* Informational */
@@ -555,7 +574,7 @@ void Response::initReasonPhrases()
     reasonPhrases[402] = "Payment Required";
     reasonPhrases[403] = "Forbidden";
     reasonPhrases[404] = "Not Found";
-    reasonPhrases[405] = "Not Allowed";
+    reasonPhrases[405] = "Method Not Allowed";
     reasonPhrases[406] = "Not Acceptable";
     reasonPhrases[407] = "Proxy Authentication Required";
     reasonPhrases[408] = "Request Timeout";

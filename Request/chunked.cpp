@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   chunked.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aben-nei <aben-nei@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 16:42:03 by aben-nei          #+#    #+#             */
-/*   Updated: 2024/04/22 23:26:20 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/29 15:47:36 by aben-nei         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ bool	Request::writeInfile(int fdFile)
 		}
 		else
 		{
+			std::string tmp = _body.substr(0, remainingChunkLength);
 			write(fdFile, _body.c_str(), remainingChunkLength);
 			_body.erase(0, remainingChunkLength + 2);
 			remainingChunkLength = 0;
@@ -50,10 +51,7 @@ void	Request::parseChunkedBody()
 	if (!_chunkedComplete)
 		return(receivecount++, void());
 	if (hasCgi())
-	{
-		requestIscomplete = true;
-		return ;
-	}
+		return (requestIscomplete = true, void());
 	int fd = open(this->_pathTmpFile.c_str(), O_RDONLY);
 	if (fd == -1)
 		return (status = InternalServerError, requestIscomplete = true, void());

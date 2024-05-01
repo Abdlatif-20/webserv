@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/22 23:42:27 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/04/30 00:09:15 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ class Response
         std::map<std::string, std::string> headers;
         std::string body;
         std::string bodyPath;
+		std::string cgiOutputPath;
         bool headersSent;
         bool responseDone;
         bool isWorking;
@@ -80,7 +81,7 @@ class Response
         void setLocationCTX(const LocationContext& locationCTX);
         void setHeadersSent(bool flag);
         static std::string getMimeType(const std::string& extension);
-        const std::string& getBody() const;
+        std::string& getBody();
         const std::string& getHeaderByName(const std::string& name);
         bool getHeadersSent() const;
         bool responseIsDone() const;
@@ -96,6 +97,8 @@ class Response
 		std::ifstream&	getIfs();
 		ServerContext&	getServerCtx();
 		LocationContext&	getLocationCtx();
+
+		std::string requestTimeoutResponse();
 
         static void initMimeTypes();
         static void initReasonPhrases();
