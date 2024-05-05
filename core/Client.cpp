@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
+/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/21 12:41:41 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/29 18:00:34 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/05/05 12:06:55 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ ssize_t Client::recvRequest(void)
 	if (len < 0)
 		throw (Fail("send fails"));
 	request.parseRequest(std::string(buff, len), serverCTX);
-	last_update_time = std::time(NULL); // to think about later
+	last_update_time = std::time(NULL);
 	requestDone = request.isDone();
 	responseDone = false;
 	return (len);
@@ -63,7 +63,7 @@ void	Client::sendResponse(void)
 		response.setServerCTX(request.getServerCTX());
 		response.setLocationCTX(request.getLocationCtx());
 		response.prepareResponse();
-		if (!response.getHeadersSent())
+		if (!response.getHeadersSent() && response.headersToString() != "\r\n")
 		{
 			std::string headers = response.headersToString();
 			response.getBody().insert(0, headers);

@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/30 12:17:27 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/05/05 12:49:10 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ std::map<std::string, std::string> Response::mimeTypes;
 
 Response::Response()
 {
+	cgi = new CGI;
     request = NULL;
     statusCode = 200;
     responseDone = false;
@@ -42,6 +43,7 @@ Response& Response::operator=(const Response& obj)
 {
     if (this == &obj)
         return *this;
+	*cgi = *obj.cgi;
 	env = obj.env;
 	cgiOutputPath = obj.cgiOutputPath;
 	CGIWorking = obj.CGIWorking;
@@ -70,6 +72,7 @@ Response& Response::operator=(const Response& obj)
 Response::~Response()
 {
     ifs.close();
+	delete cgi;
 	std::remove(cgiOutputPath.c_str());
 }
 
@@ -164,7 +167,7 @@ void Response::generateResponseError()
 
 void Response::prepareHeaders()
 {
-    if (headersSent)
+    if (headersSent || (CGIWorking && !cgi->isDone()))
         return;
 	if (statusLine.empty())
 		statusLine = std::string(HTTP_VERSION) + SPACE + Utils::numberToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
@@ -189,8 +192,11 @@ void Response::prepareHeaders()
 
 void Response::prepareBody()
 {
-	if (statusCode == 200 && locationCTX.hasCGI(bodyPath) && !CGIWorking)
+	if (statusCode == 200 && locationCTX.hasCGI(bodyPath))
 		runCGI();
+	if (CGIWorking && !cgi->isDone())
+		return ;
+	CGIWorking = false;
     if (bodyPath.empty())
     {
         responseDone = true;
@@ -315,11 +321,14 @@ void Response::autoIndex(const std::string& path)
 
 void Response::runCGI()
 {
-	CGI cgi(this, request);
-
-	CGIWorking = true;
-	cgi.setupEnv(bodyPath);
-	cgiOutputPath = cgi.execute();
+	if (!CGIWorking)
+	{
+		cgi->setup(this, request);
+		cgi->setupEnv(bodyPath);
+		cgiOutputPath = cgi->execute();
+		CGIWorking = true;
+	}
+	cgi->waitForCGI();
 }
 
 void Response::prepareRanged()
@@ -495,6 +504,7 @@ void Response::resetResponse()
     isRedirection = false;
     statusLine.clear();
 	env.clear();
+	cgi->reset();
     body.clear();
     headers.clear();
     bodyPath.clear();
