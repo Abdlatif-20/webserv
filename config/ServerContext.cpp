@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 10:40:09 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/05 00:36:00 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/05/01 19:26:35 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ ServerContext& ServerContext::operator=(const ServerContext& obj)
 
 ServerContext::~ServerContext()
 {
-
+    locations.clear();
 }
 
 /* The `void ServerContext::addLocation(LocationContext location)` function in the `ServerContext`

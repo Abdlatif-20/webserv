@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 11:15:21 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 22:12:44 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/05/01 22:53:59 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ void Lexer::getToken(const std::string& line, size_t lineIndex)
 /* The `TokensVector Lexer::tokenize(const std::string& configFile)` function in the `Lexer` class is
 responsible for reading a configuration file specified by `configFile`, tokenizing each line of the
 file, and returning a vector of tokens. */
-TokensVector Lexer::tokenize(const std::string& configFile)
+TokensVector& Lexer::tokenize(const std::string& configFile)
 {
     std::ifstream ifs(configFile);
     std::string line;
@@ -68,6 +68,7 @@ TokensVector Lexer::tokenize(const std::string& configFile)
 
     if (!ifs.good())
         throw std::runtime_error("Error: this file `" + configFile + "` doesn't exists!");
+    tokens.clear();
     while (std::getline(ifs, line))
     {
         getToken(line, lineIndex);

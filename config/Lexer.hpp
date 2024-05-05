@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/29 11:15:12 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/08 14:19:37 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/05/01 22:46:18 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,5 +28,5 @@ class Lexer
 
         static TokensVector tokens;
     public:
-        static TokensVector tokenize(const std::string& configFile);
+        static TokensVector& tokenize(const std::string& configFile);
 };

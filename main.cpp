@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/27 16:26:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/05/01 13:19:39 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/05/05 16:04:26 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,20 @@ int main(int argc, char **argv, char  **env)
 		else if (argc > 2)
 			throw Fail("invalid number of args");
 		Config	_config(configPath);
-		Core core(_config);
-		core.run();
+		Core _core;
+		while (true)
+		{
+			_config.parseConfigFile();
+			_core.setConfig(_config);
+			_core.run();
+			_core.resetCore();
+			_config.resetConfig();
+		}
 	}
 	catch(const std::exception& e)
 	{
 		std::cerr << e.what() << '\n';
+		std::exit(EXIT_FAILURE);
 	}
 	return 0;
 }

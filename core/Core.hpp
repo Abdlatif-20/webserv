@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:21:50 by houmanso          #+#    #+#             */
-/*   Updated: 2024/03/23 20:58:03 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/05/01 22:05:31 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,8 @@ class Core
 
 		void	run(void);
 		void	traceEvents(void);
+		void	setConfig(Config& conf);
+		void	resetCore();
 
 		// bool	countainHost(const server& server);
 		Core&	operator=(const Core& cpy);

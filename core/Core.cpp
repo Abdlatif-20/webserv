@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Core.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/15 17:22:17 by houmanso          #+#    #+#             */
-/*   Updated: 2024/04/29 17:55:48 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/05/02 13:13:06 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,9 @@ void	Core::traceEvents(void)
 	int	hooks;
 	size_t	i;
 	servers_it	it;
+	std::string tmp = Utils::get_last_modified_date(config.getConfigPath());
 
-	while (true)
+	while (tmp == Utils::get_last_modified_date(config.getConfigPath()))
 	{
 		for (it = servers.begin(); it !=  servers.end(); it++)
 		{
@@ -132,6 +133,27 @@ void	Core::traceEvents(void)
 			}
 		}
 	}
+}
+
+void	Core::setConfig(Config& conf)
+{
+	ServersVector::iterator	it;
+	config = conf;
+	serversConf = conf.getServers();
+	it = serversConf.begin();
+	while (it != serversConf.end())
+		servers.push_back(Server(*it++));
+	std::sort(servers.begin(), servers.end());
+}
+
+void Core::resetCore()
+{
+	config.resetConfig();
+	serversConf.clear();
+	clients.clear();
+	checklist.clear();
+	servers.clear();
+	size = 0;
 }
 
 Core &Core::operator=(const Core &cpy)

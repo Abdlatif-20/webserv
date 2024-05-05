@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/02 11:31:01 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/02/18 13:44:07 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/05/01 19:58:22 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ LocationContext& LocationContext::operator=(const LocationContext& obj)
 
 LocationContext::~LocationContext()
 {
-
+    prefix.clear();
 }
 
 /* The `const std::string &LocationContext::getPrefix() const` function is a member function of the

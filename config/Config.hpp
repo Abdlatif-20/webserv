@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 11:06:08 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/03/30 22:41:12 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/05/01 19:12:46 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ class Config
     private:
         TokensVector tokens;
         ServersVector servers;
+        std::string configPath;
         
         void parseSingleValueDirectives(TokensVector::iterator& tok_iter, Context& ctx);
         void parseMultiValueDirectives(TokensVector::iterator& tok_iter, Context& ctx);
@@ -42,4 +43,7 @@ class Config
         ~Config();
 
         ServersVector& getServers();
+        const std::string&  getConfigPath();
+        void parseConfigFile();
+        void resetConfig();
 };

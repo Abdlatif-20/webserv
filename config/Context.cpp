@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 22:24:37 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/29 12:59:14 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/05/01 19:26:06 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,9 @@ Context& Context::operator=(const Context& obj)
 
 Context::~Context()
 {
-
+    directives.clear();
+    errorPages.clear();
+    cgi.clear();
 }
 
 /* `addDirective(Directive _directive)` is a member function of the `Context` class.

@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/05/01 13:19:18 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/05/04 13:03:42 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,9 +179,12 @@ void Response::prepareHeaders()
         setHeaderAttr("location", location);
     if (isRanged)
     {
-        setHeaderAttr("accept-ranges", "bytes");
-        setHeaderAttr("content-length", Utils::numberToString((endOffset - startOffset) + 1));
-        setHeaderAttr("content-range", "bytes " + Utils::numberToString(startOffset) + "-" + Utils::numberToString(endOffset) + "/" + Utils::numberToString(Utils::getFileSize(bodyPath)));
+        // setHeaderAttr("accept-ranges", "bytes");
+        // setHeaderAttr("content-length", Utils::numberToString((endOffset - startOffset) + 1));
+        // setHeaderAttr("content-range", "bytes " + Utils::numberToString(startOffset) + "-" + Utils::numberToString(endOffset) + "/" + Utils::numberToString(Utils::getFileSize(bodyPath)));
+        headers["accept-ranges"] = "bytes";
+        headers["content-length"] = Utils::numberToString((endOffset - startOffset) + 1);
+        headers["content-range"] = "bytes " + Utils::numberToString(startOffset) + "-" + Utils::numberToString(endOffset) + "/" + Utils::numberToString(Utils::getFileSize(bodyPath));
     }
 }
 
