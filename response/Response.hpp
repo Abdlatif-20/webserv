@@ -6,11 +6,12 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:24 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/04/30 00:09:15 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/05/04 11:17:48 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
+
 
 #include "CGI.hpp"
 #include "Request.hpp"
@@ -19,9 +20,12 @@
 #include <dirent.h>
 #include <map>
 
+class CGI;
+
 class Response
 {
     private:
+		CGI	*cgi;
         Request *request;
         ServerContext serverCTX;
         LocationContext locationCTX;

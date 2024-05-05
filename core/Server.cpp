@@ -6,7 +6,7 @@
 /*   By: mel-yous <mel-yous@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/14 19:55:56 by houmanso          #+#    #+#             */
-/*   Updated: 2024/05/01 19:07:36 by mel-yous         ###   ########.fr       */
+/*   Updated: 2024/05/05 16:07:56 by mel-yous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void Server::setupServer(void)
 	sockID = socket(AF_INET, SOCK_STREAM, 0);
 	if (sockID == -1)
 		throw(Fail("Failed to create socket"));
-	if (setsockopt(sockID, SOL_SOCKET, SO_REUSEPORT, &a, sizeof a) < 0 // check port
+	if (setsockopt(sockID, SOL_SOCKET, SO_REUSEADDR, &a, sizeof a) < 0 // check port
 		|| setsockopt(sockID, SOL_SOCKET, SO_NOSIGPIPE, &a, sizeof a) < 0)
 		throw(Fail("Failed to set options"));
 	for (; res != NULL; res = res->ai_next)
