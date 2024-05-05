@@ -6,7 +6,7 @@
 /*   By: houmanso <houmanso@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 14:07:22 by mel-yous          #+#    #+#             */
-/*   Updated: 2024/05/05 12:49:10 by houmanso         ###   ########.fr       */
+/*   Updated: 2024/05/05 15:57:14 by houmanso         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,7 +172,7 @@ void Response::prepareHeaders()
 	if (statusLine.empty())
 		statusLine = std::string(HTTP_VERSION) + SPACE + Utils::numberToString(statusCode) + SPACE + reasonPhrases[statusCode] + CRLF;
     setHeaderAttr("connection", request->getHeaderByName("connection"));
-    setHeaderAttr("server", std::string(SERVER) + " (" + OS_MAC + ")");
+    setHeaderAttr("server", std::string(SERVER) + " (" + Utils::getOperatingSystem() + ")");
     setHeaderAttr("date", Utils::getCurrentTime());
     setHeaderAttr("content-length", (bodyPath.empty() ? Utils::numberToString(body.size()) : Utils::numberToString(Utils::getFileSize(bodyPath))));
     setHeaderAttr("content-type", (bodyPath.empty() ? "text/html" : getMimeType(Utils::getFileExtension(bodyPath))));
